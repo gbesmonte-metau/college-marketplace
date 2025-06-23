@@ -1,0 +1,28 @@
+{
+  "name": "college-marketplace",
+  "version": "1.0.0",
+  "description": "Planning Doc: https://docs.google.com/document/d/1zlWDMXBCj3rGgjQJbbhuEm3zAJFYVIagDv3a1pcRTSY/edit?usp=sharing",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gbesmonte-metau/college-marketplace.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/gbesmonte-metau/college-marketplace/issues"
+  },
+  "homepage": "https://github.com/gbesmonte-metau/college-marketplace#readme",
+  "dependencies": {
+    "dotenv": "^16.5.0",
+    "express": "^4.21.2"
+  },
+  "type": "module",
+  "devDependencies": {
+    "prisma": "^6.10.1"
+  }
+}
