@@ -1,5 +1,4 @@
 import express from 'express';
-import dotenv from 'dotenv';
 import { PrismaClient } from '../generated/prisma/index.js'
 
 const prisma = new PrismaClient()
@@ -8,12 +7,12 @@ router.use(express.json())
 
 //TODO: CURRENTLY NOT TESTED
 //Create a new post
-app.post('/posts', async (req, res, next) => {
+router.post('/posts', async (req, res, next) => {
     const newPost = req.body;
     console.log(req.body);
     try {
         //check if post has all required fields
-        const newPostValid = (
+        const isNewPostValid = (
           newPost.price !== undefined &&
           newPost.category !== undefined &&
           newPost.name !== undefined &&
@@ -22,7 +21,7 @@ app.post('/posts', async (req, res, next) => {
           newPost.authorId !== undefined
         )
         //create post
-        if (newPostValid) {
+        if (isNewPostValid) {
           const created = await prisma.post.create({data:newPost})
           // Convert BigInt fields to strings for JSON serialization
           const response = {

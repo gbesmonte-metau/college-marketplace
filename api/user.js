@@ -45,6 +45,9 @@ router.post('/user/register', async (req, res, next) => {
           newUser.password !== undefined &&
           newUser.username !== undefined
         )
+        if (!isNewUserValid) {
+          next({ status: 422, message: 'New user is not valid' })
+        }
         //check if username or email is taken
         const userExists = await prisma.user.findMany({
             where: {
@@ -61,14 +64,10 @@ router.post('/user/register', async (req, res, next) => {
         //hash password
         const hash = await hashPassword(newUser.password)
         //create user
-        if (isNewUserValid) {
-            const created = await prisma.user.create({
-                data: {...newUser, password: hash}
-            })
-            res.status(201).json(created)
-        } else {
-          next({ status: 422, message: 'New user is not valid' })
-        }
+        const created = await prisma.user.create({
+            data: {...newUser, password: hash}
+        })
+        res.status(201).json(created)
       } catch (err) {
         next(err)
       }
