@@ -18,6 +18,8 @@
   },
   "homepage": "https://github.com/gbesmonte-metau/college-marketplace#readme",
   "dependencies": {
+    "@prisma/client": "^6.10.1",
+    "cors": "^2.8.5",
     "dotenv": "^16.5.0",
     "express": "^4.21.2"
   },
