@@ -23,6 +23,7 @@ model User {
   bio String?
   createdPosts Post[]
   Post_UserLikedPosts Post[] @relation("UserLikedPosts")
+  Post_UserSavedPosts Post[] @relation("UserSavedPosts")
 }
 
 model Post {
@@ -30,8 +31,8 @@ model Post {
   price Float
   category String
   name String
-  time_created BigInt
-  time_sold BigInt?
+  time_created String
+  time_sold String?
   location String
   description String?
   image_url String?
@@ -41,4 +42,5 @@ model Post {
   author   User @relation(fields: [authorId], references: [id])
   authorId Int
   User_UserLikedPosts User[] @relation("UserLikedPosts")
+  User_UserSavedPosts User[] @relation("UserSavedPosts")
 }

@@ -17,12 +17,7 @@ router.get('/posts/:id', async (req, res, next) => {
             }
         })
         if (post) {
-            const response = {
-              ...post,
-              time_created: post.time_created.toString(),
-              time_sold: post.time_sold ? post.time_sold.toString() : null
-            }
-            res.status(200).json(response)
+            res.status(200).json(post)
         } else {
             next({ status: 404, message: `No post found with ID ${postId}` })
         }
@@ -35,7 +30,6 @@ router.get('/posts/:id', async (req, res, next) => {
 //Create a new post
 router.post('/posts', async (req, res, next) => {
     const newPost = req.body;
-    console.log(req.body);
     try {
         //check if post has all required fields
         const isNewPostValid = (
@@ -49,13 +43,7 @@ router.post('/posts', async (req, res, next) => {
         //create post
         if (isNewPostValid) {
           const created = await prisma.post.create({data:newPost})
-          // Convert BigInt fields to strings for JSON serialization
-          const response = {
-            ...created,
-            time_created: created.time_created.toString(),
-            time_sold: created.time_sold ? created.time_sold.toString() : null
-          }
-          res.status(201).json(response)
+          res.status(201).json(created)
         } else {
           next({ status: 422, message: 'New post is not valid' })
         }
@@ -68,7 +56,7 @@ router.post('/posts', async (req, res, next) => {
 router.get('/posts/:id/likes', async (req, res, next) => {
     const postId = req.params.id;
     try {
-        const user = await prisma.post.findUnique({
+        const post = await prisma.post.findUnique({
             where: {
                 id: parseInt(postId)
             },
@@ -76,10 +64,40 @@ router.get('/posts/:id/likes', async (req, res, next) => {
                 User_UserLikedPosts: true
             }
         })
-        const usersLiked = user.User_UserLikedPosts;
-        res.status(200).json(usersLiked);
+        const usersLiked = post.User_UserLikedPosts;
+        if (usersLiked){
+          res.status(200).json(usersLiked);
+        }
+        else{
+          next({ status: 404, message: `No users liked post with ID ${postId}` })
+        }
     }
     catch (err) {
         next(err)
     }
+})
+
+//Get all users that saved post
+router.get('/posts/:id/saves', async (req, res, next) => {
+  const postId = req.params.id;
+  try {
+      const post = await prisma.post.findUnique({
+          where: {
+              id: parseInt(postId)
+          },
+          include: {
+              User_UserSavedPosts: true
+          }
+      })
+      const usersSaved = post.User_UserSavedPosts;
+      if (usersSaved){
+        res.status(200).json(usersSaved);
+      }
+      else{
+        next({ status: 404, message: `No users saved post with ID ${postId}` })
+      }
+  }
+  catch (err) {
+      next(err)
+  }
 })

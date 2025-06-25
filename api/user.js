@@ -33,35 +33,9 @@ router.get('/user', isAuthenticated, async (req, res, next) => {
         next(err)
     }
 })
-//Get all posts that user liked
-router.get('/user/:id/likes', async (req, res, next) => {
-    const userId = req.params.id;
-    try {
-        const user = await prisma.user.findUnique({
-            where: {
-                id: parseInt(userId)
-            },
-            include: {
-                Post_UserLikedPosts: true
-            }
-        })
-        const likedPosts = user.Post_UserLikedPosts;
-        let result = [];
-        for (const post of likedPosts){
-            result.push({
-                ...post,
-              time_created: post.time_created.toString(),
-              time_sold: post.time_sold ? post.time_sold.toString() : null
-            })
-        }
-        res.status(200).json(result);
-    }
-    catch (err) {
-        next(err)
-    }
-})
+
 //Get user information by ID
-router.get('/user/:id', async (req, res, next) => {
+router.get('/users/:id', async (req, res, next) => {
     const userId = req.params.id;
     try {
         const user = await prisma.user.findUnique({
@@ -81,9 +55,8 @@ router.get('/user/:id', async (req, res, next) => {
 })
 
 //Register a new user
-router.post('/user/register', async (req, res, next) => {
+router.post('/users/register', async (req, res, next) => {
     const newUser = req.body;
-    console.log(newUser)
     try {
         //check if user has all required fields
         const isNewUserValid = (
@@ -120,14 +93,13 @@ router.post('/user/register', async (req, res, next) => {
 })
 
 //Login user
-router.post('/user/login', async (req, res, next) => {
+router.post('/users/login', async (req, res, next) => {
     const { email, password } = req.body;
     const user = await prisma.user.findUnique({where: {email}});
     if (user) {
         const isValid = await verifyPassword(password, user.password);
         if (isValid) {
             req.session.user = user;
-            console.log(req.session)
             res.status(200).json({message: 'Login successful'});
         } else {
             next({ status: 401, message: 'Invalid credentials' });
@@ -166,8 +138,34 @@ router.patch('/user', isAuthenticated, async (req, res, next) => {
     }
 })
 
+//Get all posts that user liked
+router.get('/user/likes', isAuthenticated, async (req, res, next) => {
+    const userId = req.session.user.id;
+    console.log(req.session.user.id)
+    try {
+        const user = await prisma.user.findUnique({
+            where: {
+                id: parseInt(userId)
+            },
+            include: {
+                Post_UserLikedPosts: true
+            }
+        })
+        const likedPosts = user.Post_UserLikedPosts;
+        if (likedPosts){
+            res.status(200).json(likedPosts);
+        }
+        else{
+            next({ status: 404, message: `No liked posts` })
+        }
+    }
+    catch (err) {
+        next(err)
+    }
+})
+
 //Like a post
-router.post('/user/likes/:id', isAuthenticated, async (req, res, next) => {
+router.post('/user/like/:id', isAuthenticated, async (req, res, next) => {
     const userId = req.session.user.id;
     const postId = req.params.id;
     try {
@@ -180,6 +178,51 @@ router.post('/user/likes/:id', isAuthenticated, async (req, res, next) => {
             }
         })
         res.status(200).json({message: 'Post liked'})
+    }
+    catch (err) {
+        next(err)
+    }
+})
+
+//Get all posts that user saved
+router.get('/user/saves', isAuthenticated, async (req, res, next) => {
+    const userId = req.session.user.id;
+    try {
+        const user = await prisma.user.findUnique({
+            where: {
+                id: parseInt(userId)
+            },
+            include: {
+                Post_UserSavedPosts: true
+            }
+        })
+        const savedPosts = user.Post_UserSavedPosts;
+        if (savedPosts){
+            res.status(200).json(savedPosts);
+        }
+        else{
+            next({ status: 404, message: `No saved posts` })
+        }
+    }
+    catch (err) {
+        next(err)
+    }
+})
+
+//Save a post
+router.post('/user/save/:id', isAuthenticated, async (req, res, next) => {
+    const userId = req.session.user.id;
+    const postId = req.params.id;
+    try {
+        await prisma.user.update({
+            where: {id: userId},
+            data: {
+                Post_UserSavedPosts: {
+                    connect: {id: parseInt(postId)}
+                }
+            }
+        })
+        res.status(200).json({message: 'Post saved'})
     }
     catch (err) {
         next(err)

@@ -45,7 +45,7 @@ const fakeData = {
       price: 12.5,
       category: "Collectible",
       name: "Pikachu Plush Toy",
-      time_created: 1730000000,
+      time_created: "1730000000",
       time_sold: null,
       location: "Oakland, CA",
       description: "Soft Pikachu plush, great condition!",
@@ -53,27 +53,27 @@ const fakeData = {
       condition: "Like New",
       brand: "PokéMall",
       color: "Yellow",
-      authorId: 18
+      authorId: 1
     },
     {
       price: 45.0,
       category: "Game Card",
       name: "Charizard Holo Card",
-      time_created: 1729500000,
-      time_sold: 1729550000,
+      time_created: "1729500000",
+      time_sold: "1729550000",
       location: "San Francisco, CA",
       description: null,
       image_url: "https://picsum.photos/200/300",
       condition: "Excellent",
       brand: null,
       color: null,
-      authorId: 19
+      authorId: 2
     },
     {
       price: 25.75,
       category: "Apparel",
       name: "Eevee T‑Shirt",
-      time_created: 1729000000,
+      time_created: "1729000000",
       time_sold: null,
       location: "Berkeley, CA",
       description: "Cool Eevee graphic tee, size M.",
@@ -81,27 +81,27 @@ const fakeData = {
       condition: "Good",
       brand: "PokéWear",
       color: "White",
-      authorId: 20
+      authorId: 3
     },
     {
       price: 5.0,
       category: "Accessory",
       name: "Mewtwo Keychain",
-      time_created: 1728600000,
-      time_sold: 1728700000,
+      time_created: "1728600000",
+      time_sold: "1728700000",
       location: "Oakland, CA",
       description: "Mewtwo keychain, metallic finish.",
       image_url: null,
       condition: null,
       brand: "Team Rocket",
       color: "Purple",
-      authorId: 21
+      authorId: 4
     },
     {
       price: 30.0,
       category: "Toy",
       name: "Jigglypuff Mic Plush",
-      time_created: 1728200000,
+      time_created: "1728200000",
       time_sold: null,
       location: "San Jose, CA",
       description: null,
@@ -109,13 +109,12 @@ const fakeData = {
       condition: "New",
       brand: "PokéSound",
       color: null,
-      authorId: 22
+      authorId: 5
     }
   ]
 };
 
 async function main() {
-  /*
   for (const user of fakeData.users) {
     const newUser = user;
         //hash password
@@ -124,7 +123,7 @@ async function main() {
         const created = await prisma.user.create({
             data: {...newUser, password: hash}
         })
-  }*/
+      }
   for (const post of fakeData.posts){
     const newPost = post;
         //create post
@@ -137,7 +136,6 @@ async function resetDatabase() {
   await prisma.user.deleteMany()
 }
 
-//await resetDatabase();
 
 main()
   .catch((e) => {
