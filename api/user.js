@@ -1,5 +1,4 @@
 import express from 'express';
-import dotenv from 'dotenv';
 import { PrismaClient } from '../generated/prisma/index.js'
 import { hashPassword, verifyPassword } from './bcrypt.js';
 
@@ -7,6 +6,7 @@ const prisma = new PrismaClient()
 export const router = express.Router();
 router.use(express.json())
 
+//Auth check middleware
 function isAuthenticated (req, res, next) {
     if (req.session.user) next()
     else {
@@ -17,6 +17,52 @@ function isAuthenticated (req, res, next) {
 //Get the user information of the currently authenticated user
 router.get('/user', isAuthenticated, async (req, res, next) => {
     const userId = req.session.user.id
+    try {
+        const user = await prisma.user.findUnique({
+            where: {
+                id: parseInt(userId)
+            }
+        })
+        if (user) {
+            res.status(200).json(user)
+        } else {
+            next({ status: 404, message: `No user found with ID ${userId}` })
+        }
+    }
+    catch (err) {
+        next(err)
+    }
+})
+//Get all posts that user liked
+router.get('/user/:id/likes', async (req, res, next) => {
+    const userId = req.params.id;
+    try {
+        const user = await prisma.user.findUnique({
+            where: {
+                id: parseInt(userId)
+            },
+            include: {
+                Post_UserLikedPosts: true
+            }
+        })
+        const likedPosts = user.Post_UserLikedPosts;
+        let result = [];
+        for (const post of likedPosts){
+            result.push({
+                ...post,
+              time_created: post.time_created.toString(),
+              time_sold: post.time_sold ? post.time_sold.toString() : null
+            })
+        }
+        res.status(200).json(result);
+    }
+    catch (err) {
+        next(err)
+    }
+})
+//Get user information by ID
+router.get('/user/:id', async (req, res, next) => {
+    const userId = req.params.id;
     try {
         const user = await prisma.user.findUnique({
             where: {
@@ -96,4 +142,46 @@ router.post('/user/login', async (req, res, next) => {
 router.post('/user/logout', isAuthenticated, (req, res, next) => {
     req.session.user = null;
     res.json({ message: 'Logout successful' });
+})
+
+//Edit user profile
+router.patch('/user', isAuthenticated, async (req, res, next) => {
+    const userId = req.session.user.id
+    const updatedFields = req.body;
+    try {
+        const newUser = await prisma.user.update({
+            where: {
+                id: parseInt(userId)
+            },
+            data: updatedFields
+        });
+
+        if (newUser) {
+            res.status(200).json(newUser)
+        } else {
+            next({ status: 404, message: `No user found with ID ${userId}` })
+        }
+    } catch (err) {
+        next(err)
+    }
+})
+
+//Like a post
+router.post('/user/likes/:id', isAuthenticated, async (req, res, next) => {
+    const userId = req.session.user.id;
+    const postId = req.params.id;
+    try {
+        await prisma.user.update({
+            where: {id: userId},
+            data: {
+                Post_UserLikedPosts: {
+                    connect: {id: parseInt(postId)}
+                }
+            }
+        })
+        res.status(200).json({message: 'Post liked'})
+    }
+    catch (err) {
+        next(err)
+    }
 })
