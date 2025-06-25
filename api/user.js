@@ -34,25 +34,6 @@ router.get('/user', isAuthenticated, async (req, res, next) => {
     }
 })
 
-//Get user information by ID
-router.get('/users/:id', async (req, res, next) => {
-    const userId = req.params.id;
-    try {
-        const user = await prisma.user.findUnique({
-            where: {
-                id: parseInt(userId)
-            }
-        })
-        if (user) {
-            res.status(200).json(user)
-        } else {
-            next({ status: 404, message: `No user found with ID ${userId}` })
-        }
-    }
-    catch (err) {
-        next(err)
-    }
-})
 
 //Register a new user
 router.post('/users/register', async (req, res, next) => {
@@ -100,6 +81,7 @@ router.post('/users/login', async (req, res, next) => {
         const isValid = await verifyPassword(password, user.password);
         if (isValid) {
             req.session.user = user;
+            console.log(req.session.user)
             res.status(200).json({message: 'Login successful'});
         } else {
             next({ status: 401, message: 'Invalid credentials' });
@@ -114,6 +96,26 @@ router.post('/users/login', async (req, res, next) => {
 router.post('/user/logout', isAuthenticated, (req, res, next) => {
     req.session.user = null;
     res.json({ message: 'Logout successful' });
+})
+
+//Get user information by ID
+router.get('/users/:id', async (req, res, next) => {
+    const userId = req.params.id;
+    try {
+        const user = await prisma.user.findUnique({
+            where: {
+                id: parseInt(userId)
+            }
+        })
+        if (user) {
+            res.status(200).json(user)
+        } else {
+            next({ status: 404, message: `No user found with ID ${userId}` })
+        }
+    }
+    catch (err) {
+        next(err)
+    }
 })
 
 //Edit user profile
