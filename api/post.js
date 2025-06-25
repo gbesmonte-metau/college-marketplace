@@ -5,7 +5,13 @@ const prisma = new PrismaClient()
 export const router = express.Router();
 router.use(express.json())
 
-//TODO: Function to check if user matches post author
+//Auth check middleware
+function isAuthenticated (req, res, next) {
+    if (req.session.user) next()
+    else {
+        res.status(401).json({ message: 'User not authenticated' })
+    }
+}
 
 //Get post of id
 router.get('/posts/:id', async (req, res, next) => {
@@ -100,4 +106,58 @@ router.get('/posts/:id/saves', async (req, res, next) => {
   catch (err) {
       next(err)
   }
+})
+
+//Get all posts of a user
+router.get('/posts', isAuthenticated, async (req, res, next) => {
+    const userId = req.session.user.id;
+    try {
+        const posts = await prisma.post.findMany({
+            where: {
+                authorId: parseInt(userId)
+            }
+        })
+        if (posts.length > 0) {
+            res.status(200).json(posts)
+        } else {
+            next({ status: 404, message: `No posts found with user ID ${userId}` })
+        }
+    }
+    catch (err) {
+        next(err)
+    }
+})
+
+//TODO: NOT TESTED
+//Edit a post
+router.patch('/post/:id', isAuthenticated, async (req, res, next) => {
+    const userId = req.session.user.id
+    const postId = req.params.id;
+    const updatedFields = req.body;
+    try {
+        const getPost = await prisma.post.findUnique({
+            where: {
+                id: parseInt(postId)
+            }
+        })
+        if (!getPost) {
+            next({ status: 404, message: `No post found with ID ${postId}` });
+        }
+        if (getPost.authorId !== userId) {
+            next({ status: 403, message: `You are not the author of this post` });
+        }
+        const newPost = await prisma.post.update({
+            where: {
+                id: parseInt(userId)
+            },
+            data: updatedFields
+        });
+        if (newPost) {
+            res.status(200).json(newPost)
+        } else {
+            next({ status: 404, message: `No post found with ID ${postId}` })
+        }
+    } catch (err) {
+        next(err)
+    }
 })
