@@ -3,7 +3,7 @@ import {useState} from 'react'
 import Post from './Post'
 import "../components-css/PostPage.css"
 import Filter from './Filter'
-import {category, categoryArr} from "../App"
+import { GetCategoryIdByName } from '../../utils'
 
 export default function PostPage() {
     const [posts, setPosts] = useState([]);
@@ -22,7 +22,7 @@ export default function PostPage() {
         if (filter.category){
             for (const categoryStr of filter.category){
                 if (filter[categoryStr] !== 'All'){
-                    params.append("category", category[categoryStr]);
+                    params.append("category", GetCategoryIdByName(categoryStr));
                 }
             }
         }

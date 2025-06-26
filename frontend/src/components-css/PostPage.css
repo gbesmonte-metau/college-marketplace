@@ -4,10 +4,12 @@
 .post-body{
     display:grid;
     grid-template-columns: 1fr 8fr;
+    height: 100%;
 }
 .post-grid{
     display: flex;
     gap: 20px;
+    flex-wrap: wrap;
 }
 .post-image {
     width: 200px;

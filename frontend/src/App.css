@@ -9,9 +9,9 @@ main {
 }
 .app-header {
   height: 10vh;
-  background-color: red;
+  background-color: darkgray;
 }
 .app-footer {
   height: 5vh;
-  background-color: blue;
+  background-color: darkgray;
 }
