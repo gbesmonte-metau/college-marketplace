@@ -43,7 +43,7 @@ const fakeData = {
   posts: [
     {
       price: 12.5,
-      category: "Collectible",
+      category: 5,
       name: "Pikachu Plush Toy",
       time_created: "1730000000",
       time_sold: null,
@@ -57,7 +57,7 @@ const fakeData = {
     },
     {
       price: 45.0,
-      category: "Game Card",
+      category: 5,
       name: "Charizard Holo Card",
       time_created: "1729500000",
       time_sold: "1729550000",
@@ -71,7 +71,7 @@ const fakeData = {
     },
     {
       price: 25.75,
-      category: "Apparel",
+      category: 7,
       name: "Eevee T‑Shirt",
       time_created: "1729000000",
       time_sold: null,
@@ -85,7 +85,7 @@ const fakeData = {
     },
     {
       price: 5.0,
-      category: "Accessory",
+      category: 5,
       name: "Mewtwo Keychain",
       time_created: "1728600000",
       time_sold: "1728700000",
@@ -99,7 +99,7 @@ const fakeData = {
     },
     {
       price: 30.0,
-      category: "Toy",
+      category: 5,
       name: "Jigglypuff Mic Plush",
       time_created: "1728200000",
       time_sold: null,
@@ -115,6 +115,7 @@ const fakeData = {
 };
 
 async function main() {
+  /*
   for (const user of fakeData.users) {
     const newUser = user;
         //hash password
@@ -124,10 +125,11 @@ async function main() {
             data: {...newUser, password: hash}
         })
       }
+        */
   for (const post of fakeData.posts){
     const newPost = post;
         //create post
-          const created = await prisma.post.create({data:newPost})
+        const created = await prisma.post.create({data:newPost})
   }
 }
 

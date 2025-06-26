@@ -1,7 +1,15 @@
 .post-page{
     overflow: scroll;
 }
+.post-body{
+    display:grid;
+    grid-template-columns: 1fr 8fr;
+}
 .post-grid{
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    display: flex;
+    gap: 20px;
+}
+.post-image {
+    width: 200px;
+    height: 200px;
 }
