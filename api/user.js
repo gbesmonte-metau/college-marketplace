@@ -81,8 +81,7 @@ router.post('/users/login', async (req, res, next) => {
         const isValid = await verifyPassword(password, user.password);
         if (isValid) {
             req.session.user = user;
-            console.log(req.session.user)
-            res.status(200).json({message: 'Login successful'});
+            res.status(200).json(user);
         } else {
             next({ status: 401, message: 'Invalid credentials' });
         }

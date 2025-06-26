@@ -7,6 +7,9 @@
 main {
   height: 85vh;
 }
+.page {
+  height: 100%;
+}
 .app-header {
   height: 10vh;
   background-color: darkgray;
@@ -14,4 +17,9 @@ main {
 .app-footer {
   height: 5vh;
   background-color: darkgray;
+}
+.nav-bar{
+  display: flex;
+  justify-content: center;
+  gap: 10px;
 }
