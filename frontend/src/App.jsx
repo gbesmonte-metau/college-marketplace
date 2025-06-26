@@ -5,6 +5,7 @@ import Layout from './components/Layout';
 import LoginPage from './components/LoginPage';
 import {useState, createContext, useEffect} from 'react';
 import ProfilePage from './components/ProfilePage';
+import RegisterPage from './components/RegisterPage';
 
 export const UserContext = createContext();
 
@@ -27,24 +28,35 @@ const routes = createBrowserRouter([
       },
       {
         path: '/register',
-        element: <div>register</div>
+        element: <RegisterPage/>
       }
     ]
   },
 ]);
 
 function App() {
-  const [user, setUser] = useState(null);
-
-  return (
-    <div className="app">
-      <main>
-        <UserContext.Provider value={{user, setUser}}>
-        <RouterProvider router={routes} />
-        </UserContext.Provider>
-      </main>
+    const [user, setUser] = useState(null);
+    async function getLoggedInUser() {
+        const response = await fetch(import.meta.env.VITE_URL + '/user', {
+            credentials: 'include'
+        });
+        const result = await response.json();
+        if (response.ok){
+            setUser(result);
+        }
+    }
+    useEffect(() => {
+      getLoggedInUser();
+    }, []);
+    return (
+      <div className="app">
+        <main>
+          <UserContext.Provider value={{user, setUser}}>
+          <RouterProvider router={routes} />
+          </UserContext.Provider>
+        </main>
     </div>
-  )
+    )
 }
 
 export default App
