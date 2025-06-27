@@ -6,6 +6,7 @@ import LoginPage from './components/LoginPage';
 import {useState, createContext, useEffect} from 'react';
 import ProfilePage from './components/ProfilePage';
 import RegisterPage from './components/RegisterPage';
+import PostDetails from './components/PostDetails';
 
 export const UserContext = createContext();
 
@@ -29,6 +30,10 @@ const routes = createBrowserRouter([
       {
         path: '/register',
         element: <RegisterPage/>
+      },
+      {
+        path: '/post/:id',
+        element: <PostDetails/>
       }
     ]
   },
@@ -49,13 +54,11 @@ function App() {
       getLoggedInUser();
     }, []);
     return (
-      <div className="app">
-        <main>
+      <main>
           <UserContext.Provider value={{user, setUser}}>
           <RouterProvider router={routes} />
           </UserContext.Provider>
-        </main>
-    </div>
+      </main>
     )
 }
 

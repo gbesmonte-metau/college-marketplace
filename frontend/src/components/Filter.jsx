@@ -1,9 +1,9 @@
 import React from 'react'
 import { useState } from 'react'
 import "../components-css/Filter.css"
-import { categoryArr, GetCategoryNameById } from '../../utils'
+import { categoryArr, GetCategoryNameById} from '../../utils'
 
-export default function Filter({setFilter}) {
+export default function Filter({filter, setFilter}) {
     const [price, setPrice] = useState(0);
     const [categoryChecked, setCategoryChecked] = useState(new Array(categoryArr.length).fill(false));
 
@@ -11,10 +11,10 @@ export default function Filter({setFilter}) {
         e.preventDefault();
         const categories = categoryChecked.map((item, index) => item ? GetCategoryNameById(index) : null).filter(item => item !== null);
         setFilter({
+            ...filter,
             price: price || undefined,
             category: categories.length > 0 ? categories : null,
         })
-
     }
     function HandleCategoryChange(id){
         const updatedCategoryChecked = categoryChecked.map((item, index) => index === id ? !item : item);
@@ -23,7 +23,7 @@ export default function Filter({setFilter}) {
     function ClearFilter(){
         setPrice(0);
         setCategoryChecked(new Array(categoryArr.length).fill(false));
-        setFilter({});
+        setFilter({...filter, price: undefined, category: null});
     }
 
     return (

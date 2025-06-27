@@ -41,13 +41,21 @@ router.get('/posts', async (req, res, next) => {
         if (req.query.price != 'undefined') {
             whereClause.price = { lte: parseFloat(req.query.price) };
         }
-        //category
+        //mutiple categories
         if (Array.isArray(req.query.category)) {
             const categories = req.query.category.map(Number);
             whereClause.category = { in: categories };
         }
+        //one category
         else if (req.query?.category){
             whereClause.category = parseInt(req.query.category);
+        }
+        //search
+        if (req.query.search) {
+            whereClause.OR = [
+                { name: { contains: req.query.search } },
+                { description: { contains: req.query.search } },
+            ]
         }
         const posts = await prisma.post.findMany({
             where: whereClause
