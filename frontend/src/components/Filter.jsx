@@ -1,28 +1,28 @@
 import React from 'react'
 import { useState } from 'react'
 import "../components-css/Filter.css"
-import { categoryArr, GetCategoryNameById} from '../../utils'
+import { categoryArr, GetCategoryArrToBool, GetCategoryIdByName} from '../../utils'
 
 export default function Filter({filter, setFilter}) {
     const [price, setPrice] = useState(0);
-    const [categoryChecked, setCategoryChecked] = useState(new Array(categoryArr.length).fill(false));
+    const [categoryChecked, setCategoryChecked] = useState(GetCategoryArrToBool());
 
     function HandleFilter(e){
         e.preventDefault();
-        const categories = categoryChecked.map((item, index) => item ? GetCategoryNameById(index) : null).filter(item => item !== null);
+        const categories = Object.keys(categoryChecked).filter((categoryName) => (categoryChecked[categoryName])).map((categoryName) => (GetCategoryIdByName(categoryName)));
         setFilter({
             ...filter,
             price: price || undefined,
             category: categories.length > 0 ? categories : null,
         })
     }
-    function HandleCategoryChange(id){
-        const updatedCategoryChecked = categoryChecked.map((item, index) => index === id ? !item : item);
+    function HandleCategoryChange(categoryName){
+        const updatedCategoryChecked = {...categoryChecked, [categoryName]: !categoryChecked[categoryName]};
         setCategoryChecked(updatedCategoryChecked);
     }
     function ClearFilter(){
         setPrice(0);
-        setCategoryChecked(new Array(categoryArr.length).fill(false));
+        setCategoryChecked(GetCategoryArrToBool());
         setFilter({...filter, price: undefined, category: null});
     }
 
@@ -38,7 +38,7 @@ export default function Filter({filter, setFilter}) {
                 <p>Category:</p>
                 {categoryArr.slice(1,categoryArr.length).map((c, id) => (
                     <div className='filter' key={id+1}>
-                        <input type='checkbox' id={c} checked={categoryChecked[id+1]} onChange={() => HandleCategoryChange(id+1)}/>
+                        <input type='checkbox' id={c} checked={categoryChecked[c]} onChange={() => HandleCategoryChange(c)}/>
                         <label htmlFor={c}>{c}</label>
                     </div>
                 ))}

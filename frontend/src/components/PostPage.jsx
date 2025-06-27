@@ -3,7 +3,6 @@ import {useState} from 'react'
 import Post from './Post'
 import "../components-css/PostPage.css"
 import Filter from './Filter'
-import { GetCategoryIdByName } from '../../utils'
 import CreatePost from './CreatePost'
 
 export default function PostPage() {
@@ -24,9 +23,9 @@ export default function PostPage() {
         }
         const params = new URLSearchParams(parseFilter);
         if (filter.category){
-            for (const categoryStr of filter.category){
-                if (filter[categoryStr] !== 'All'){
-                    params.append("category", GetCategoryIdByName(categoryStr));
+            for (const categoryId of filter.category){
+                if (filter[categoryId] !== 0){
+                    params.append("category", categoryId);
                 }
             }
         }
