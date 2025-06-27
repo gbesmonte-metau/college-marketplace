@@ -1,0 +1,14 @@
+.app-header {
+  height: 10vh;
+  background-color: darkgray;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+.nav-bar{
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}

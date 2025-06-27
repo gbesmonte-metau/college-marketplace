@@ -41,13 +41,21 @@ router.get('/posts', async (req, res, next) => {
         if (req.query.price != 'undefined') {
             whereClause.price = { lte: parseFloat(req.query.price) };
         }
-        //category
+        //mutiple categories
         if (Array.isArray(req.query.category)) {
             const categories = req.query.category.map(Number);
             whereClause.category = { in: categories };
         }
+        //one category
         else if (req.query?.category){
             whereClause.category = parseInt(req.query.category);
+        }
+        //search
+        if (req.query.search) {
+            whereClause.OR = [
+                { name: { contains: req.query.search } },
+                { description: { contains: req.query.search } },
+            ]
         }
         const posts = await prisma.post.findMany({
             where: whereClause
@@ -158,9 +166,43 @@ router.get('/authored', isAuthenticated, async (req, res, next) => {
     }
 })
 
+//Delete a post
+router.delete('/posts/:id', isAuthenticated, async (req, res, next) => {
+    const userId = req.session.user.id
+    const postId = req.params.id;
+    try {
+        const getPost = await prisma.post.findUnique({
+            where: {
+                id: parseInt(postId)
+            }
+        })
+        if (!getPost) {
+            next({ status: 404, message: `No post found with ID ${postId}` });
+            return;
+        }
+        if (getPost.authorId !== userId) {
+            next({ status: 403, message: `You are not the author of this post` });
+            return;
+        }
+        const deletedPost = await prisma.post.delete({
+            where: {
+                id: parseInt(postId)
+            }
+        })
+        if (deletedPost) {
+            res.status(200).json(deletedPost)
+        } else {
+            next({ status: 404, message: `No post found with ID ${postId}` })
+        }
+    }
+    catch (err) {
+        next(err)
+    }
+})
+
 //TODO: NOT TESTED
 //Edit a post
-router.patch('/post/:id', isAuthenticated, async (req, res, next) => {
+router.patch('/posts/:id', isAuthenticated, async (req, res, next) => {
     const userId = req.session.user.id
     const postId = req.params.id;
     const updatedFields = req.body;
@@ -172,9 +214,11 @@ router.patch('/post/:id', isAuthenticated, async (req, res, next) => {
         })
         if (!getPost) {
             next({ status: 404, message: `No post found with ID ${postId}` });
+            return;
         }
         if (getPost.authorId !== userId) {
             next({ status: 403, message: `You are not the author of this post` });
+            return;
         }
         const newPost = await prisma.post.update({
             where: {

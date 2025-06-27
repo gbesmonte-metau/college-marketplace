@@ -24,3 +24,11 @@ export function GetCategoryIdByName(name){
 export function GetCategoryArrLength(){
     return categoryArr.length;
 }
+
+export function GetCategoryArrToBool(){
+    let dict = {};
+    categoryArr.map((item) => {
+        dict[item] = false;
+    })
+    return dict;
+}

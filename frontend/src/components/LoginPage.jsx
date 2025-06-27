@@ -2,6 +2,7 @@ import React from 'react'
 import { useNavigate } from 'react-router';
 import { useContext } from 'react'
 import { UserContext } from '../App';
+import '../components-css/LoginPage.css'
 
 export default function LoginPage() {
     const navigate = useNavigate();
@@ -33,8 +34,9 @@ export default function LoginPage() {
     }
     return (
         <div className="page">
-            <div>
-                <form onSubmit={HandleLogin}>
+            <div className='login-body'>
+                <h2>Log in</h2>
+                <form className='login-form' onSubmit={HandleLogin}>
                     <input type="text" placeholder="Email" required/>
                     <input type="password" placeholder="Password" required/>
                     <button type="submit">Login</button>

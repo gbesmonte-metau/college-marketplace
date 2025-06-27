@@ -1,31 +1,26 @@
 .app {
-  text-align: center;
   display: grid;
-  grid-template-rows: 1fr auto 1fr;
+  grid-template-rows: auto 1fr auto;
   height: 100vh;
-}
-main {
-  height: 85vh;
 }
 .page {
   height: 100%;
-}
-.app-header {
-  height: 10vh;
-  background-color: darkgray;
+  overflow: scroll;
 }
 .app-footer {
   height: 5vh;
   background-color: darkgray;
-}
-.nav-bar{
   display: flex;
   justify-content: center;
-  gap: 10px;
+  align-items: center;
 }
-
 .profile-pic {
   width: 50px;
+  border-radius: 50%;
+  background-color: white;
+}
+.profile-pic-large{
+  width: 100px;
   border-radius: 50%;
   background-color: white;
 }

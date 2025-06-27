@@ -15,7 +15,7 @@ app.use(cors(
 ));
 app.use(expressSession({
     name: 'cookie',
-    cookie: { path: '/', httpOnly: false, secure: false, maxAge: 600000 },
+    cookie: { path: '/', httpOnly: false, secure: false},
     secret: 'temporary secret',
     resave: false,
     saveUninitialized: false,

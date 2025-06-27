@@ -1,0 +1,13 @@
+.login-body{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+.login-form{
+    display:flex;
+    flex-direction: column;
+    padding: 20px;
+    background-color: lightgray;
+}

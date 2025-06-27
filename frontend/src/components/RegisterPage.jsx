@@ -1,5 +1,6 @@
 import React from 'react'
 import { useNavigate } from 'react-router';
+import '../components-css/RegisterPage.css'
 
 export default function RegisterPage() {
     const navigate = useNavigate();
@@ -32,8 +33,9 @@ export default function RegisterPage() {
 
     return (
         <div className="page">
-            <div>
-                <form onSubmit={HandleRegister}>
+            <div className='register-body'>
+                <h2>Register</h2>
+                <form className='register-form' onSubmit={HandleRegister}>
                     <input type="text" placeholder="Email" required/>
                     <input type="text" placeholder="Username" required/>
                     <input type="password" placeholder="Password" required/>
