@@ -7,6 +7,7 @@ import {useState, createContext, useEffect} from 'react';
 import ProfilePage from './components/ProfilePage';
 import RegisterPage from './components/RegisterPage';
 import PostDetails from './components/PostDetails';
+import MyPostsPage from './components/MyPostsPage';
 
 export const UserContext = createContext();
 
@@ -34,6 +35,10 @@ const routes = createBrowserRouter([
       {
         path: '/post/:id',
         element: <PostDetails/>
+      },
+      {
+        path: '/myposts',
+        element: <MyPostsPage/>
       }
     ]
   },

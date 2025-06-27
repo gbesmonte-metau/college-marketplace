@@ -59,8 +59,9 @@ export default function PostPage() {
                     <button onClick={HandleClear}>Clear</button>
                 </form>
             </div>
-            <button onClick={() => setIsCreatePostOpen(true)}>Create Post
-            </button>
+            <div className='create-btn'>
+                <button onClick={() => setIsCreatePostOpen(true)}>Create Post</button>
+            </div>
             <div className='post-body'>
                 <Filter filter={filter} setFilter={setFilter}/>
                 <div className='post-page'>

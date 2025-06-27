@@ -2,6 +2,7 @@ import React from 'react'
 import { Link , useNavigate} from 'react-router'
 import { useContext } from 'react'
 import { UserContext } from '../App';
+import '../components-css/Header.css'
 
 export default function Header() {
   const { user, setUser } = useContext(UserContext);
@@ -36,6 +37,7 @@ export default function Header() {
         {!user && <Link to='/login'>Login</Link>}
         {!user && <Link to='/register'>Register</Link>}
         {user && <Link to='/profile'>Profile</Link>}
+        {user && <Link to='/myposts'>My Posts</Link>}
         {user && <button onClick={HandleLogout}>Logout</button>}
         {user && <img className="profile-pic" src={user.icon} alt="profile pic" />}
        </nav>
