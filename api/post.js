@@ -33,6 +33,36 @@ router.get('/posts/:id', async (req, res, next) => {
     }
 })
 
+//Get all posts (+ query)
+router.get('/posts', async (req, res, next) => {
+    try {
+        const whereClause = {};
+        //price
+        if (req.query.price != 'undefined') {
+            whereClause.price = { lte: parseFloat(req.query.price) };
+        }
+        //category
+        if (Array.isArray(req.query.category)) {
+            const categories = req.query.category.map(Number);
+            whereClause.category = { in: categories };
+        }
+        else if (req.query?.category){
+            whereClause.category = parseInt(req.query.category);
+        }
+        const posts = await prisma.post.findMany({
+            where: whereClause
+        })
+        if (posts.length > 0) {
+            res.status(200).json(posts)
+        } else {
+            next({ status: 404, message: 'No posts found' })
+        }
+    }
+    catch (err) {
+        next(err)
+    }
+})
+
 //Create a new post
 router.post('/posts', async (req, res, next) => {
     const newPost = req.body;
@@ -108,8 +138,8 @@ router.get('/posts/:id/saves', async (req, res, next) => {
   }
 })
 
-//Get all posts of a user
-router.get('/posts', isAuthenticated, async (req, res, next) => {
+//Get all posts a user Authored
+router.get('/authored', isAuthenticated, async (req, res, next) => {
     const userId = req.session.user.id;
     try {
         const posts = await prisma.post.findMany({

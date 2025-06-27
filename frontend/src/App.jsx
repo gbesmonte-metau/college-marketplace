@@ -1,35 +1,62 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
+import PostPage from './components/PostPage';
+import {createBrowserRouter, RouterProvider} from 'react-router';
+import Layout from './components/Layout';
+import LoginPage from './components/LoginPage';
+import {useState, createContext, useEffect} from 'react';
+import ProfilePage from './components/ProfilePage';
+import RegisterPage from './components/RegisterPage';
+
+export const UserContext = createContext();
+
+const routes = createBrowserRouter([
+  {
+    element: <Layout/>,
+    errorElement: <div>404 Not Found</div>,
+    children: [
+      {
+        path: '/',
+        element: <PostPage/>
+      },
+      {
+        path: '/profile',
+        element: <ProfilePage/>
+      },
+      {
+        path: '/login',
+        element: <LoginPage/>
+      },
+      {
+        path: '/register',
+        element: <RegisterPage/>
+      }
+    ]
+  },
+]);
 
 function App() {
-  const [count, setCount] = useState(0)
-
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    const [user, setUser] = useState(null);
+    async function getLoggedInUser() {
+        const response = await fetch(import.meta.env.VITE_URL + '/user', {
+            credentials: 'include'
+        });
+        const result = await response.json();
+        if (response.ok){
+            setUser(result);
+        }
+    }
+    useEffect(() => {
+      getLoggedInUser();
+    }, []);
+    return (
+      <div className="app">
+        <main>
+          <UserContext.Provider value={{user, setUser}}>
+          <RouterProvider router={routes} />
+          </UserContext.Provider>
+        </main>
+    </div>
+    )
 }
 
 export default App
