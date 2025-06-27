@@ -4,6 +4,7 @@ import Post from './Post'
 import "../components-css/PostPage.css"
 import Filter from './Filter'
 import CreatePost from './CreatePost'
+import { GetCategoryIdByName } from '../../utils'
 
 export default function PostPage() {
     const [posts, setPosts] = useState([]);
@@ -23,9 +24,9 @@ export default function PostPage() {
         }
         const params = new URLSearchParams(parseFilter);
         if (filter.category){
-            for (const categoryId of filter.category){
-                if (filter[categoryId] !== 0){
-                    params.append("category", categoryId);
+            for (const categoryStr of filter.category){
+                if (filter[categoryStr] !== 'All'){
+                    params.append("category", GetCategoryIdByName(categoryStr));
                 }
             }
         }
