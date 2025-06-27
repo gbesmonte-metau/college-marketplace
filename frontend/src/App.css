@@ -14,9 +14,13 @@
   justify-content: center;
   align-items: center;
 }
-
 .profile-pic {
   width: 50px;
+  border-radius: 50%;
+  background-color: white;
+}
+.profile-pic-large{
+  width: 100px;
   border-radius: 50%;
   background-color: white;
 }

@@ -58,10 +58,16 @@ export default function PostDetails() {
                 <h1>{postDetails.name}</h1>
                 <p>{postDetails.price}</p>
                 <p>{postDetails.description}</p>
-                <p>{postDetails.authorId}</p>
+                <p>AuthorId: {postDetails.authorId}</p>
+                <p>Location: {postDetails.location}</p>
+                <p>Color: {postDetails.color}</p>
+                <p>Brand: {postDetails.brand}</p>
+                <p>Condition: {postDetails.condition}</p>
                 <img src={postDetails.image_url} alt={postDetails.name} />
+                <div>
                 {user && user.id === postDetails.authorId && <button onClick={HandleDelete}>Delete Post</button>}
                 {user && user.id === postDetails.authorId && <button onClick={OpenEdit}>Edit Post</button>}
+                </div>
             </div>
             }
             {isEditOpen && <EditPost postDetails={postDetails} setIsEditOpen={setIsEditOpen}/>}
