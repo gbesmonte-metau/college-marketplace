@@ -2,11 +2,18 @@ import React from 'react'
 import { useNavigate} from 'react-router'
 import { useState, useEffect } from 'react';
 
+import { FaHeart } from "react-icons/fa";
+import { FaRegHeart } from "react-icons/fa";
+import { FaRegBookmark } from "react-icons/fa";
+import { FaBookmark } from "react-icons/fa";
+
 export default function Post({post}) {
     const [isLiked, setIsLiked] = useState(false);
+    const [isSaved, setIsSaved] = useState(false);
 
     useEffect(() => {
         GetIsLiked();
+        GetIsSaved();
     }, []);
 
     const navigate = useNavigate();
@@ -30,6 +37,24 @@ export default function Post({post}) {
         catch (e){
             alert(e);
         }
+    }
+    async function GetIsSaved(){
+        try{
+            const response = await fetch(import.meta.env.VITE_URL + `/user/save/${post.id}`, {
+                credentials: 'include',
+            });
+            const result = await response.json();
+            if (result.saved){
+                setIsSaved(true);
+            }
+            else {
+                setIsSaved(false);
+            }
+        }
+        catch (e){
+            alert(e);
+        }
+
     }
 
     async function HandleLike(e){
@@ -63,17 +88,28 @@ export default function Post({post}) {
     async function HandleSave(e){
         e.preventDefault();
         e.stopPropagation();
-        console.log("Save");
-        const response = await fetch(import.meta.env.VITE_URL + `/user/save/${post.id}`, {
-            credentials: 'include',
-            method: 'POST'
-        });
-        const result = await response.json();
-        if (response.ok){
-            alert("you saved this post");
+        try{
+            if (isSaved){
+                const response = await fetch(import.meta.env.VITE_URL + `/user/unsave/${post.id}`, {
+                    credentials: 'include',
+                    method: 'DELETE'
+                });
+                if (response.ok){
+                    setIsSaved(false);
+                }
+            }
+            else{
+                const response = await fetch(import.meta.env.VITE_URL + `/user/save/${post.id}`, {
+                    credentials: 'include',
+                    method: 'POST'
+                });
+                if (response.ok){
+                    setIsSaved(true);
+                }
+            }
         }
-        else{
-            alert(result.message);
+        catch (e){
+            alert(e);
         }
     }
 
@@ -82,8 +118,8 @@ export default function Post({post}) {
             <p>{post.name}</p>
             <img className='post-image' src={post.image_url ? post.image_url : "../../public/placeholder.png"} alt={post.name}/>
             <p>${post.price.toFixed(2)}</p>
-            <button onClick={HandleLike}>{isLiked ? "Unlike" : "Like" }</button>
-            <button onClick={HandleSave}>Save</button>
+            <button onClick={HandleLike}>{isLiked ? <FaHeart/> : <FaRegHeart/> }</button>
+            <button onClick={HandleSave}>{isSaved ? <FaBookmark/> : <FaRegBookmark/> }</button>
         </div>
     )
 }
