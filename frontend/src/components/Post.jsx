@@ -1,6 +1,8 @@
 import React from 'react'
 import { useNavigate} from 'react-router'
 import { useState, useEffect } from 'react';
+import { useContext } from 'react'
+import { UserContext } from '../App';
 
 import { FaHeart } from "react-icons/fa";
 import { FaRegHeart } from "react-icons/fa";
@@ -10,10 +12,13 @@ import { FaBookmark } from "react-icons/fa";
 export default function Post({post}) {
     const [isLiked, setIsLiked] = useState(false);
     const [isSaved, setIsSaved] = useState(false);
+    const { user, setUser } = useContext(UserContext);
 
     useEffect(() => {
-        GetIsLiked();
-        GetIsSaved();
+        if (user){
+            GetIsLiked();
+            GetIsSaved();
+        }
     }, []);
 
     const navigate = useNavigate();

@@ -5,6 +5,7 @@ import { useState, useContext } from 'react'
 import { UserContext } from '../App';
 import { useNavigate } from 'react-router';
 import { fetchCreatePost } from '../api';
+import Places from './AddressForm';
 
 export default function CreatePost({setIsCreatePostOpen}) {
     const { user, setUser } = useContext(UserContext);
@@ -69,6 +70,8 @@ export default function CreatePost({setIsCreatePostOpen}) {
                         </select>
                         <input type='text' placeholder='Brand' value={brand} onChange={(e) => setBrand(e.target.value)}/>
                         <input type='text' placeholder='Color' value={color} onChange={(e) => setColor(e.target.value)}/>
+                        <Places setLocation={setLocation}></Places>
+                        {location}
                         <button type='submit'>Create</button>
                         <button onClick={() => setIsCreatePostOpen(false)}>Close</button>
                     </form>
