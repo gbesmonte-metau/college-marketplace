@@ -50,11 +50,20 @@ router.get('/posts', async (req, res, next) => {
         else if (req.query?.category){
             whereClause.category = parseInt(req.query.category);
         }
+        //multiple colors
+        if (Array.isArray(req.query.color)) {
+            const colors = req.query.color.map(String);
+            whereClause.color = { in: colors, mode: 'insensitive' };
+        }
+        //one color
+        else if (req.query?.color){
+            whereClause.color = { contains: req.query.color, mode: 'insensitive' };
+        }
         //search
         if (req.query.search) {
             whereClause.OR = [
-                { name: { contains: req.query.search } },
-                { description: { contains: req.query.search } },
+                { name: { contains: req.query.search, mode: 'insensitive' } },
+                { description: { contains: req.query.search, mode: 'insensitive'} },
             ]
         }
         const posts = await prisma.post.findMany({

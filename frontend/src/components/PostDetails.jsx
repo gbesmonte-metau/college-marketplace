@@ -1,6 +1,7 @@
 import React from 'react'
 import { useNavigate, useParams } from 'react-router'
 import { useState, useEffect } from 'react';
+import { categoryArr } from '../../utils';
 import { useContext } from 'react'
 import { UserContext } from '../App';
 import EditPost from './EditPost';
@@ -63,6 +64,7 @@ export default function PostDetails() {
                 <p>Color: {postDetails.color}</p>
                 <p>Brand: {postDetails.brand}</p>
                 <p>Condition: {postDetails.condition}</p>
+                <p>Category: {categoryArr[postDetails.category]}</p>
                 <img src={postDetails.image_url} alt={postDetails.name} />
                 <div>
                 {user && user.id === postDetails.authorId && <button onClick={HandleDelete}>Delete Post</button>}

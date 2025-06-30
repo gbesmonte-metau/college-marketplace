@@ -30,7 +30,13 @@ export default function PostPage() {
                 }
             }
         }
+        if (filter.color){
+            for (const colorStr of filter.color){
+                params.append("color", colorStr);
+            }
+        }
         const response = await fetch(url + '?' + params.toString());
+        console.log(url + '?' + params.toString());
         const result = await response.json();
         if (!response.ok) {
             setPosts([]);

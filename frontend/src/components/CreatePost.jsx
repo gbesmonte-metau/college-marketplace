@@ -1,54 +1,51 @@
 import React from 'react'
 import '../components-css/CreatePost.css'
 import { categoryArr, GetCategoryIdByName } from '../../utils'
-import { useContext } from 'react'
+import { useState, useContext } from 'react'
 import { UserContext } from '../App';
 import { useNavigate } from 'react-router';
+import { fetchCreatePost } from '../api';
 
 export default function CreatePost({setIsCreatePostOpen}) {
     const { user, setUser } = useContext(UserContext);
     const navigate = useNavigate();
+
+    //create variables
+    const [price, setPrice] = useState(0);
+    const [category, setCategory] = useState(1);
+    const [name, setName] = useState("");
+    const [description, setDescription] = useState("");
+    const [condition, setCondition] = useState("New");
+    const [brand, setBrand] = useState("");
+    const [color, setColor] = useState("");
+    const [location, setLocation] = useState("{}");
+
     async function HandleCreate(e) {
         e.preventDefault()
         if (!user){
             alert("You must be logged in to create a post");
             return;
         }
-        const settings = {
-            method: 'POST',
-            credentials: 'include',
-            headers: {
-                Accept: 'application/json',
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                price: parseFloat(e.target[0].value),
-                category: parseInt(e.target[1].value),
-                name: e.target[2].value,
-                description: e.target[3].value || "",
-                condition: e.target[4].value,
-                brand: e.target[5].value || "",
-                color: e.target[6].value || "",
-                time_created: Date.now().toString(),
-                location: "{}",
-                authorId: user.id,
-            })
-        };
-        console.log(settings.body);
-        try {
-            const response = await fetch(import.meta.env.VITE_URL + '/posts', settings);
-            const result = await response.json();
-            if (response.ok){
-                alert("Post created successfully");
-                setIsCreatePostOpen(false);
-                navigate('/');
-            }
-            else{
-                alert(result.message);
-            }
+        const body = {
+            price: parseFloat(price),
+            category: parseInt(category),
+            name: name,
+            description: description,
+            condition: condition,
+            brand: brand,
+            color: color,
+            time_created: Date.now().toString(),
+            location: location,
+            authorId: user.id,
         }
-        catch (error) {
-            console.log(error);
+        const response = await fetchCreatePost(body);
+        const result = await response.json();
+        if (response.ok){
+            setIsCreatePostOpen(false);
+            navigate('/');
+        }
+        else{
+            alert(result.message);
         }
     }
 
@@ -58,20 +55,20 @@ export default function CreatePost({setIsCreatePostOpen}) {
                 <div>
                     <h2>Create Post</h2>
                     <form onSubmit={HandleCreate}>
-                        <input type="text" placeholder="Price" required/>
-                        <select name="category" id="category">
+                        <input type="text" value={price} onChange={(e) => setPrice(e.target.value)} required/>
+                        <select name="category" id="category" value={category} onChange={(e) => setCategory(e.target.value)}>
                             {categoryArr.slice(1,categoryArr.length).map((category, index) =>
                                 <option key={index} value={GetCategoryIdByName(category)}>{category}</option>
                             )}
                         </select>
-                        <input type='text' placeholder='Name' required/>
-                        <input type='text' placeholder='Description'/>
-                        <select name="condition" id="condition">
+                        <input type='text' placeholder='Name' value={name} onChange={(e) => setName(e.target.value)} required/>
+                        <input type='text' placeholder='Description' value={description} onChange={(e) => setDescription(e.target.value)}/>
+                        <select name="condition" id="condition" value={condition} onChange={(e) => setCondition(e.target.value)}>
                             <option value="new">New</option>
                             <option value="used">Used</option>
                         </select>
-                        <input type='text' placeholder='Brand'/>
-                        <input type='text' placeholder='Color'/>
+                        <input type='text' placeholder='Brand' value={brand} onChange={(e) => setBrand(e.target.value)}/>
+                        <input type='text' placeholder='Color' value={color} onChange={(e) => setColor(e.target.value)}/>
                         <button type='submit'>Create</button>
                         <button onClick={() => setIsCreatePostOpen(false)}>Close</button>
                     </form>
