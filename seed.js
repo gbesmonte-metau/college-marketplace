@@ -8,35 +8,40 @@ const fakeData = {
       username: "pikachu",
       password: "pikachu",
       icon: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/25.png",
-      bio: "Pikachu"
+      bio: "Pikachu",
+      location: '{"lat": 37.8044, "lng": -122.2711}'
     },
     {
       email: "charizard@gmail.com",
       username: "charizard",
       password: "charizard",
       icon: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/6.png",
-      bio: "Charizard"
+      bio: "Charizard",
+      location: '{"lat": 37.6879, "lng": -122.4702}'
     },
     {
       email: "eevee@gmail.com",
       username: "eevee",
       password: "eevee",
       icon: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/133.png",
-      bio: "Eevee"
+      bio: "Eevee",
+      location: '{"lat": 37.4419, "lng": -122.1430}'
     },
     {
       email: "mewtwo@gmail.com",
       username: "mewtwo",
       password: "mewtwo",
       icon: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/150.png",
-      bio: "Mewtwo"
+      bio: "Mewtwo",
+      location: '{"lat": 38.1041, "lng": -122.2566}'
     },
     {
       email: "jigglypuff@gmail.com",
       username: "jigglypuff",
       password: "jigglypuff",
       icon: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/39.png",
-      bio: "Jigglypuff"
+      bio: "Jigglypuff",
+      location: '{"lat": 36.9741, "lng": -122.0308}'
     }
   ],
 
@@ -47,7 +52,7 @@ const fakeData = {
       "name": "Smart Microwave Oven",
       "time_created": "1687785600",
       "time_sold": null,
-      "location": "{\"lat\": 37.7749, \"lng\": -122.4194}",
+      "location": "{\"lat\": 37.8044, \"lng\": -122.2711}",    // Oakland (~8 miles)
       "description": "A sleek, modern microwave with smart features and voice control.",
       "image_url": "https://picsum.photos/200/300?random=1",
       "condition": "NEW",
@@ -61,7 +66,7 @@ const fakeData = {
       "name": "Electric Scooter X200",
       "time_created": "1687785600",
       "time_sold": null,
-      "location": "{\"lat\": 37.7749, \"lng\": -122.4194}",
+      "location": "{\"lat\": 37.6879, \"lng\": -122.4702}",    // Daly City (~10 miles)
       "description": "High-speed electric scooter with a 25-mile range.",
       "image_url": "https://picsum.photos/200/300?random=2",
       "condition": "NEW",
@@ -75,7 +80,7 @@ const fakeData = {
       "name": "Non-Stick Frying Pan",
       "time_created": "1687785600",
       "time_sold": null,
-      "location": "{\"lat\": 37.7749, \"lng\": -122.4194}",
+      "location": "{\"lat\": 37.4419, \"lng\": -122.1430}",    // Palo Alto (~33 miles)
       "description": "Durable non-stick frying pan for everyday cooking.",
       "image_url": "https://picsum.photos/200/300?random=3",
       "condition": "NEW",
@@ -89,7 +94,7 @@ const fakeData = {
       "name": "Memory Foam Mattress Topper",
       "time_created": "1687785600",
       "time_sold": null,
-      "location": "{\"lat\": 37.7749, \"lng\": -122.4194}",
+      "location": "{\"lat\": 38.1041, \"lng\": -122.2566}",    // Santa Rosa (~56 miles, a bit further but close enough)
       "description": "Enhance your sleep with this comfortable memory foam topper.",
       "image_url": "https://picsum.photos/200/300?random=4",
       "condition": "NEW",
@@ -103,7 +108,7 @@ const fakeData = {
       "name": "Djungelskog Plush Bear",
       "time_created": "1687785600",
       "time_sold": null,
-      "location": "{\"lat\": 37.7749, \"lng\": -122.4194}",
+      "location": "{\"lat\": 37.3382, \"lng\": -121.8863}",    // San Jose (~48 miles)
       "description": "Soft and cuddly plush bear from the Djungelskog collection.",
       "image_url": "https://picsum.photos/200/300?random=5",
       "condition": "NEW",
@@ -117,7 +122,7 @@ const fakeData = {
       "name": "Collapsible Laundry Basket",
       "time_created": "1687785600",
       "time_sold": null,
-      "location": "{\"lat\": 37.7749, \"lng\": -122.4194}",
+      "location": "{\"lat\": 37.8715, \"lng\": -122.2730}",    // Berkeley (~9 miles)
       "description": "Space-saving laundry basket that folds flat when not in use.",
       "image_url": "https://picsum.photos/200/300?random=6",
       "condition": "NEW",
@@ -131,7 +136,7 @@ const fakeData = {
       "name": "Cotton T-Shirt",
       "time_created": "1687785600",
       "time_sold": null,
-      "location": "{\"lat\": 37.7749, \"lng\": -122.4194}",
+      "location": "{\"lat\": 37.7749, \"lng\": -122.0819}",    // Fremont (~22 miles)
       "description": "Soft cotton t-shirt available in various sizes.",
       "image_url": "https://picsum.photos/200/300?random=7",
       "condition": "NEW",
@@ -145,7 +150,7 @@ const fakeData = {
       "name": "Ergonomic Office Chair",
       "time_created": "1687785600",
       "time_sold": null,
-      "location": "{\"lat\": 37.7749, \"lng\": -122.4194}",
+      "location": "{\"lat\": 37.6872, \"lng\": -122.4702}",    // Daly City (~10 miles)
       "description": "Comfortable office chair with lumbar support and adjustable height.",
       "image_url": "https://picsum.photos/200/300?random=8",
       "condition": "NEW",
@@ -159,7 +164,7 @@ const fakeData = {
       "name": "LED Desk Lamp",
       "time_created": "1687785600",
       "time_sold": null,
-      "location": "{\"lat\": 37.7749, \"lng\": -122.4194}",
+      "location": "{\"lat\": 37.8044, \"lng\": -122.2712}",    // Oakland (~8 miles)
       "description": "Energy-efficient LED desk lamp with adjustable brightness.",
       "image_url": "https://picsum.photos/200/300?random=9",
       "condition": "NEW",
@@ -173,7 +178,7 @@ const fakeData = {
       "name": "Reusable Shopping Bag",
       "time_created": "1687785600",
       "time_sold": null,
-      "location": "{\"lat\": 37.7749, \"lng\": -122.4194}",
+      "location": "{\"lat\": 37.8049, \"lng\": -122.2694}",    // Oakland (~7.5 miles)
       "description": "Eco-friendly reusable shopping bag made from recycled materials.",
       "image_url": "https://picsum.photos/200/300?random=10",
       "condition": "NEW",
@@ -187,7 +192,7 @@ const fakeData = {
       "name": "Smart LED Monitor",
       "time_created": "1687785600",
       "time_sold": null,
-      "location": "{\"lat\": 37.7749, \"lng\": -122.4194}",
+      "location": "{\"lat\": 37.7749, \"lng\": -122.4194}",    // San Francisco (center)
       "description": "27-inch smart LED monitor with built-in speakers and Wi-Fi.",
       "image_url": "https://picsum.photos/200/300?random=11",
       "condition": "NEW",
@@ -201,7 +206,7 @@ const fakeData = {
       "name": "Electric Bike ZR500",
       "time_created": "1687785600",
       "time_sold": null,
-      "location": "{\"lat\": 37.7749, \"lng\": -122.4194}",
+      "location": "{\"lat\": 37.5629, \"lng\": -122.3255}",    // Redwood City (~20 miles)
       "description": "High-performance electric bike with a 50-mile range and top speed of 28 mph.",
       "image_url": "https://picsum.photos/200/300?random=12",
       "condition": "NEW",
@@ -215,7 +220,7 @@ const fakeData = {
       "name": "Wireless Earbuds Pro",
       "time_created": "1687785600",
       "time_sold": null,
-      "location": "{\"lat\": 37.7749, \"lng\": -122.4194}",
+      "location": "{\"lat\": 37.7749, \"lng\": -122.4194}",    // San Francisco (center)
       "description": "Premium wireless earbuds with noise cancellation and 30-hour battery life.",
       "image_url": "https://picsum.photos/200/300?random=13",
       "condition": "NEW",
@@ -229,7 +234,7 @@ const fakeData = {
       "name": "Foldable Electric Scooter",
       "time_created": "1687785600",
       "time_sold": null,
-      "location": "{\"lat\": 37.7749, \"lng\": -122.4194}",
+      "location": "{\"lat\": 37.6875, \"lng\": -122.4700}",    // Daly City (~10 miles)
       "description": "Compact and foldable electric scooter with a 15-mile range.",
       "image_url": "https://picsum.photos/200/300?random=14",
       "condition": "NEW",
@@ -243,7 +248,7 @@ const fakeData = {
       "name": "Cast Iron Skillet",
       "time_created": "1687785600",
       "time_sold": null,
-      "location": "{\"lat\": 37.7749, \"lng\": -122.4194}",
+      "location": "{\"lat\": 37.4419, \"lng\": -122.1431}",    // Palo Alto (~33 miles)
       "description": "Pre-seasoned cast iron skillet perfect for searing, sautéing, baking, broiling, braising, frying, and more.",
       "image_url": "https://picsum.photos/200/300?random=15",
       "condition": "NEW",
@@ -257,7 +262,7 @@ const fakeData = {
       "name": "Adjustable Bed Frame",
       "time_created": "1687785600",
       "time_sold": null,
-      "location": "{\"lat\": 37.7749, \"lng\": -122.4194}",
+      "location": "{\"lat\": 37.8043, \"lng\": -122.2710}",    // Oakland (~8 miles)
       "description": "Adjustable bed frame with wireless remote and USB charging ports.",
       "image_url": "https://picsum.photos/200/300?random=16",
       "condition": "NEW",
@@ -271,7 +276,7 @@ const fakeData = {
       "name": "Smart LED Desk Lamp",
       "time_created": "1687785600",
       "time_sold": null,
-      "location": "{\"lat\": 37.7749, \"lng\": -122.4194}",
+      "location": "{\"lat\": 37.8716, \"lng\": -122.2727}",    // Berkeley (~9 miles)
       "description": "Adjustable smart LED desk lamp with touch controls and color temperature settings.",
       "image_url": "https://picsum.photos/200/300?random=17",
       "condition": "NEW",
@@ -285,7 +290,7 @@ const fakeData = {
       "name": "Stainless Steel Water Bottle",
       "time_created": "1687785600",
       "time_sold": null,
-      "location": "{\"lat\": 37.7749, \"lng\": -122.4194}",
+      "location": "{\"lat\": 37.3382, \"lng\": -121.8863}",    // San Jose (~48 miles)
       "description": "Durable stainless steel water bottle with double-wall insulation to keep drinks cold or hot.",
       "image_url": "https://picsum.photos/200/300?random=18",
       "condition": "NEW",
@@ -299,7 +304,7 @@ const fakeData = {
       "name": "4K Ultra HD Smart TV",
       "time_created": "1687785600",
       "time_sold": null,
-      "location": "{\"lat\": 37.7749, \"lng\": -122.4194}",
+      "location": "{\"lat\": 37.5628, \"lng\": -122.3256}",    // Redwood City (~20 miles)
       "description": "55-inch 4K Ultra HD Smart TV with built-in Wi-Fi and streaming apps.",
       "image_url": "https://picsum.photos/200/300?random=19",
       "condition": "NEW",
@@ -313,7 +318,7 @@ const fakeData = {
       "name": "Electric Scooter ZR300",
       "time_created": "1687785600",
       "time_sold": null,
-      "location": "{\"lat\": 37.7749, \"lng\": -122.4194}",
+      "location": "{\"lat\": 37.6870, \"lng\": -122.4701}",    // Daly City (~10 miles)
       "description": "High-performance electric scooter with a 30-mile range and top speed of 20 mph.",
       "image_url": "https://picsum.photos/200/300?random=20",
       "condition": "NEW",
@@ -345,7 +350,6 @@ async function resetDatabase() {
   await prisma.post.deleteMany()
   await prisma.user.deleteMany()
 }
-
 
 main()
   .catch((e) => {

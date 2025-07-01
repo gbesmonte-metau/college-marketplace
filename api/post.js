@@ -13,6 +13,29 @@ function isAuthenticated (req, res, next) {
     }
 }
 
+//Distance filtering calculations
+/* creds: https://gist.github.com/SimonJThompson/c9d01f0feeb95b18c7b0 */
+function toRad(v){return v * Math.PI / 180;}
+function kmToMiles(km) {return (km * 0.62137).toFixed(2);}
+function haversine(l1, l2) {
+	var R = 6371; // km
+	var x1 = l2.lat-l1.lat;
+	var dLat = toRad(x1);
+	var x2 = l2.lng-l1.lng;
+	var dLon = toRad(x2);
+	var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+			Math.cos(toRad(l1.lat)) * Math.cos(toRad(l2.lat)) *
+			Math.sin(dLon/2) * Math.sin(dLon/2);
+	var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+	var d = R * c;
+	return d;
+}
+function getDistanceCoords(coord1, coord2){
+    const distanceKM = haversine(coord1, coord2);
+    return kmToMiles(distanceKM);
+}
+
+
 //Get post of id
 router.get('/posts/:id', async (req, res, next) => {
     const postId = req.params.id;
@@ -66,9 +89,19 @@ router.get('/posts', async (req, res, next) => {
                 { description: { contains: req.query.search, mode: 'insensitive'} },
             ]
         }
-        const posts = await prisma.post.findMany({
+        let posts = await prisma.post.findMany({
             where: whereClause
         })
+        //distance
+        if (posts && req.query.distance != 'undefined' && req.session.user && req.session.user.location) {
+            const distance = parseInt(req.query.distance);
+            const userLocation = JSON.parse(req.session.user.location);
+            posts = posts.filter(post => {
+                const postLocation = JSON.parse(post.location);
+                const actualDistance = getDistanceCoords(userLocation, postLocation);
+                return actualDistance <= distance;
+            })
+        }
         if (posts.length > 0) {
             res.status(200).json(posts)
         } else {

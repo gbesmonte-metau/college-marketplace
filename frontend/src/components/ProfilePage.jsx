@@ -37,6 +37,10 @@ export default function ProfilePage() {
         }
     }
 
+    function HandleEdit() {
+
+    }
+
     useEffect(() => {
         getProfile();
         getLikedPosts();
@@ -49,13 +53,15 @@ export default function ProfilePage() {
                 <img className='profile-pic-large' src={userInfo.icon} alt="profile_pic" />
                 <p>Username: {userInfo.username}</p>
                 <p>Bio: {userInfo.bio}</p>
+                <p>Location: {userInfo.location ? userInfo.location : "No location"}</p>
+                <button onClick={HandleEdit}>Edit Profile</button>
                 <h2>Liked Posts:</h2>
                 <div className='liked-posts'>
-                    {likedPosts && likedPosts.length > 0 ? likedPosts.map(post => <Post post={post}></Post>) : <p>No liked posts</p>}
+                    {likedPosts && likedPosts.length > 0 ? likedPosts.map((post, idx) => <Post key={idx} post={post}></Post>) : <p>No liked posts</p>}
                 </div>
                 <h2>Saved Posts:</h2>
                 <div className='saved-posts'>
-                    {savedPosts && savedPosts.length > 0 ? savedPosts.map(post => <Post post={post}></Post>) : <p>No saved posts</p>}
+                    {savedPosts && savedPosts.length > 0 ? savedPosts.map((post,idx) => <Post key={idx} post={post}></Post>) : <p>No saved posts</p>}
                 </div>
 
             </div>

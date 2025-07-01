@@ -35,7 +35,13 @@ export default function PostPage() {
                 params.append("color", colorStr);
             }
         }
-        const response = await fetch(url + '?' + params.toString());
+        if (filter.distance != "All"){
+            params.append("distance", filter.distance);
+        }
+        const response = await fetch(url + '?' + params.toString(), {
+            method: 'GET',
+            credentials: 'include',
+        });
         console.log(url + '?' + params.toString());
         const result = await response.json();
         if (!response.ok) {

@@ -10,7 +10,7 @@ export default function AddressForm({setLocation}) {
     const inputref = useRef(null)
     const { isLoaded } = useJsApiLoader({
       id: "google-map-script",
-      googleMapsApiKey: import.meta.env.GOOGLE_API_KEY,
+      googleMapsApiKey: import.meta.env.VITE_GOOGLE_API_KEY,
       libraries: libraries,
     })
 
