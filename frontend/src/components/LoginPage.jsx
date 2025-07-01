@@ -29,7 +29,7 @@ export default function LoginPage() {
             navigate("/", result);
         }
         catch (error) {
-            console.log(error);
+            alert(error);
         }
     }
     return (

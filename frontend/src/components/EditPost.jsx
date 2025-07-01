@@ -25,7 +25,6 @@ export default function EditPost({postDetails, setIsEditOpen}) {
                 color: e.target[6].value || undefined,
             })
         };
-        console.log(settings.body);
         try {
             const response = await fetch(import.meta.env.VITE_URL + `/posts/${postDetails.id}`, settings);
             const result = await response.json();
@@ -38,7 +37,7 @@ export default function EditPost({postDetails, setIsEditOpen}) {
             }
         }
         catch (error) {
-            console.log(error);
+            alert(error);
         }
     }
 

@@ -1,11 +1,11 @@
 import React from 'react'
 import '../components-css/CreatePost.css'
-import { categoryArr, GetCategoryIdByName } from '../../utils'
+import { categoryArr, GetCategoryIdByName, conditionArr, GetConditionIdByName, colorArr, GetColorIdByName} from '../../utils'
 import { useState, useContext } from 'react'
 import { UserContext } from '../App';
 import { useNavigate } from 'react-router';
 import { fetchCreatePost } from '../api';
-import Places from './AddressForm';
+import AddressForm from './AddressForm';
 
 export default function CreatePost({setIsCreatePostOpen}) {
     const { user, setUser } = useContext(UserContext);
@@ -13,12 +13,12 @@ export default function CreatePost({setIsCreatePostOpen}) {
 
     //create variables
     const [price, setPrice] = useState(0);
-    const [category, setCategory] = useState(1);
+    const [category, setCategory] = useState(9);
     const [name, setName] = useState("");
     const [description, setDescription] = useState("");
     const [condition, setCondition] = useState("New");
     const [brand, setBrand] = useState("");
-    const [color, setColor] = useState("");
+    const [color, setColor] = useState("White");
     const [location, setLocation] = useState("{}");
 
     async function HandleCreate(e) {
@@ -56,21 +56,46 @@ export default function CreatePost({setIsCreatePostOpen}) {
                 <div>
                     <h2>Create Post</h2>
                     <form onSubmit={HandleCreate}>
-                        <input type="text" value={price} onChange={(e) => setPrice(e.target.value)} required/>
-                        <select name="category" id="category" value={category} onChange={(e) => setCategory(e.target.value)}>
-                            {categoryArr.slice(1,categoryArr.length).map((category, index) =>
-                                <option key={index} value={GetCategoryIdByName(category)}>{category}</option>
-                            )}
-                        </select>
-                        <input type='text' placeholder='Name' value={name} onChange={(e) => setName(e.target.value)} required/>
-                        <input type='text' placeholder='Description' value={description} onChange={(e) => setDescription(e.target.value)}/>
-                        <select name="condition" id="condition" value={condition} onChange={(e) => setCondition(e.target.value)}>
-                            <option value="new">New</option>
-                            <option value="used">Used</option>
-                        </select>
-                        <input type='text' placeholder='Brand' value={brand} onChange={(e) => setBrand(e.target.value)}/>
-                        <input type='text' placeholder='Color' value={color} onChange={(e) => setColor(e.target.value)}/>
-                        <Places setLocation={setLocation}></Places>
+                        <div>
+                            <p>Price</p>
+                            <input name="price" type="text" value={price} onChange={(e) => setPrice(e.target.value)} required/>
+                        </div>
+                        <div>
+                            <p>Category</p>
+                            <select name="category" id="category" value={category} onChange={(e) => setCategory(e.target.value)}>
+                                {categoryArr.slice(0,-1).map((category, index) =>
+                                    <option key={index} value={GetCategoryIdByName(category)}>{category}</option>
+                                )}
+                            </select>
+                        </div>
+                        <div>
+                            <p>Name</p>
+                            <input name="name" type='text' placeholder='Name' value={name} onChange={(e) => setName(e.target.value)} required/>
+                        </div>
+                        <div>
+                            <p>Description</p>
+                            <input name="description" type='text' placeholder='Description' value={description} onChange={(e) => setDescription(e.target.value)}/>
+                        </div>
+                        <div>
+                            <p>Condition</p>
+                            <select name="condition" id="condition" value={condition} onChange={(e) => setCondition(e.target.value)}>
+                                {conditionArr.slice(0,-1).map((condition, index) =>
+                                    <option key={index} value={condition}>{condition}</option>
+                                )}
+                            </select>
+                        </div>
+                        <div>
+                            <input name="brand" type='text' placeholder='Brand' value={brand} onChange={(e) => setBrand(e.target.value)}/>
+                        </div>
+                        <div>
+                            <p>Color</p>
+                            <select name="color" id="color" value={color} onChange={(e) => setColor(e.target.value)}>
+                                {colorArr.slice(0,-1).map((color, index) =>
+                                    <option key={index} value={color}>{color}</option>
+                                )}
+                            </select>
+                        </div>
+                        <AddressForm setLocation={setLocation}/>
                         {location}
                         <button type='submit'>Create</button>
                         <button onClick={() => setIsCreatePostOpen(false)}>Close</button>

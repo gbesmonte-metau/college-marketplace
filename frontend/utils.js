@@ -1,36 +1,20 @@
 const category = {
-  "All": 0,
-  "Electronics": 1,
-  "Transportation": 2,
-  "Kitchen": 3,
-  "Bedroom": 4,
-  "Toys/Collectibles": 5,
-  "Bathroom": 6,
-  "Clothing": 7,
-  "Furniture": 8,
-  "Decor": 9,
-  "Other": 10,
+  "Electronics": 0,
+  "Transportation": 1,
+  "Kitchen": 2,
+  "Bedroom": 3,
+  "Toys/Collectibles": 4,
+  "Bathroom": 5,
+  "Clothing": 6,
+  "Furniture": 7,
+  "Decor": 8,
+  "Other": 9,
+  "All": 10,
 }
 export const categoryArr = Object.keys(category);
 
-export function GetCategoryNameById(id){
-    return categoryArr[id];
-}
-
 export function GetCategoryIdByName(name){
     return category[name];
-}
-
-export function GetCategoryArrLength(){
-    return categoryArr.length;
-}
-
-export function GetCategoryArrToBool(){
-    let dict = {};
-    categoryArr.map((item) => {
-        dict[item] = false;
-    })
-    return dict;
 }
 
 export const color = {
@@ -45,7 +29,28 @@ export const color = {
     "Pink": 8,
     "Brown": 9,
     "Silver": 10,
-    "Gold": 11
+    "Gold": 11,
+    "Other": 12,
+    "All": 13,
 }
 
 export const colorArr = Object.keys(color);
+
+export function GetColorIdByName(name){
+    return color[name];
+}
+
+export const condition = {
+    "New": 0,
+    "Like New": 1,
+    "Good": 2,
+    "Fair": 3,
+    "Unspecified": 4,
+    "All": 5,
+}
+
+export const conditionArr = Object.keys(condition);
+
+export function GetConditionIdByName(name){
+    return condition[name];
+}

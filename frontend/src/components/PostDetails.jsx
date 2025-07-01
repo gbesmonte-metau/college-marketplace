@@ -25,11 +25,11 @@ export default function PostDetails() {
                 setPostDetails(result);
             }
             else{
-                console.log(result);
+                alert(result);
             }
         }
         catch(error){
-            console.log(error);
+            alert(error);
         }
     }
 

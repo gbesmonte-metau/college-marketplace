@@ -35,6 +35,11 @@ export default function PostPage() {
                 params.append("color", colorStr);
             }
         }
+        if (filter.condition){
+            for (const conditionStr of filter.condition){
+                params.append("condition", conditionStr);
+            }
+        }
         if (filter.distance != "All"){
             params.append("distance", filter.distance);
         }
@@ -42,7 +47,6 @@ export default function PostPage() {
             method: 'GET',
             credentials: 'include',
         });
-        console.log(url + '?' + params.toString());
         const result = await response.json();
         if (!response.ok) {
             setPosts([]);
@@ -66,7 +70,7 @@ export default function PostPage() {
         <div className='page'>
             <div className='search-bar'>
                 <form onSubmit={HandleSearch}>
-                    <input type="text" placeholder='Search for a post' value={search} onChange={(e) => setSearch(e.target.value)}/>
+                    <input name="search" type="text" placeholder='Search for a post' value={search} onChange={(e) => setSearch(e.target.value)}/>
                     <button type="submit">Search</button>
                     <button onClick={HandleClear}>Clear</button>
                 </form>

@@ -1,7 +1,7 @@
 import React from 'react'
 import { useState } from 'react'
 import "../components-css/Filter.css"
-import { categoryArr, colorArr} from '../../utils'
+import { categoryArr, colorArr, condition, conditionArr} from '../../utils'
 import MultiselectFilter from './MultiselectFilter';
 import { useContext } from 'react'
 import { UserContext } from '../App';
@@ -10,6 +10,7 @@ export default function Filter({filter, setFilter}) {
     const [price, setPrice] = useState(0);
     const [categories, setCategories] = useState([]);
     const [colors, setColors] = useState([]);
+    const [conditions, setConditions] = useState([]);
     const [distance, setDistance] = useState("All");
     const [triggerClear, setTriggerClear] = useState(false);
     const { user, setUser } = useContext(UserContext);
@@ -21,13 +22,14 @@ export default function Filter({filter, setFilter}) {
             price: price || undefined,
             category: categories.length > 0 ? categories : null,
             color: colors.length > 0 ? colors : null,
+            condition: conditions.length > 0 ? conditions : null,
             distance: distance || "All"
         })
     }
     function ClearFilter(){
         setPrice(0);
         setDistance("All");
-        setFilter({...filter, price: undefined, distance: undefined, category: null, color: null});
+        setFilter({...filter, price: undefined, distance: undefined, category: null, color: null, condition: null});
         setTriggerClear(!triggerClear);
     }
 
@@ -36,8 +38,8 @@ export default function Filter({filter, setFilter}) {
             <form onSubmit={HandleFilter}>
                 <div className='filter-price'>
                     <p>Price:</p>
-                    <input type='range' min='0' max='1000' value={price} onChange={(e) => setPrice(parseInt(e.target.value).toFixed(2))}/>
-                    <label htmlFor='range'>${price}</label>
+                    <input id="price" type='range' min='0' max='1000' value={price} onChange={(e) => setPrice(parseInt(e.target.value).toFixed(2))}/>
+                    <label htmlFor='price'>${price}</label>
                 </div>
                 {user && user.location && <div>
                     <p>Maximum distance: (miles)</p>
@@ -51,9 +53,11 @@ export default function Filter({filter, setFilter}) {
                     </select>
                 </div>}
                 <p>Category:</p>
-                <MultiselectFilter options={categoryArr.slice(1)} setOptions={setCategories} triggerClear={triggerClear}/>
+                <MultiselectFilter options={categoryArr.slice(0,-1)} setOptions={setCategories} triggerClear={triggerClear}/>
                 <p>Color:</p>
-                <MultiselectFilter options={colorArr} setOptions={setColors} triggerClear={triggerClear}/>
+                <MultiselectFilter options={colorArr.slice(0,-1)} setOptions={setColors} triggerClear={triggerClear}/>
+                <p>Condition:</p>
+                <MultiselectFilter options={conditionArr.slice(0,-1)} setOptions={setConditions} triggerClear={triggerClear}/>
                 <button type='submit'>Apply Filter</button>
                 <button type='button' onClick={ClearFilter}>Clear Filter</button>
             </form>

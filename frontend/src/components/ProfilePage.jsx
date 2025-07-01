@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react'
 import '../components-css/ProfilePage.css'
 import Post from './Post'
+import EditProfile from './EditProfile';
 
 export default function ProfilePage() {
     const [userInfo, setUserInfo] = useState({});
     const [likedPosts, setLikedPosts] = useState([]);
     const [savedPosts, setSavedPosts] = useState([]);
+    const [isEditOpen, setIsEditOpen] = useState(false);
 
     async function getProfile() {
         const response = await fetch(import.meta.env.VITE_URL + '/user', {
@@ -38,7 +40,7 @@ export default function ProfilePage() {
     }
 
     function HandleEdit() {
-
+        setIsEditOpen(true);
     }
 
     useEffect(() => {
@@ -63,8 +65,8 @@ export default function ProfilePage() {
                 <div className='saved-posts'>
                     {savedPosts && savedPosts.length > 0 ? savedPosts.map((post,idx) => <Post key={idx} post={post}></Post>) : <p>No saved posts</p>}
                 </div>
-
             </div>
+            {isEditOpen && <EditProfile setIsEditOpen={setIsEditOpen}/>}
         </div>
     )
 }

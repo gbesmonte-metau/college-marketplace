@@ -23,11 +23,11 @@ export default function RegisterPage() {
         try {
             const response = await fetch(import.meta.env.VITE_URL + '/users/register', settings);
             const result = await response.json();
-            console.log(result);
+            alert(result);
             navigate("/login", result);
         }
         catch (error) {
-            console.log(error);
+            alert(error);
         }
     }
 

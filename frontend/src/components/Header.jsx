@@ -25,7 +25,7 @@ export default function Header() {
             navigate('/');
         }
         catch (error) {
-            console.log(error);
+            alert(error);
         }
   }
 

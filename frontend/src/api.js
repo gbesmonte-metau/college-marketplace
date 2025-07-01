@@ -13,6 +13,6 @@ export async function fetchCreatePost(postBody){
         return response;
     }
     catch (error) {
-        console.log(error);
+        alert(error);
     }
 }

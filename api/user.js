@@ -142,7 +142,6 @@ router.patch('/user', isAuthenticated, async (req, res, next) => {
 //Get all posts that user liked
 router.get('/user/likes', isAuthenticated, async (req, res, next) => {
     const userId = req.session.user.id;
-    console.log(req.session.user.id)
     try {
         const user = await prisma.user.findUnique({
             where: {
@@ -181,12 +180,7 @@ router.get('/user/like/:id', isAuthenticated, async (req, res, next) => {
             next({ status: 404, message: `No user found with ID ${userId}` })
         }
         const post = user.Post_UserLikedPosts.find(post => post.id === parseInt(postId));
-        if (post){
-            res.status(200).json({liked: true});
-        }
-        else{
-            res.status(200).json({liked: false})
-        }
+        res.status(200).json({liked: post});
     }
     catch (err) {
         next(err)
@@ -214,7 +208,7 @@ router.post('/user/like/:id', isAuthenticated, async (req, res, next) => {
 })
 
 //Unlike a post
-router.delete('/user/unlike/:id', isAuthenticated, async (req, res, next) => {
+router.post('/user/unlike/:id', isAuthenticated, async (req, res, next) => {
     const userId = req.session.user.id;
     const postId = req.params.id;
     try {
@@ -248,12 +242,7 @@ router.get('/user/save/:id', isAuthenticated, async (req, res, next) => {
             next({ status: 404, message: `No user found with ID ${userId}` })
         }
         const post = user.Post_UserSavedPosts.find(post => post.id === parseInt(postId));
-        if (post){
-            res.status(200).json({saved: true});
-        }
-        else{
-            res.status(200).json({saved: false})
-        }
+        res.status(200).json({saved: post});
     }
     catch (err) {
         next(err)
@@ -307,7 +296,7 @@ router.post('/user/save/:id', isAuthenticated, async (req, res, next) => {
 })
 
 //Unsave a post
-router.delete('/user/unsave/:id', isAuthenticated, async (req, res, next) => {
+router.post('/user/unsave/:id', isAuthenticated, async (req, res, next) => {
     const userId = req.session.user.id;
     const postId = req.params.id;
     try {

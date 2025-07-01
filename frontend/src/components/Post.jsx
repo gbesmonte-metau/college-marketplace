@@ -32,12 +32,7 @@ export default function Post({post}) {
                 credentials: 'include',
             });
             const result = await response.json();
-            if (result.liked){
-                setIsLiked(true);
-            }
-            else {
-                setIsLiked(false);
-            }
+            setIsLiked(result.liked);
         }
         catch (e){
             alert(e);
@@ -49,12 +44,7 @@ export default function Post({post}) {
                 credentials: 'include',
             });
             const result = await response.json();
-            if (result.saved){
-                setIsSaved(true);
-            }
-            else {
-                setIsSaved(false);
-            }
+            setIsSaved(result.saved);
         }
         catch (e){
             alert(e);
@@ -65,24 +55,14 @@ export default function Post({post}) {
     async function HandleLike(e){
         e.preventDefault();
         e.stopPropagation();
+        const URL = import.meta.env.VITE_URL + (isLiked ? `/user/unlike/${post.id}` : `/user/like/${post.id}`);
         try{
-            if (isLiked){
-                const response = await fetch(import.meta.env.VITE_URL + `/user/unlike/${post.id}`, {
-                    credentials: 'include',
-                    method: 'DELETE'
-                });
-                if (response.ok){
-                    setIsLiked(false);
-                }
-            }
-            else{
-                const response = await fetch(import.meta.env.VITE_URL + `/user/like/${post.id}`, {
-                    credentials: 'include',
-                    method: 'POST'
-                });
-                if (response.ok){
-                    setIsLiked(true);
-                }
+            const response = await fetch(URL, {
+                credentials: 'include',
+                method: 'POST'
+            });
+            if (response.ok){
+                setIsLiked(!isLiked);
             }
         }
         catch (e){
@@ -93,24 +73,14 @@ export default function Post({post}) {
     async function HandleSave(e){
         e.preventDefault();
         e.stopPropagation();
+        const URL = import.meta.env.VITE_URL + (isSaved ? `/user/unsave/${post.id}` : `/user/save/${post.id}`);
         try{
-            if (isSaved){
-                const response = await fetch(import.meta.env.VITE_URL + `/user/unsave/${post.id}`, {
-                    credentials: 'include',
-                    method: 'DELETE'
-                });
-                if (response.ok){
-                    setIsSaved(false);
-                }
-            }
-            else{
-                const response = await fetch(import.meta.env.VITE_URL + `/user/save/${post.id}`, {
-                    credentials: 'include',
-                    method: 'POST'
-                });
-                if (response.ok){
-                    setIsSaved(true);
-                }
+            const response = await fetch(URL, {
+                credentials: 'include',
+                method: 'POST'
+            });
+            if (response.ok){
+                setIsSaved(!isSaved);
             }
         }
         catch (e){

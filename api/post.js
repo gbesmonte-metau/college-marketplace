@@ -82,6 +82,15 @@ router.get('/posts', async (req, res, next) => {
         else if (req.query?.color){
             whereClause.color = { contains: req.query.color, mode: 'insensitive' };
         }
+        //multiple conditions
+        if (Array.isArray(req.query.condition)) {
+            const conditions = req.query.condition.map(String);
+            whereClause.condition = { in: conditions, mode: 'insensitive' };
+        }
+        //one condition
+        else if (req.query?.condition){
+            whereClause.condition = { contains: req.query.condition, mode: 'insensitive' };
+        }
         //search
         if (req.query.search) {
             whereClause.OR = [
