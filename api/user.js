@@ -128,7 +128,6 @@ router.patch('/user', isAuthenticated, async (req, res, next) => {
             },
             data: updatedFields
         });
-
         if (newUser) {
             res.status(200).json(newUser)
         } else {

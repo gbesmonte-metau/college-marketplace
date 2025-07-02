@@ -20,9 +20,11 @@ model User {
   username String @unique
   password String
   location String?
+  formatted_address String?
   icon String?
   bio String?
-  createdPosts Post[]
+  createdPosts Post[] @relation("UserCreatedPosts")
+  boughtPosts Post[] @relation("UserBoughtPosts")
   Post_UserLikedPosts Post[] @relation("UserLikedPosts")
   Post_UserSavedPosts Post[] @relation("UserSavedPosts")
 }
@@ -35,13 +37,16 @@ model Post {
   time_created String
   time_sold String?
   location String
+  formatted_address String @default("unknown")
   description String?
   image_url String?
   condition String?
   brand String?
   color String?
-  author   User @relation(fields: [authorId], references: [id])
+  author   User @relation("UserCreatedPosts", fields: [authorId], references: [id])
   authorId Int
+  buyer User? @relation("UserBoughtPosts", fields: [buyerId], references: [id])
+  buyerId Int?
   User_UserLikedPosts User[] @relation("UserLikedPosts")
   User_UserSavedPosts User[] @relation("UserSavedPosts")
 }

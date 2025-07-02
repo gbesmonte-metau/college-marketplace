@@ -1,6 +1,6 @@
 import React from 'react'
 import '../components-css/CreatePost.css'
-import { categoryArr, GetCategoryIdByName, conditionArr, GetConditionIdByName, colorArr, GetColorIdByName} from '../../utils'
+import { categoryArr, GetCategoryIdByName, conditionArr, colorArr} from '../../utils'
 import { useState, useContext } from 'react'
 import { UserContext } from '../App';
 import { useNavigate } from 'react-router';
@@ -21,6 +21,7 @@ export default function CreatePost({setIsCreatePostOpen}) {
     const [brand, setBrand] = useState("");
     const [color, setColor] = useState("White");
     const [location, setLocation] = useState("{}");
+    const [formattedAddr, setFormattedAddr] = useState("");
     const [url, setUrl] = useState("");
 
     async function HandleCreate(e) {
@@ -39,6 +40,7 @@ export default function CreatePost({setIsCreatePostOpen}) {
             color: color,
             time_created: Date.now().toString(),
             location: location,
+            formatted_address: formattedAddr,
             image_url: url,
             authorId: user.id,
         }
@@ -81,13 +83,14 @@ export default function CreatePost({setIsCreatePostOpen}) {
                         </div>
                         <div>
                             <p>Condition</p>
-                            <select name="condition" id="condition" value={condition} onChange={(e) => setCondition(e.target.value)}>
+                            <select name="condition" id="condition" value={condition} onChange={(e) => setCondition(e.target.value)} required>
                                 {conditionArr.slice(0,-1).map((condition, index) =>
                                     <option key={index} value={condition}>{condition}</option>
                                 )}
                             </select>
                         </div>
                         <div>
+                            <p>Brand</p>
                             <input name="brand" type='text' placeholder='Brand' value={brand} onChange={(e) => setBrand(e.target.value)}/>
                         </div>
                         <div>
@@ -98,8 +101,7 @@ export default function CreatePost({setIsCreatePostOpen}) {
                                 )}
                             </select>
                         </div>
-                        <AddressForm setLocation={setLocation}/>
-                        {location}
+                        <AddressForm setLocation={setLocation} setFormattedAddr={setFormattedAddr}/>
                         <UploadImage url={url} setUrl={setUrl}/>
                         <button type='submit'>Create</button>
                         <button onClick={() => setIsCreatePostOpen(false)}>Close</button>

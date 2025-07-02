@@ -60,6 +60,8 @@ router.get('/posts/:id', async (req, res, next) => {
 router.get('/posts', async (req, res, next) => {
     try {
         const whereClause = {};
+        //exclude purchased posts
+        whereClause.buyerId = null;
         //price
         if (req.query.price != 'undefined') {
             whereClause.price = { lte: parseFloat(req.query.price) };
@@ -251,7 +253,65 @@ router.delete('/posts/:id', isAuthenticated, async (req, res, next) => {
     }
 })
 
-//TODO: NOT TESTED
+//Purchase a post
+router.post('/posts/:id/purchase', isAuthenticated, async (req, res, next) => {
+    const userId = req.session.user.id
+    const postId = req.params.id;
+    try {
+        const getPost = await prisma.post.findUnique({
+            where: {
+                id: parseInt(postId)
+            }
+        })
+        if (!getPost) {
+            next({ status: 404, message: `No post found with ID ${postId}` });
+            return;
+        }
+        if (getPost.authorId === userId) {
+            next({ status: 403, message: `You are the author of this post` });
+            return;
+        }
+        const newPost = await prisma.post.update({
+            where: {
+                id: parseInt(postId)
+            },
+            data: {
+                buyerId: userId,
+                time_sold: Date.now().toString()
+            }
+        });
+        if (newPost) {
+            res.status(200).json(newPost)
+        }
+        else {
+            next({ status: 404, message: `No post found with ID ${postId}` })
+        }
+    }
+    catch (err) {
+        next(err)
+    }
+})
+
+//Get all posts a user bought
+router.get('/bought', isAuthenticated, async (req, res, next) => {
+    const userId = req.session.user.id;
+    try {
+        const posts = await prisma.post.findMany({
+            where: {
+                buyerId: parseInt(userId)
+            }
+        })
+        if (posts.length > 0) {
+            res.status(200).json(posts)
+        } else {
+            next({ status: 404, message: `No posts found with user ID ${userId}` })
+        }
+    }
+    catch (err) {
+        next(err)
+    }
+})
+
 //Edit a post
 router.patch('/posts/:id', isAuthenticated, async (req, res, next) => {
     const userId = req.session.user.id
@@ -273,7 +333,7 @@ router.patch('/posts/:id', isAuthenticated, async (req, res, next) => {
         }
         const newPost = await prisma.post.update({
             where: {
-                id: parseInt(userId)
+                id: parseInt(postId)
             },
             data: updatedFields
         });

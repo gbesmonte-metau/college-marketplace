@@ -57,7 +57,7 @@ export default function UploadImage({url, setUrl}) {
           )}
         </div>
         <div>
-          {!url && (loading ? (
+          {loading ? (
             <div>
               <p>Loading</p>
             </div>
@@ -71,7 +71,7 @@ export default function UploadImage({url, setUrl}) {
                         type="file" />
                 </label>
             </div>
-            ))}
+            )}
         </div>
       </div>
     );

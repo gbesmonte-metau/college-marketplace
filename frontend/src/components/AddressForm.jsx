@@ -5,7 +5,8 @@ import {
 import { useState, useRef } from "react"
 
 const libraries = ["places"]
-export default function AddressForm({setLocation}) {
+
+export default function AddressForm({setLocation, setFormattedAddr}) {
     const [address, setAddress] = useState("")
     const inputref = useRef(null)
     const { isLoaded } = useJsApiLoader({
@@ -21,7 +22,8 @@ export default function AddressForm({setLocation}) {
       if (lat && lng) {
         setLocation(JSON.stringify({lat, lng}));
       }
-      setAddress(address)
+      setFormattedAddr(address[0].formatted_address);
+      setAddress(address);
     }
 
     return (

@@ -13,8 +13,8 @@
 }
 .edit-body {
     background: white;
-    height: 30%;
-    width: 30%;
+    height: 80%;
+    width: 80%;
     border-radius: 20px;
     overflow: scroll;
 }

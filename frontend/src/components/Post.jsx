@@ -12,14 +12,20 @@ import { FaBookmark } from "react-icons/fa";
 export default function Post({post}) {
     const [isLiked, setIsLiked] = useState(false);
     const [isSaved, setIsSaved] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
     const { user, setUser } = useContext(UserContext);
 
     useEffect(() => {
-        if (user){
-            GetIsLiked();
-            GetIsSaved();
-        }
+        Initialize();
     }, []);
+
+    async function Initialize(){
+        if (user){
+            await GetIsLiked();
+            await GetIsSaved();
+        }
+        setIsLoading(false);
+    }
 
     const navigate = useNavigate();
     function OpenPost(){
@@ -89,12 +95,16 @@ export default function Post({post}) {
     }
 
     return (
-        <div onClick={OpenPost}>
-            <p>{post.name}</p>
-            <img className='post-image' src={post.image_url ? post.image_url : "../../public/placeholder.png"} alt={post.name}/>
-            <p>${post.price.toFixed(2)}</p>
-            <button onClick={HandleLike}>{isLiked ? <FaHeart/> : <FaRegHeart/> }</button>
-            <button onClick={HandleSave}>{isSaved ? <FaBookmark/> : <FaRegBookmark/> }</button>
-        </div>
+        <>
+            {!isLoading ?
+            <div onClick={OpenPost}>
+                <p>{post.name}</p>
+                <img className='post-image' src={post.image_url ? post.image_url : "../../public/placeholder.png"} alt={post.name}/>
+                <p>${post.price.toFixed(2)}</p>
+                <button onClick={HandleLike}>{isLiked ? <FaHeart/> : <FaRegHeart/> }</button>
+                <button onClick={HandleSave}>{isSaved ? <FaBookmark/> : <FaRegBookmark/> }</button>
+            </div>:
+            <p>Loading</p>}
+        </>
     )
 }

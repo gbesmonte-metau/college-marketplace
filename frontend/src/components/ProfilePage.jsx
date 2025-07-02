@@ -7,6 +7,7 @@ export default function ProfilePage() {
     const [userInfo, setUserInfo] = useState({});
     const [likedPosts, setLikedPosts] = useState([]);
     const [savedPosts, setSavedPosts] = useState([]);
+    const [boughtPosts, setBoughtPosts] = useState([]);
     const [isEditOpen, setIsEditOpen] = useState(false);
 
     async function getProfile() {
@@ -39,6 +40,16 @@ export default function ProfilePage() {
         }
     }
 
+    async function getBoughtPosts() {
+        const response = await fetch(import.meta.env.VITE_URL + '/bought', {
+            credentials: 'include'
+        });
+        const result = await response.json();
+        if (response.ok){
+            setBoughtPosts(result);
+        }
+    }
+
     function HandleEdit() {
         setIsEditOpen(true);
     }
@@ -47,6 +58,7 @@ export default function ProfilePage() {
         getProfile();
         getLikedPosts();
         getSavedPosts();
+        getBoughtPosts();
     }, [])
 
     return (
@@ -55,7 +67,7 @@ export default function ProfilePage() {
                 <img className='profile-pic-large' src={userInfo.icon} alt="profile_pic" />
                 <p>Username: {userInfo.username}</p>
                 <p>Bio: {userInfo.bio}</p>
-                <p>Location: {userInfo.location ? userInfo.location : "No location"}</p>
+                <p>Location: {userInfo.formatted_address ? userInfo.formatted_address : "No location"}</p>
                 <button onClick={HandleEdit}>Edit Profile</button>
                 <h2>Liked Posts:</h2>
                 <div className='liked-posts'>
@@ -65,8 +77,12 @@ export default function ProfilePage() {
                 <div className='saved-posts'>
                     {savedPosts && savedPosts.length > 0 ? savedPosts.map((post,idx) => <Post key={idx} post={post}></Post>) : <p>No saved posts</p>}
                 </div>
+                <h2>My Purchases:</h2>
+                <div className='purchased-posts'>
+                    {boughtPosts && boughtPosts.length > 0 ? boughtPosts.map((post,idx) => <Post key={idx} post={post}></Post>) : <p>No purchases</p>}
+                </div>
             </div>
-            {isEditOpen && <EditProfile setIsEditOpen={setIsEditOpen}/>}
+            {isEditOpen && <EditProfile userInfo={userInfo} setIsEditOpen={setIsEditOpen}/>}
         </div>
     )
 }
