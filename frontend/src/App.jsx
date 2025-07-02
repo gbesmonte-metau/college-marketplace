@@ -39,7 +39,7 @@ const routes = createBrowserRouter([
       {
         path: '/myposts',
         element: <MyPostsPage/>
-      }
+      },
     ]
   },
 ]);

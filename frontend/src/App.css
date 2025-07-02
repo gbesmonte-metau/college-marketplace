@@ -24,3 +24,8 @@
   border-radius: 50%;
   background-color: white;
 }
+.uploaded-img{
+  width: 300px;
+  height: 300px;
+  object-fit: cover;
+}

@@ -6,6 +6,7 @@ import { UserContext } from '../App';
 import { useNavigate } from 'react-router';
 import { fetchCreatePost } from '../api';
 import AddressForm from './AddressForm';
+import UploadImage from './UploadImage';
 
 export default function CreatePost({setIsCreatePostOpen}) {
     const { user, setUser } = useContext(UserContext);
@@ -20,6 +21,7 @@ export default function CreatePost({setIsCreatePostOpen}) {
     const [brand, setBrand] = useState("");
     const [color, setColor] = useState("White");
     const [location, setLocation] = useState("{}");
+    const [url, setUrl] = useState("");
 
     async function HandleCreate(e) {
         e.preventDefault()
@@ -37,6 +39,7 @@ export default function CreatePost({setIsCreatePostOpen}) {
             color: color,
             time_created: Date.now().toString(),
             location: location,
+            image_url: url,
             authorId: user.id,
         }
         const response = await fetchCreatePost(body);
@@ -97,6 +100,7 @@ export default function CreatePost({setIsCreatePostOpen}) {
                         </div>
                         <AddressForm setLocation={setLocation}/>
                         {location}
+                        <UploadImage url={url} setUrl={setUrl}/>
                         <button type='submit'>Create</button>
                         <button onClick={() => setIsCreatePostOpen(false)}>Close</button>
                     </form>
