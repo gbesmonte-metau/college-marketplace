@@ -25,13 +25,18 @@ export default function Header() {
             navigate('/');
         }
         catch (error) {
-            console.log(error);
+            alert(error);
         }
+  }
+
+  function HandleTitleClick(e) {
+      e.preventDefault();
+      navigate('/');
   }
 
   return (
     <div className="app-header">
-       <h1>College Marketplace</h1>
+       <h1 onClick={HandleTitleClick}>College Marketplace</h1>
        <nav className='nav-bar'>
         <Link to='/'>Home</Link>
         {!user && <Link to='/login'>Login</Link>}

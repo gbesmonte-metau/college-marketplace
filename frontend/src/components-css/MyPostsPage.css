@@ -1,5 +1,13 @@
 .mypost-body{
     display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+.mypost-grid {
+    display: flex;
     gap: 20px;
     flex-wrap: wrap;
 }

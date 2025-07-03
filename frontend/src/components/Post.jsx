@@ -1,53 +1,111 @@
 import React from 'react'
-import { useNavigate } from 'react-router'
+import { useNavigate} from 'react-router'
+import { useState, useEffect } from 'react';
+import { useContext } from 'react'
+import { UserContext } from '../App';
+
+import { FaHeart } from "react-icons/fa";
+import { FaRegHeart } from "react-icons/fa";
+import { FaRegBookmark } from "react-icons/fa";
+import { FaBookmark } from "react-icons/fa";
+import "../components-css/Post.css"
 
 export default function Post({post}) {
+    const [isLiked, setIsLiked] = useState(false);
+    const [isSaved, setIsSaved] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
+    const { user, setUser } = useContext(UserContext);
+
+    useEffect(() => {
+        Initialize();
+    }, []);
+
+    async function Initialize(){
+        if (user){
+            await GetIsLiked();
+            await GetIsSaved();
+        }
+        setIsLoading(false);
+    }
+
     const navigate = useNavigate();
     function OpenPost(){
-        navigate(`/post/${post.id}`);
+        navigate(`/posts/${post.id}`);
+    }
+
+    async function GetIsLiked(){
+        try{
+            const response = await fetch(import.meta.env.VITE_URL + `/user/like/${post.id}`, {
+                credentials: 'include',
+            });
+            const result = await response.json();
+            setIsLiked(result.liked);
+        }
+        catch (e){
+            alert(e);
+        }
+    }
+    async function GetIsSaved(){
+        try{
+            const response = await fetch(import.meta.env.VITE_URL + `/user/save/${post.id}`, {
+                credentials: 'include',
+            });
+            const result = await response.json();
+            setIsSaved(result.saved);
+        }
+        catch (e){
+            alert(e);
+        }
+
     }
 
     async function HandleLike(e){
         e.preventDefault();
         e.stopPropagation();
-        console.log("Like");
-        const response = await fetch(import.meta.env.VITE_URL + `/user/like/${post.id}`, {
-            credentials: 'include',
-            method: 'POST'
-        });
-        const result = await response.json();
-        if (response.ok){
-            alert("you liked this post");
+        const URL = import.meta.env.VITE_URL + (isLiked ? `/user/unlike/${post.id}` : `/user/like/${post.id}`);
+        try{
+            const response = await fetch(URL, {
+                credentials: 'include',
+                method: 'POST'
+            });
+            if (response.ok){
+                setIsLiked(!isLiked);
+            }
         }
-        else{
-            alert(result.message);
+        catch (e){
+            alert(e);
         }
     }
 
     async function HandleSave(e){
         e.preventDefault();
         e.stopPropagation();
-        console.log("Save");
-        const response = await fetch(import.meta.env.VITE_URL + `/user/save/${post.id}`, {
-            credentials: 'include',
-            method: 'POST'
-        });
-        const result = await response.json();
-        if (response.ok){
-            alert("you saved this post");
+        const URL = import.meta.env.VITE_URL + (isSaved ? `/user/unsave/${post.id}` : `/user/save/${post.id}`);
+        try{
+            const response = await fetch(URL, {
+                credentials: 'include',
+                method: 'POST'
+            });
+            if (response.ok){
+                setIsSaved(!isSaved);
+            }
         }
-        else{
-            alert(result.message);
+        catch (e){
+            alert(e);
         }
     }
 
     return (
-        <div onClick={OpenPost}>
-            <p>{post.name}</p>
+        <div className="post" onClick={OpenPost}>
             <img className='post-image' src={post.image_url ? post.image_url : "../../public/placeholder.png"} alt={post.name}/>
-            <p>${post.price.toFixed(2)}</p>
-            <button onClick={HandleLike}>Like</button>
-            <button onClick={HandleSave}>Save</button>
+            <div className='post-content'>
+                <p>{post.name}</p>
+                <p className='price-tag'>${post.price.toFixed(2)}</p>
+                <div className='post-buttons'>
+                    <button onClick={HandleLike}>{isLiked ? <FaHeart/> : <FaRegHeart/> }</button>
+                    <button onClick={HandleSave}>{isSaved ? <FaBookmark/> : <FaRegBookmark/> }</button>
+                </div>
+            </div>
         </div>
     )
 }

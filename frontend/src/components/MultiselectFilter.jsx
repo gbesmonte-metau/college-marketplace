@@ -24,11 +24,12 @@ export default function MultiselectFilter({options, setOptions, triggerClear}) {
 
     return (
         <div className='filter-category'>
-            <p>Category:</p>
             {options.map((c, id) => (
                 <div className='filter' key={id}>
-                    <input type='checkbox' checked={optionChecked[c]} onChange={() => HandleCheckedChange(c)}/>
-                    <label htmlFor={c}>{c}</label>
+                    <label>
+                        <input id={c} type='checkbox' checked={optionChecked[c]} onChange={() => HandleCheckedChange(c)}/>
+                        {c}
+                    </label>
                 </div>
             ))}
         </div>

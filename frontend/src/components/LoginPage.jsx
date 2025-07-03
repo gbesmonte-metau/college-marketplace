@@ -29,18 +29,26 @@ export default function LoginPage() {
             navigate("/", result);
         }
         catch (error) {
-            console.log(error);
+            alert(error);
         }
     }
     return (
         <div className="page">
-            <div className='login-body'>
-                <h2>Log in</h2>
-                <form className='login-form' onSubmit={HandleLogin}>
-                    <input type="text" placeholder="Email" required/>
-                    <input type="password" placeholder="Password" required/>
-                    <button type="submit">Login</button>
-                </form>
+            <div className='login-box'>
+                <div className='login-body'>
+                    <h2>Welcome Back!</h2>
+                    <form className='login-form' onSubmit={HandleLogin}>
+                        <div>
+                            <p>Email:</p>
+                            <input type="text" placeholder="Email" required/>
+                        </div>
+                        <div>
+                            <p>Password:</p>
+                            <input type="password" placeholder="Password" required/>
+                        </div>
+                        <button type="submit">Login</button>
+                    </form>
+                </div>
             </div>
         </div>
     )

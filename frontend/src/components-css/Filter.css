@@ -1,3 +1,13 @@
+.filter-box{
+    margin-left: 20px;
+    background-color: var(--background);
+    border-radius: 10px;
+    padding: 10px;
+ }
+
+.filter-box p {
+    font-weight: bold;
+}
 .filter-category{
     display: flex;
     flex-direction: column;

@@ -11,10 +11,39 @@
     justify-content: center;
     align-items: center;
 }
+.edit-modal h2 {
+    margin-left: 10px;
+}
 .edit-body {
     background: white;
-    height: 30%;
-    width: 30%;
+    height: 80%;
+    width: 80%;
     border-radius: 20px;
     overflow: scroll;
+}
+.edit-option {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    align-items: center;
+}
+.edit-option input, .edit-option select {
+    width: 200px;
+    height: 30px;
+    margin: 0;
+    padding: 5px;
+    font-family: 'Montserrat', sans-serif;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-size: 14px;
+}
+.edit-box {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+}
+.edit-post-img {
+    width: 500px;
+    height: 500px;
+    object-fit: cover;
+    justify-self: center;
 }

@@ -1,13 +1,28 @@
+.register-box {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-image: linear-gradient(var(--primary), var(--accent));
+}
 .register-body{
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    height: 100%;
+    background-color: white;
+    width: 300px;
+    height: 400px;
+    border-radius: 10px;
 }
 .register-form{
     display:flex;
     flex-direction: column;
-    padding: 20px;
-    background-color: lightgray;
+}
+.register-form input {
+    padding: 5px;
+    font-family: 'Montserrat', sans-serif;
+}
+.register-form button {
+    margin-top: 20px;
 }
