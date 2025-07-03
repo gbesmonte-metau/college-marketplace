@@ -33,14 +33,25 @@ export default function RegisterPage() {
 
     return (
         <div className="page">
-            <div className='register-body'>
-                <h2>Register</h2>
-                <form className='register-form' onSubmit={HandleRegister}>
-                    <input type="text" placeholder="Email" required/>
-                    <input type="text" placeholder="Username" required/>
-                    <input type="password" placeholder="Password" required/>
-                    <button type="submit">Register</button>
-                </form>
+            <div className='register-box'>
+                <div className='register-body'>
+                    <h2>Welcome!</h2>
+                    <form className='register-form' onSubmit={HandleRegister}>
+                        <div>
+                            <p>Email:</p>
+                            <input type="text" placeholder="Email" required/>
+                        </div>
+                        <div>
+                            <p>Username:</p>
+                            <input type="text" placeholder="Username" required/>
+                        </div>
+                        <div>
+                            <p>Password:</p>
+                            <input type="password" placeholder="Password" required/>
+                        </div>
+                        <button type="submit">Register</button>
+                    </form>
+                </div>
             </div>
         </div>
   )

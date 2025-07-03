@@ -58,14 +58,15 @@ export default function EditPost({postDetails, setIsEditOpen}) {
     return (
         <div className='edit-modal'>
             <div className='edit-body'>
-                <div>
-                    <h2>Edit Post</h2>
+                <h2>Edit Post</h2>
+                <div className='edit-box'>
+                    {url ? <img className='edit-post-img' src={url} alt="uploaded image" /> : <img className='edit-post-img' src='../../placeholder.png' alt="placeholder image"/>}
                     <form onSubmit={HandleEdit}>
-                        <div>
+                        <div className='edit-option'>
                             <p>Price</p>
                             <input name="price" type="text" value={price} onChange={(e) => setPrice(e.target.value)} required/>
                         </div>
-                        <div>
+                        <div className='edit-option'>
                             <p>Category</p>
                             <select name="category" id="category" value={category} onChange={(e) => setCategory(e.target.value)}>
                                 {categoryArr.slice(0,-1).map((category, index) =>
@@ -73,15 +74,15 @@ export default function EditPost({postDetails, setIsEditOpen}) {
                                 )}
                             </select>
                         </div>
-                        <div>
+                        <div className='edit-option'>
                             <p>Name</p>
                             <input name="name" type='text' placeholder='Name' value={name} onChange={(e) => setName(e.target.value)} required/>
                         </div>
-                        <div>
+                        <div className='edit-option'>
                             <p>Description</p>
                             <input name="description" type='text' placeholder='Description' value={description} onChange={(e) => setDescription(e.target.value)}/>
                         </div>
-                        <div>
+                        <div className='edit-option'>
                             <p>Condition</p>
                             <select name="condition" id="condition" value={condition} onChange={(e) => setCondition(e.target.value)}>
                                 {conditionArr.slice(0,-1).map((condition, index) =>
@@ -89,11 +90,11 @@ export default function EditPost({postDetails, setIsEditOpen}) {
                                 )}
                             </select>
                         </div>
-                        <div>
+                        <div className='edit-option'>
                             <p>Brand</p>
                             <input name="brand" type='text' placeholder='Brand' value={brand} onChange={(e) => setBrand(e.target.value)}/>
                         </div>
-                        <div>
+                        <div className='edit-option'>
                             <p>Color</p>
                             <select name="color" id="color" value={color} onChange={(e) => setColor(e.target.value)}>
                                 {colorArr.slice(0,-1).map((color, index) =>
@@ -101,8 +102,14 @@ export default function EditPost({postDetails, setIsEditOpen}) {
                                 )}
                             </select>
                         </div>
-                        <AddressForm setLocation={setLocation} setFormattedAddr={setFormattedAddr}/>
-                        <UploadImage url={url} setUrl={setUrl}/>
+                        <div className='edit-option'>
+                            <p>Location</p>
+                            <AddressForm setLocation={setLocation} setFormattedAddr={setFormattedAddr}/>
+                        </div>
+                        <div className='edit-option'>
+                            <p>Image</p>
+                            <UploadImage url={url} setUrl={setUrl}/>
+                        </div>
                         <button type='submit'>Edit</button>
                         <button onClick={() => setIsEditOpen(false)}>Close</button>
                     </form>

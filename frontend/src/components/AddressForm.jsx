@@ -29,7 +29,6 @@ export default function AddressForm({setLocation, setFormattedAddr}) {
     return (
       <>
           <div>
-            <p>Address</p>
             {isLoaded && (
               <StandaloneSearchBox
                 onLoad={(ref) => (inputref.current = ref)}

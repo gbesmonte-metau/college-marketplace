@@ -5,7 +5,7 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
-    background-color: #e9fbf4;
+    background-color: var(--light-primary);
     border-radius: 10px;
     overflow: hidden;
 }

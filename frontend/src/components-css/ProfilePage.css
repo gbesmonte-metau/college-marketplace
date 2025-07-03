@@ -36,7 +36,10 @@ nav ul {
     gap: 20px;
 }
 nav ul li {
-    border-top: 1px solid lightgray;
+    border-bottom: 1px solid lightgray;
     width: 100px;
     text-align: center;
+}
+.selected {
+    font-weight: bold;
 }

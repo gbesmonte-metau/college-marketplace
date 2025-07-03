@@ -34,7 +34,7 @@ const routes = createBrowserRouter([
         element: <RegisterPage/>
       },
       {
-        path: '/post/:id',
+        path: '/posts/:id',
         element: <PostDetails/>
       },
       {

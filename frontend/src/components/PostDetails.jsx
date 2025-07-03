@@ -5,6 +5,7 @@ import { categoryArr } from '../../utils';
 import { useContext } from 'react'
 import { UserContext } from '../App';
 import EditPost from './EditPost';
+import "../components-css/PostDetails.css"
 
 export default function PostDetails() {
     const id = useParams().id;
@@ -72,29 +73,37 @@ export default function PostDetails() {
 
 
     return (
-        <div>
+        <div className='page'>
             {postDetails &&
             <div>
-                <h1>{postDetails.name}</h1>
-                <p>{postDetails.price}</p>
-                <p>{postDetails.description}</p>
-                <p>
-                    {user && user.id === postDetails.authorId ?
-                        <Link to={`/profile`}>My Profile</Link>
-                    : <Link to={`/profile/${postDetails.authorId}`}>View Author Details</Link>}
-                </p>
-                <p>Location: {postDetails.formatted_address}</p>
-                <p>Color: {postDetails.color}</p>
-                <p>Brand: {postDetails.brand}</p>
-                <p>Condition: {postDetails.condition}</p>
-                <p>Category: {categoryArr[postDetails.category]}</p>
-                <img src={postDetails.image_url} alt={postDetails.name} />
-                <div>
-                    {postDetails.buyerId ? <p>Already Purchased</p> : <button onClick={HandlePurchase}>Purchase</button>}
-                </div>
-                <div>
-                {user && user.id === postDetails.authorId && <button onClick={HandleDelete}>Delete Post</button>}
-                {user && user.id === postDetails.authorId && <button onClick={OpenEdit}>Edit Post</button>}
+                <div className='details'>
+                    <div className='img-container'>
+                        <img className='details-image' src={postDetails.image_url || "../../public/placeholder.png"} alt={postDetails.name} />
+                    </div>
+                    <div className='details-info'>
+                        <div className='details-header'>
+                            <h2>{postDetails.name}</h2>
+                            <h3>${postDetails.price}</h3>
+                            <div>
+                                {postDetails.buyerId ? <p>Already Purchased</p> : <button onClick={HandlePurchase}>Purchase</button>}
+                            </div>
+                            <p>
+                                {user && user.id === postDetails.authorId ?
+                                    <Link to={`/profile`}>My Profile</Link>
+                                : <Link to={`/profile/${postDetails.authorId}`}>View Author Details</Link>}
+                            </p>
+                            <div>
+                            {user && user.id === postDetails.authorId && <button onClick={HandleDelete}>Delete Post</button>}
+                            {user && user.id === postDetails.authorId && <button onClick={OpenEdit}>Edit Post</button>}
+                            </div>
+                        </div>
+                        <p>{postDetails.description}</p>
+                        <p>Location: {postDetails.formatted_address}</p>
+                        <p>Color: {postDetails.color}</p>
+                        <p>Brand: {postDetails.brand}</p>
+                        <p>Condition: {postDetails.condition}</p>
+                        <p>Category: {categoryArr[postDetails.category]}</p>
+                    </div>
                 </div>
             </div>
             }

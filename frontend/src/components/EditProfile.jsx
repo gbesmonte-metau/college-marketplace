@@ -2,6 +2,7 @@ import React from 'react'
 import { useState } from 'react'
 import UploadImage from './UploadImage'
 import AddressForm from './AddressForm'
+import '../components-css/EditProfile.css'
 
 export default function EditProfile({userInfo, setIsEditOpen}) {
     const [icon, setIcon] = useState(userInfo.icon);
@@ -42,8 +43,11 @@ export default function EditProfile({userInfo, setIsEditOpen}) {
     }
 
     return (
-        <div className="edit-modal">
-            <div className='edit-body'>
+        <div className="edit-profile-modal">
+            <div className='edit-profile-body'>
+                {icon ? <img className='edit-icon' src={icon} alt="profile icon" /> : <p>No icon</p>}
+                <div>
+                    <h2>Edit Profile</h2>
                     <form onSubmit={HandleEdit}>
                         <div>
                             <p>Icon</p>
@@ -53,10 +57,14 @@ export default function EditProfile({userInfo, setIsEditOpen}) {
                             <p>Bio</p>
                             <input name="bio" type='text' placeholder='Bio' value={bio} onChange={(e) => setBio(e.target.value)} required/>
                         </div>
-                        <AddressForm setLocation={setLocation} setFormattedAddr={setAddress}/>
+                        <div>
+                            <p>Location</p>
+                            <AddressForm setLocation={setLocation} setFormattedAddr={setAddress}/>
+                        </div>
                         <button type='submit'>Save</button>
+                        <button onClick={() => setIsEditOpen(false)}>Close</button>
                     </form>
-                <button onClick={() => setIsEditOpen(false)}>Close</button>
+                </div>
             </div>
         </div>
     )

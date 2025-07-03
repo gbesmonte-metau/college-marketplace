@@ -63,7 +63,7 @@ router.get('/posts', async (req, res, next) => {
         //exclude purchased posts
         whereClause.buyerId = null;
         //price
-        if (req.query.price != 'undefined') {
+        if (req.query?.price) {
             whereClause.price = { lte: parseFloat(req.query.price) };
         }
         //mutiple categories
@@ -104,7 +104,7 @@ router.get('/posts', async (req, res, next) => {
             where: whereClause
         })
         //distance
-        if (posts && req.query.distance != 'undefined' && req.session.user && req.session.user.location) {
+        if (posts && req.query.distance && req.query.distance != 'undefined' && req.session.user && req.session.user.location) {
             const distance = parseInt(req.query.distance);
             const userLocation = JSON.parse(req.session.user.location);
             posts = posts.filter(post => {
@@ -120,31 +120,6 @@ router.get('/posts', async (req, res, next) => {
         }
     }
     catch (err) {
-        next(err)
-    }
-})
-
-//Create a new post
-router.post('/posts', async (req, res, next) => {
-    const newPost = req.body;
-    try {
-        //check if post has all required fields
-        const isNewPostValid = (
-          newPost.price !== undefined &&
-          newPost.category !== undefined &&
-          newPost.name !== undefined &&
-          newPost.time_created !== undefined &&
-          newPost.location !== undefined &&
-          newPost.authorId !== undefined
-        )
-        //create post
-        if (isNewPostValid) {
-          const created = await prisma.post.create({data:newPost})
-          res.status(201).json(created)
-        } else {
-          next({ status: 422, message: 'New post is not valid' })
-        }
-    } catch (err) {
         next(err)
     }
 })
@@ -197,6 +172,32 @@ router.get('/posts/:id/saves', async (req, res, next) => {
   catch (err) {
       next(err)
   }
+})
+
+//Create a new post
+router.post('/posts', async (req, res, next) => {
+    const newPost = req.body;
+    try {
+        //check if post has all required fields
+        const isNewPostValid = (
+          newPost.price !== null &&
+          newPost.category !== null &&
+          newPost.name !== null &&
+          newPost.time_created !== null &&
+          newPost.location !== null &&
+          newPost.authorId !== null &&
+          newPost.location !== null
+        )
+        //create post
+        if (isNewPostValid) {
+          const created = await prisma.post.create({data:newPost})
+          res.status(201).json(created)
+        } else {
+          next({ status: 422, message: 'New post is not valid- missing a field' })
+        }
+    } catch (err) {
+        next(err)
+    }
 })
 
 //Get all posts a user Authored

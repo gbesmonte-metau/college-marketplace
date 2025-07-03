@@ -30,7 +30,7 @@ export default function Post({post}) {
 
     const navigate = useNavigate();
     function OpenPost(){
-        navigate(`/post/${post.id}`);
+        navigate(`/posts/${post.id}`);
     }
 
     async function GetIsLiked(){

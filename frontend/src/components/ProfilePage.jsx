@@ -83,8 +83,11 @@ export default function ProfilePage() {
                 </div>
                 <nav>
                     <ul>
-                        {Object.keys(mode).map((key, idx) =>
-                        <li key={idx} onClick={() => setModeState(mode[key])}>{key}</li>)}
+                        {Object.keys(mode).map((key, idx) => (
+                        modeState == mode[key] ?
+                        <li key={idx} className='selected' onClick={() => setModeState(mode[key])}>{key}</li> :
+                        <li key={idx} onClick={() => setModeState(mode[key])}>{key}</li>
+                        ))}
                     </ul>
                 </nav>
                 {modeState == mode.Likes && <div className='liked-posts'>

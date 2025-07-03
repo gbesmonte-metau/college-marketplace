@@ -18,24 +18,30 @@ export default function UploadImage({url, setUrl}) {
     };
 
     async function uploadSingleImage(base64) {
-      setLoading(true);
-      const response = await fetch(import.meta.env.VITE_URL + "/uploadImage", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ image: base64 }),
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setUrl(data.url);
-        alert("Image uploaded successfully");
-        setLoading(false);
-      }
-      else{
-        alert("Error uploading image- upload will retry in the background");
-        setLoading(false);
-      }
+        setLoading(true);
+        try{
+            const response = await fetch(import.meta.env.VITE_URL + "/uploadImage", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ image: base64 }),
+            });
+            if (response.ok) {
+              const data = await response.json();
+              setUrl(data.url);
+              alert("Image uploaded successfully");
+            }
+            else{
+                alert(response.message);
+            }
+        }
+        catch(error){
+            alert("Error uploading image- upload will retry in the background");
+        }
+        finally {
+            setLoading(false);
+        }
     }
 
     const uploadImage = async (event) => {
@@ -50,13 +56,6 @@ export default function UploadImage({url, setUrl}) {
     return (
       <div>
         <div>
-          {url && (
-            <div>
-                <img src={url} alt="uploaded image" className="uploaded-img"/>
-            </div>
-          )}
-        </div>
-        <div>
           {loading ? (
             <div>
               <p>Loading</p>
@@ -64,7 +63,6 @@ export default function UploadImage({url, setUrl}) {
             ) : (
             <div>
                 <label htmlFor="dropzone-file">
-                    <p>Upload an Image</p>
                     <input
                         onChange={uploadImage}
                         id="dropzone-file"

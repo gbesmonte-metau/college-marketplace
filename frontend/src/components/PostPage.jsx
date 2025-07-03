@@ -18,11 +18,14 @@ export default function PostPage() {
 
     async function getPosts() {
         const url = new URL(import.meta.env.VITE_URL + '/posts');
-        const parseFilter = {
-            price: filter.price,
-            search: filter.search || "",
+        const params = new URLSearchParams();
+
+        if (filter.price) {
+            params.append("price", filter.price);
         }
-        const params = new URLSearchParams(parseFilter);
+        if (filter.search) {
+            params.append("search", filter.search);
+        }
         if (filter.category){
             for (const categoryStr of filter.category){
                 if (filter[categoryStr] !== 'All'){
@@ -40,10 +43,14 @@ export default function PostPage() {
                 params.append("condition", conditionStr);
             }
         }
-        if (filter.distance != "All"){
+        if (filter.distance && filter.distance !== "All"){
             params.append("distance", filter.distance);
         }
-        const response = await fetch(url + '?' + params.toString(), {
+
+        const queryString = params.toString();
+        const fetchUrl = queryString ? `${url}?${queryString}` : url.toString();
+
+        const response = await fetch(fetchUrl, {
             method: 'GET',
             credentials: 'include',
         });

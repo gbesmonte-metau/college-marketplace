@@ -54,7 +54,7 @@ const fakeData = {
       "time_sold": null,
       "location": "{\"lat\": 37.8044, \"lng\": -122.2711}",    // Oakland (~8 miles)
       "description": "A sleek, modern microwave with smart features and voice control.",
-      "image_url": "https://picsum.photos/200/300?random=1",
+      "image_url": "https://res.cloudinary.com/doeql5cyb/image/upload/v1751565221/microwave_rwntzs.jpg",
       "condition": "New",
       "brand": "MicroTech",
       "color": "Silver",
@@ -68,10 +68,10 @@ const fakeData = {
       "time_sold": null,
       "location": "{\"lat\": 37.6879, \"lng\": -122.4702}",    // Daly City (~10 miles)
       "description": "High-speed electric scooter with a 25-mile range.",
-      "image_url": "https://picsum.photos/200/300?random=2",
+      "image_url": "https://res.cloudinary.com/doeql5cyb/image/upload/v1751565212/electric_scooter_r8gzzy.jpg",
       "condition": "Like New",
       "brand": "EcoRide",
-      "color": "Black",
+      "color": "Red",
       "authorId": 2
     },
     {
@@ -82,10 +82,10 @@ const fakeData = {
       "time_sold": null,
       "location": "{\"lat\": 37.4419, \"lng\": -122.1430}",    // Palo Alto (~33 miles)
       "description": "Durable non-stick frying pan for everyday cooking.",
-      "image_url": "https://picsum.photos/200/300?random=3",
+      "image_url": "https://res.cloudinary.com/doeql5cyb/image/upload/v1751565317/pan-554072_1280_pxwc0z.jpg",
       "condition": "Good",
       "brand": "CookMaster",
-      "color": "Red",
+      "color": "Black",
       "authorId": 3
     },
     {
@@ -96,10 +96,10 @@ const fakeData = {
       "time_sold": null,
       "location": "{\"lat\": 38.1041, \"lng\": -122.2566}",    // Santa Rosa (~56 miles, a bit further but close enough)
       "description": "Enhance your sleep with this comfortable memory foam topper.",
-      "image_url": "https://picsum.photos/200/300?random=4",
+      "image_url": "https://res.cloudinary.com/doeql5cyb/image/upload/v1751565361/comfort-8069094_1280_bh7jod.jpg",
       "condition": "Fair",
       "brand": "SleepWell",
-      "color": "White",
+      "color": "Blue",
       "authorId": 4
     },
     {
@@ -110,7 +110,7 @@ const fakeData = {
       "time_sold": null,
       "location": "{\"lat\": 37.3382, \"lng\": -121.8863}",    // San Jose (~48 miles)
       "description": "Soft and cuddly plush bear from the Djungelskog collection.",
-      "image_url": "https://picsum.photos/200/300?random=5",
+      "image_url": "https://res.cloudinary.com/doeql5cyb/image/upload/v1751565480/giant-teddy-4353077_1280_rg0xww.jpg",
       "condition": "Unspecified",
       "brand": "IKEA",
       "color": "Brown",
@@ -124,7 +124,7 @@ const fakeData = {
       "time_sold": null,
       "location": "{\"lat\": 37.8715, \"lng\": -122.2730}",    // Berkeley (~9 miles)
       "description": "Space-saving laundry basket that folds flat when not in use.",
-      "image_url": "https://picsum.photos/200/300?random=6",
+      "image_url": "https://res.cloudinary.com/doeql5cyb/image/upload/v1751565564/laundry-basket-59654_1280_q8kxk7.jpg",
       "condition": "New",
       "brand": "HomeBasics",
       "color": "Blue",
@@ -138,7 +138,7 @@ const fakeData = {
       "time_sold": null,
       "location": "{\"lat\": 37.7749, \"lng\": -122.0819}",    // Fremont (~22 miles)
       "description": "Soft cotton t-shirt available in various sizes.",
-      "image_url": "https://picsum.photos/200/300?random=7",
+      "image_url": "https://res.cloudinary.com/doeql5cyb/image/upload/v1751565640/t-shirt-1278404_640_grbw9s.jpg",
       "condition": "Like New",
       "brand": "FashionCo",
       "color": "White",
@@ -152,10 +152,10 @@ const fakeData = {
       "time_sold": null,
       "location": "{\"lat\": 37.6872, \"lng\": -122.4702}",    // Daly City (~10 miles)
       "description": "Comfortable office chair with lumbar support and adjustable height.",
-      "image_url": "https://picsum.photos/200/300?random=8",
+      "image_url": "https://res.cloudinary.com/doeql5cyb/image/upload/v1751566102/effydesk-TIOGOV5ZQzA-unsplash_bsujya.jpg",
       "condition": "Good",
       "brand": "WorkComfort",
-      "color": "Black",
+      "color": "Silver",
       "authorId": 3
     },
     {
@@ -166,10 +166,10 @@ const fakeData = {
       "time_sold": null,
       "location": "{\"lat\": 37.8044, \"lng\": -122.2712}",    // Oakland (~8 miles)
       "description": "Energy-efficient LED desk lamp with adjustable brightness.",
-      "image_url": "https://picsum.photos/200/300?random=9",
+      "image_url": "https://res.cloudinary.com/doeql5cyb/image/upload/v1751566187/oscar-ivan-esquivel-arteaga-at5-1nW3UCY-unsplash_jtwxsw.jpg",
       "condition": "Fair",
       "brand": "BrightLight",
-      "color": "Silver",
+      "color": "Pink",
       "authorId": 4
     },
     {
@@ -180,10 +180,10 @@ const fakeData = {
       "time_sold": null,
       "location": "{\"lat\": 37.8049, \"lng\": -122.2694}",    // Oakland (~7.5 miles)
       "description": "Eco-friendly reusable shopping bag made from recycled materials.",
-      "image_url": "https://picsum.photos/200/300?random=10",
+      "image_url": "https://res.cloudinary.com/doeql5cyb/image/upload/v1751566265/ginny-rose-stewart-_kUCAyYFVBI-unsplash_p0pfvn.jpg",
       "condition": "Unspecified",
       "brand": "EcoGoods",
-      "color": "Green",
+      "color": "White",
       "authorId": 5
     },
     {
@@ -194,7 +194,7 @@ const fakeData = {
       "time_sold": null,
       "location": "{\"lat\": 37.7749, \"lng\": -122.4194}",    // San Francisco (center)
       "description": "27-inch smart LED monitor with built-in speakers and Wi-Fi.",
-      "image_url": "https://picsum.photos/200/300?random=11",
+      "image_url": "https://res.cloudinary.com/doeql5cyb/image/upload/v1751566321/rohit-KZnfwqi-B0U-unsplash_fajax3.jpg",
       "condition": "New",
       "brand": "VisionTech",
       "color": "Black",
@@ -208,10 +208,10 @@ const fakeData = {
       "time_sold": null,
       "location": "{\"lat\": 37.5629, \"lng\": -122.3255}",    // Redwood City (~20 miles)
       "description": "High-performance electric bike with a 50-mile range and top speed of 28 mph.",
-      "image_url": "https://picsum.photos/200/300?random=12",
+      "image_url": "https://res.cloudinary.com/doeql5cyb/image/upload/v1751566355/himiway-bikes-jvNc-dwIISg-unsplash_fu2vpt.jpg",
       "condition": "Like New",
       "brand": "RideFast",
-      "color": "Red",
+      "color": "Black",
       "authorId": 2
     },
     {
@@ -222,10 +222,10 @@ const fakeData = {
       "time_sold": null,
       "location": "{\"lat\": 37.7749, \"lng\": -122.4194}",    // San Francisco (center)
       "description": "Premium wireless earbuds with noise cancellation and 30-hour battery life.",
-      "image_url": "https://picsum.photos/200/300?random=13",
+      "image_url": "https://res.cloudinary.com/doeql5cyb/image/upload/v1751566411/daniel-romero-k6zPpoQhVX0-unsplash_yzxjrh.jpg",
       "condition": "Good",
       "brand": "SoundWave",
-      "color": "Black",
+      "color": "White",
       "authorId": 1
     },
     {
@@ -236,10 +236,10 @@ const fakeData = {
       "time_sold": null,
       "location": "{\"lat\": 37.6875, \"lng\": -122.4700}",    // Daly City (~10 miles)
       "description": "Compact and foldable electric scooter with a 15-mile range.",
-      "image_url": "https://picsum.photos/200/300?random=14",
+      "image_url": "https://res.cloudinary.com/doeql5cyb/image/upload/v1751566455/yiting-he-CorgaWm5Arc-unsplash_bhcnap.jpg",
       "condition": "Fair",
       "brand": "UrbanRide",
-      "color": "Blue",
+      "color": "Black",
       "authorId": 2
     },
     {
@@ -250,7 +250,7 @@ const fakeData = {
       "time_sold": null,
       "location": "{\"lat\": 37.4419, \"lng\": -122.1431}",    // Palo Alto (~33 miles)
       "description": "Pre-seasoned cast iron skillet perfect for searing, sautéing, baking, broiling, braising, frying, and more.",
-      "image_url": "https://picsum.photos/200/300?random=15",
+      "image_url": "https://res.cloudinary.com/doeql5cyb/image/upload/v1751566506/james-kern-qufi5Rm9j2U-unsplash_munpva.jpg",
       "condition": "Unspecified",
       "brand": "GrillMaster",
       "color": "Black",
@@ -264,10 +264,10 @@ const fakeData = {
       "time_sold": null,
       "location": "{\"lat\": 37.8043, \"lng\": -122.2710}",    // Oakland (~8 miles)
       "description": "Adjustable bed frame with wireless remote and USB charging ports.",
-      "image_url": "https://picsum.photos/200/300?random=16",
+      "image_url": "https://res.cloudinary.com/doeql5cyb/image/upload/v1751566635/indoor-4148891_1280_tvuk7v.jpg",
       "condition": "New",
       "brand": "SleepTech",
-      "color": "Gray",
+      "color": "Blue",
       "authorId": 4
     },
     {
@@ -292,10 +292,10 @@ const fakeData = {
       "time_sold": null,
       "location": "{\"lat\": 37.3382, \"lng\": -121.8863}",    // San Jose (~48 miles)
       "description": "Durable stainless steel water bottle with double-wall insulation to keep drinks cold or hot.",
-      "image_url": "https://picsum.photos/200/300?random=18",
+      "image_url": "https://res.cloudinary.com/doeql5cyb/image/upload/v1751566718/personalgraphic-com-OUjR8lrGccs-unsplash_sscqjd.jpg",
       "condition": "Good",
       "brand": "HydroFlask",
-      "color": "Black",
+      "color": "White",
       "authorId": 1
     },
     {
@@ -306,7 +306,7 @@ const fakeData = {
       "time_sold": null,
       "location": "{\"lat\": 37.5628, \"lng\": -122.3256}",    // Redwood City (~20 miles)
       "description": "55-inch 4K Ultra HD Smart TV with built-in Wi-Fi and streaming apps.",
-      "image_url": "https://picsum.photos/200/300?random=19",
+      "image_url": "https://res.cloudinary.com/doeql5cyb/image/upload/v1751566758/boliviainteligente-zULmo_Yxu-0-unsplash_mbyuxd.jpg",
       "condition": "Fair",
       "brand": "Visionary",
       "color": "Black",
@@ -320,7 +320,7 @@ const fakeData = {
       "time_sold": null,
       "location": "{\"lat\": 37.6870, \"lng\": -122.4701}",    // Daly City (~10 miles)
       "description": "High-performance electric scooter with a 30-mile range and top speed of 20 mph.",
-      "image_url": "https://picsum.photos/200/300?random=20",
+      "image_url": "https://res.cloudinary.com/doeql5cyb/image/upload/v1751566801/martin-katler-SwWewDn3CG4-unsplash_ssxuaz.jpg",
       "condition": "Unspecified",
       "brand": "RideFast",
       "color": "Red",
