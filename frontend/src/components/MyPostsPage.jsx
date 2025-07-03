@@ -21,8 +21,13 @@ export default function MyPostsPage() {
     }, [])
 
     return (
-        <div className="mypost-body">
-            {myPosts && myPosts.map((post,idx) => (<Post key={idx} post={post}></Post>))}
+        <div className='page'>
+            <div className="mypost-body">
+                <h2>My Posts</h2>
+                <div className='mypost-grid'>
+                    {myPosts && myPosts.map((post,idx) => (<Post key={idx} post={post}></Post>))}
+                </div>
+            </div>
         </div>
     )
 }

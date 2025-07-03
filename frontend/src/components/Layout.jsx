@@ -7,8 +7,10 @@ export default function Layout() {
   return (
     <div className="app">
       <Header/>
-      <Outlet/>
-      <Footer/>
+      <div>
+        <Outlet/>
+        <Footer/>
+      </div>
     </div>
   )
 }

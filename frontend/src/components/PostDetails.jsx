@@ -1,5 +1,5 @@
 import React from 'react'
-import { useNavigate, useParams } from 'react-router'
+import { useNavigate, useParams, Link } from 'react-router'
 import { useState, useEffect } from 'react';
 import { categoryArr } from '../../utils';
 import { useContext } from 'react'
@@ -78,7 +78,11 @@ export default function PostDetails() {
                 <h1>{postDetails.name}</h1>
                 <p>{postDetails.price}</p>
                 <p>{postDetails.description}</p>
-                <p>AuthorId: {postDetails.authorId}</p>
+                <p>
+                    {user && user.id === postDetails.authorId ?
+                        <Link to={`/profile`}>My Profile</Link>
+                    : <Link to={`/profile/${postDetails.authorId}`}>View Author Details</Link>}
+                </p>
                 <p>Location: {postDetails.formatted_address}</p>
                 <p>Color: {postDetails.color}</p>
                 <p>Brand: {postDetails.brand}</p>

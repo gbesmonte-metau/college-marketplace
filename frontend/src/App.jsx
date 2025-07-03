@@ -8,6 +8,7 @@ import ProfilePage from './components/ProfilePage';
 import RegisterPage from './components/RegisterPage';
 import PostDetails from './components/PostDetails';
 import MyPostsPage from './components/MyPostsPage';
+import OtherProfilePage from './components/OtherProfilePage';
 
 export const UserContext = createContext();
 
@@ -40,6 +41,10 @@ const routes = createBrowserRouter([
         path: '/myposts',
         element: <MyPostsPage/>
       },
+      {
+        path: '/profile/:id',
+        element: <OtherProfilePage/>
+      }
     ]
   },
 ]);

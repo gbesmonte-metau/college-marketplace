@@ -1,7 +1,36 @@
+@media (prefers-color-scheme: light) {
+  :root {
+    --text: #051f14;
+    --background: #fbfefd;
+    --primary: #22dd95;
+    --secondary: #8397ec;
+    --accent: #6e5ce6;
+  }
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --text: #e0faef;
+    --background: #010403;
+    --primary: #22dd95;
+    --secondary: #13267c;
+    --accent: #2c19a3;
+  }
+}
+
 body {
   margin: 0;
   height: 100vh;
+  font-family: 'Montserrat', sans-serif;
 }
 .pac-container:after{
   content:none !important;
+}
+button {
+  font-family: 'Montserrat', sans-serif;
+  background-color: var(--primary);
+  color: var(--text);
+  border: none;
+  border-radius: 5px;
+  margin: 2px;
+  padding: 8px;
 }

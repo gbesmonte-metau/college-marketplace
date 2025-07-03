@@ -1,0 +1,32 @@
+.post {
+    margin: 5px;
+    width: 250px;
+    height: 400px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background-color: #e9fbf4;
+    border-radius: 10px;
+    overflow: hidden;
+}
+.post-image {
+    width: 100%;
+    height: 300px;
+    object-fit: cover;
+    overflow: hidden;
+}
+.post-content{
+    padding: 10px;
+}
+.price-tag {
+    font-weight: bold;
+}
+.post-buttons {
+    display: flex;
+    justify-content: right;
+}
+.post-buttons button {
+    background-color: transparent;
+    color: var(--accent);
+    font-size: 1.2rem;
+}

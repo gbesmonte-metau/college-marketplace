@@ -3,12 +3,20 @@ import '../components-css/ProfilePage.css'
 import Post from './Post'
 import EditProfile from './EditProfile';
 
+const mode = {
+    "Likes": 0,
+    "Saves": 1,
+    "Purchased": 2
+}
+
 export default function ProfilePage() {
     const [userInfo, setUserInfo] = useState({});
     const [likedPosts, setLikedPosts] = useState([]);
     const [savedPosts, setSavedPosts] = useState([]);
     const [boughtPosts, setBoughtPosts] = useState([]);
     const [isEditOpen, setIsEditOpen] = useState(false);
+    const [modeState, setModeState] = useState(mode.Likes);
+
 
     async function getProfile() {
         const response = await fetch(import.meta.env.VITE_URL + '/user', {
@@ -64,23 +72,30 @@ export default function ProfilePage() {
     return (
         <div className='page'>
             <div className='profile-body'>
-                <img className='profile-pic-large' src={userInfo.icon} alt="profile_pic" />
-                <p>Username: {userInfo.username}</p>
-                <p>Bio: {userInfo.bio}</p>
-                <p>Location: {userInfo.formatted_address ? userInfo.formatted_address : "No location"}</p>
-                <button onClick={HandleEdit}>Edit Profile</button>
-                <h2>Liked Posts:</h2>
-                <div className='liked-posts'>
+                <div className='profile-info'>
+                    <img className='profile-pic-large' src={userInfo.icon} alt="profile_pic" />
+                    <div>
+                        <h3>{userInfo.username}</h3>
+                        <p>Bio: {userInfo.bio}</p>
+                        <p>Location: {userInfo.formatted_address ? userInfo.formatted_address : "No location"}</p>
+                        <button className="edit-btn" onClick={HandleEdit}>Edit Profile</button>
+                    </div>
+                </div>
+                <nav>
+                    <ul>
+                        {Object.keys(mode).map((key, idx) =>
+                        <li key={idx} onClick={() => setModeState(mode[key])}>{key}</li>)}
+                    </ul>
+                </nav>
+                {modeState == mode.Likes && <div className='liked-posts'>
                     {likedPosts && likedPosts.length > 0 ? likedPosts.map((post, idx) => <Post key={idx} post={post}></Post>) : <p>No liked posts</p>}
-                </div>
-                <h2>Saved Posts:</h2>
-                <div className='saved-posts'>
+                </div>}
+                {modeState == mode.Saves && <div className='saved-posts'>
                     {savedPosts && savedPosts.length > 0 ? savedPosts.map((post,idx) => <Post key={idx} post={post}></Post>) : <p>No saved posts</p>}
-                </div>
-                <h2>My Purchases:</h2>
-                <div className='purchased-posts'>
+                </div>}
+                {modeState == mode.Purchased && <div className='purchased-posts'>
                     {boughtPosts && boughtPosts.length > 0 ? boughtPosts.map((post,idx) => <Post key={idx} post={post}></Post>) : <p>No purchases</p>}
-                </div>
+                </div>}
             </div>
             {isEditOpen && <EditProfile userInfo={userInfo} setIsEditOpen={setIsEditOpen}/>}
         </div>

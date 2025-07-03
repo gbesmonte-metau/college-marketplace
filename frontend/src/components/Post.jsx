@@ -8,6 +8,7 @@ import { FaHeart } from "react-icons/fa";
 import { FaRegHeart } from "react-icons/fa";
 import { FaRegBookmark } from "react-icons/fa";
 import { FaBookmark } from "react-icons/fa";
+import "../components-css/Post.css"
 
 export default function Post({post}) {
     const [isLiked, setIsLiked] = useState(false);
@@ -95,16 +96,16 @@ export default function Post({post}) {
     }
 
     return (
-        <>
-            {!isLoading ?
-            <div onClick={OpenPost}>
+        <div className="post" onClick={OpenPost}>
+            <img className='post-image' src={post.image_url ? post.image_url : "../../public/placeholder.png"} alt={post.name}/>
+            <div className='post-content'>
                 <p>{post.name}</p>
-                <img className='post-image' src={post.image_url ? post.image_url : "../../public/placeholder.png"} alt={post.name}/>
-                <p>${post.price.toFixed(2)}</p>
-                <button onClick={HandleLike}>{isLiked ? <FaHeart/> : <FaRegHeart/> }</button>
-                <button onClick={HandleSave}>{isSaved ? <FaBookmark/> : <FaRegBookmark/> }</button>
-            </div>:
-            <p>Loading</p>}
-        </>
+                <p className='price-tag'>${post.price.toFixed(2)}</p>
+                <div className='post-buttons'>
+                    <button onClick={HandleLike}>{isLiked ? <FaHeart/> : <FaRegHeart/> }</button>
+                    <button onClick={HandleSave}>{isSaved ? <FaBookmark/> : <FaRegBookmark/> }</button>
+                </div>
+            </div>
+        </div>
     )
 }

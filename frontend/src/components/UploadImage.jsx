@@ -33,7 +33,7 @@ export default function UploadImage({url, setUrl}) {
         setLoading(false);
       }
       else{
-        alert("Error uploading image");
+        alert("Error uploading image- upload will retry in the background");
         setLoading(false);
       }
     }

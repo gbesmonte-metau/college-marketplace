@@ -3,6 +3,14 @@
     flex-direction: column;
     align-items: center;
 }
+.profile-info {
+    padding-top: 20px;
+    padding-bottom: 20px;
+    width: 100%;
+    display:flex;
+    justify-content: center;
+    gap: 20px;
+}
 .liked-posts {
     display: flex;
     flex-wrap: wrap;
@@ -12,4 +20,23 @@
     display: flex;
     flex-wrap: wrap;
     gap: 20px;
+}
+.purchased-posts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+.edit-btn{
+    background-color: var(--accent);
+    color: white;
+}
+nav ul {
+    list-style-type: none;
+    display: flex;
+    gap: 20px;
+}
+nav ul li {
+    border-top: 1px solid lightgray;
+    width: 100px;
+    text-align: center;
 }
