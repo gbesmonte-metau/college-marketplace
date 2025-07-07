@@ -18,11 +18,14 @@ export default function PostPage() {
 
     async function getPosts() {
         const url = new URL(import.meta.env.VITE_URL + '/posts');
-        const parseFilter = {
-            price: filter.price,
-            search: filter.search || "",
+        const params = new URLSearchParams();
+
+        if (filter.price) {
+            params.append("price", filter.price);
         }
-        const params = new URLSearchParams(parseFilter);
+        if (filter.search) {
+            params.append("search", filter.search);
+        }
         if (filter.category){
             for (const categoryStr of filter.category){
                 if (filter[categoryStr] !== 'All'){
@@ -30,7 +33,27 @@ export default function PostPage() {
                 }
             }
         }
-        const response = await fetch(url + '?' + params.toString());
+        if (filter.color){
+            for (const colorStr of filter.color){
+                params.append("color", colorStr);
+            }
+        }
+        if (filter.condition){
+            for (const conditionStr of filter.condition){
+                params.append("condition", conditionStr);
+            }
+        }
+        if (filter.distance && filter.distance !== "All"){
+            params.append("distance", filter.distance);
+        }
+
+        const queryString = params.toString();
+        const fetchUrl = queryString ? `${url}?${queryString}` : url.toString();
+
+        const response = await fetch(fetchUrl, {
+            method: 'GET',
+            credentials: 'include',
+        });
         const result = await response.json();
         if (!response.ok) {
             setPosts([]);
@@ -54,7 +77,7 @@ export default function PostPage() {
         <div className='page'>
             <div className='search-bar'>
                 <form onSubmit={HandleSearch}>
-                    <input type="text" placeholder='Search for a post' value={search} onChange={(e) => setSearch(e.target.value)}/>
+                    <input name="search" type="text" placeholder='Search for a post' value={search} onChange={(e) => setSearch(e.target.value)}/>
                     <button type="submit">Search</button>
                     <button onClick={HandleClear}>Clear</button>
                 </form>

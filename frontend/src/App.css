@@ -1,7 +1,7 @@
 .app {
-  display: grid;
-  grid-template-rows: auto 1fr auto;
   height: 100vh;
+  display: grid;
+  grid-template-rows: auto 1fr;
 }
 .page {
   height: 100%;
@@ -9,18 +9,23 @@
 }
 .app-footer {
   height: 5vh;
-  background-color: darkgray;
+  background-color: var(--secondary);
   display: flex;
   justify-content: center;
   align-items: center;
 }
 .profile-pic {
-  width: 50px;
+  width: 30px;
   border-radius: 50%;
   background-color: white;
 }
 .profile-pic-large{
-  width: 100px;
+  width: 200px;
   border-radius: 50%;
   background-color: white;
+}
+.uploaded-img{
+  width: 300px;
+  height: 300px;
+  object-fit: cover;
 }

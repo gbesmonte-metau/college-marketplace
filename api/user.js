@@ -128,7 +128,6 @@ router.patch('/user', isAuthenticated, async (req, res, next) => {
             },
             data: updatedFields
         });
-
         if (newUser) {
             res.status(200).json(newUser)
         } else {
@@ -142,7 +141,6 @@ router.patch('/user', isAuthenticated, async (req, res, next) => {
 //Get all posts that user liked
 router.get('/user/likes', isAuthenticated, async (req, res, next) => {
     const userId = req.session.user.id;
-    console.log(req.session.user.id)
     try {
         const user = await prisma.user.findUnique({
             where: {
@@ -159,6 +157,29 @@ router.get('/user/likes', isAuthenticated, async (req, res, next) => {
         else{
             next({ status: 404, message: `No liked posts` })
         }
+    }
+    catch (err) {
+        next(err)
+    }
+})
+
+
+//Get if user liked a post
+router.get('/user/like/:id', isAuthenticated, async (req, res, next) => {
+    const userId = req.session.user.id;
+    const postId = req.params.id;
+    try {
+        const user = await prisma.user.findUnique({
+            where: {id : userId},
+            include: {
+                Post_UserLikedPosts: true,
+            }
+        })
+        if (!user){
+            next({ status: 404, message: `No user found with ID ${userId}` })
+        }
+        const post = user.Post_UserLikedPosts.find(post => post.id === parseInt(postId));
+        res.status(200).json({liked: post});
     }
     catch (err) {
         next(err)
@@ -184,6 +205,49 @@ router.post('/user/like/:id', isAuthenticated, async (req, res, next) => {
         next(err)
     }
 })
+
+//Unlike a post
+router.post('/user/unlike/:id', isAuthenticated, async (req, res, next) => {
+    const userId = req.session.user.id;
+    const postId = req.params.id;
+    try {
+        await prisma.user.update({
+            where: {id: userId},
+            data: {
+                Post_UserLikedPosts: {
+                    disconnect: {id: parseInt(postId)}
+                }
+            }
+        });
+        res.status(200).json({message: 'Post unliked'});
+    }
+    catch (err) {
+        next(err)
+    }
+});
+
+//Get if user saved a post
+router.get('/user/save/:id', isAuthenticated, async (req, res, next) => {
+    const userId = req.session.user.id;
+    const postId = req.params.id;
+    try {
+        const user = await prisma.user.findUnique({
+            where: {id : userId},
+            include: {
+                Post_UserSavedPosts: true,
+            }
+        })
+        if (!user){
+            next({ status: 404, message: `No user found with ID ${userId}` })
+        }
+        const post = user.Post_UserSavedPosts.find(post => post.id === parseInt(postId));
+        res.status(200).json({saved: post});
+    }
+    catch (err) {
+        next(err)
+    }
+})
+
 
 //Get all posts that user saved
 router.get('/user/saves', isAuthenticated, async (req, res, next) => {
@@ -229,3 +293,23 @@ router.post('/user/save/:id', isAuthenticated, async (req, res, next) => {
         next(err)
     }
 })
+
+//Unsave a post
+router.post('/user/unsave/:id', isAuthenticated, async (req, res, next) => {
+    const userId = req.session.user.id;
+    const postId = req.params.id;
+    try {
+        await prisma.user.update({
+            where: {id: userId},
+            data: {
+                Post_UserSavedPosts: {
+                    disconnect: {id: parseInt(postId)}
+                }
+            }
+        });
+        res.status(200).json({message: 'Post unsaved'});
+    }
+    catch (err) {
+        next(err)
+    }
+});

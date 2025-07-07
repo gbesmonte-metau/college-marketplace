@@ -1,9 +1,11 @@
 import React from 'react'
-import { useNavigate, useParams } from 'react-router'
+import { useNavigate, useParams, Link } from 'react-router'
 import { useState, useEffect } from 'react';
+import { categoryArr } from '../../utils';
 import { useContext } from 'react'
 import { UserContext } from '../App';
 import EditPost from './EditPost';
+import "../components-css/PostDetails.css"
 
 export default function PostDetails() {
     const id = useParams().id;
@@ -24,11 +26,11 @@ export default function PostDetails() {
                 setPostDetails(result);
             }
             else{
-                console.log(result);
+                alert(result);
             }
         }
         catch(error){
-            console.log(error);
+            alert(error);
         }
     }
 
@@ -50,23 +52,58 @@ export default function PostDetails() {
         setIsEditOpen(true);
     }
 
+    async function HandlePurchase(e) {
+        e.preventDefault();
+        if (!user) {
+            alert("You need to login to purchase this item");
+            return;
+        }
+        const response = await fetch(import.meta.env.VITE_URL + `/posts/${id}/purchase`, {
+            credentials: 'include',
+            method: 'POST'
+        });
+        const result = await response.json();
+        if (!response.ok) {
+            alert(result.message);
+        }
+        else {
+            alert("Purchase successful");
+        }
+    }
+
 
     return (
-        <div>
+        <div className='page'>
             {postDetails &&
             <div>
-                <h1>{postDetails.name}</h1>
-                <p>{postDetails.price}</p>
-                <p>{postDetails.description}</p>
-                <p>AuthorId: {postDetails.authorId}</p>
-                <p>Location: {postDetails.location}</p>
-                <p>Color: {postDetails.color}</p>
-                <p>Brand: {postDetails.brand}</p>
-                <p>Condition: {postDetails.condition}</p>
-                <img src={postDetails.image_url} alt={postDetails.name} />
-                <div>
-                {user && user.id === postDetails.authorId && <button onClick={HandleDelete}>Delete Post</button>}
-                {user && user.id === postDetails.authorId && <button onClick={OpenEdit}>Edit Post</button>}
+                <div className='details'>
+                    <div className='img-container'>
+                        <img className='details-image' src={postDetails.image_url || "../../public/placeholder.png"} alt={postDetails.name} />
+                    </div>
+                    <div className='details-info'>
+                        <div className='details-header'>
+                            <h2>{postDetails.name}</h2>
+                            <h3>${postDetails.price}</h3>
+                            <div>
+                                {postDetails.buyerId ? <p>Already Purchased</p> : <button onClick={HandlePurchase}>Purchase</button>}
+                            </div>
+                            <p>
+                                {user && user.id === postDetails.authorId ?
+                                    <Link to={`/profile`}>My Profile</Link>
+                                : <Link to={`/profile/${postDetails.authorId}`}>View Author Details</Link>}
+                            </p>
+                            <div>
+                            {user && user.id === postDetails.authorId && <button onClick={HandleDelete}>Delete Post</button>}
+                            {user && user.id === postDetails.authorId && <button onClick={OpenEdit}>Edit Post</button>}
+                            </div>
+                        </div>
+                        <p>{postDetails.description}</p>
+                        <p>Location: {postDetails.formatted_address}</p>
+                        <p>Color: {postDetails.color}</p>
+                        <p>Brand: {postDetails.brand}</p>
+                        <p>Condition: {postDetails.condition}</p>
+                        <p>Category: {categoryArr[postDetails.category]}</p>
+                    </div>
                 </div>
             </div>
             }

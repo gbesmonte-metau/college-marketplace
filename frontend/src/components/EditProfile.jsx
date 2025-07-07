@@ -1,0 +1,71 @@
+import React from 'react'
+import { useState } from 'react'
+import UploadImage from './UploadImage'
+import AddressForm from './AddressForm'
+import '../components-css/EditProfile.css'
+
+export default function EditProfile({userInfo, setIsEditOpen}) {
+    const [icon, setIcon] = useState(userInfo.icon);
+    const [bio, setBio] = useState(userInfo.bio);
+    const [location, setLocation] = useState(userInfo.location);
+    const [address, setAddress] = useState(userInfo.address);
+
+    async function HandleEdit(e) {
+        e.preventDefault();
+        const settings = {
+            method: 'PATCH',
+            credentials: 'include',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                icon: icon,
+                bio: bio,
+                location: location,
+                formatted_address: address,
+            })
+        };
+        try {
+            const response = await fetch(import.meta.env.VITE_URL + `/user`, settings);
+            const result = await response.json();
+            if (response.ok){
+                alert("User edit");
+                setIsEditOpen(false);
+            }
+            else{
+                alert(result.message);
+            }
+        }
+        catch (error) {
+            alert(error);
+        }
+    }
+
+    return (
+        <div className="edit-profile-modal">
+            <div className='edit-profile-body'>
+                {icon ? <img className='edit-icon' src={icon} alt="profile icon" /> : <p>No icon</p>}
+                <div>
+                    <h2>Edit Profile</h2>
+                    <form onSubmit={HandleEdit}>
+                        <div>
+                            <p>Icon</p>
+                            <UploadImage url={icon} setUrl={setIcon}/>
+                        </div>
+                        <div>
+                            <p>Bio</p>
+                            <input name="bio" type='text' placeholder='Bio' value={bio} onChange={(e) => setBio(e.target.value)} required/>
+                        </div>
+                        <div>
+                            <p>Location</p>
+                            <AddressForm setLocation={setLocation} setFormattedAddr={setAddress}/>
+                        </div>
+                        <button type='submit'>Save</button>
+                        <button onClick={() => setIsEditOpen(false)}>Close</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    )
+}
