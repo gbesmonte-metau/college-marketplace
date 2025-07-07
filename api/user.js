@@ -58,8 +58,16 @@ router.post('/users/register', async (req, res, next) => {
             }
         })
         if (userExists.length > 0) {
-          next({ status: 409, message: 'Username or email already exists' })
-          return;
+            if (userExists[0].email === newUser.email) {
+                next({ status: 409, message: 'Email already exists' })
+                return;
+            }
+            if (userExists[0].username === newUser.username) {
+                next({ status: 409, message: 'Username already exists' })
+                return;
+            }
+            next({ status: 409, message: 'Email or username already exists' })
+            return;
         }
         //hash password
         const hash = await hashPassword(newUser.password)
@@ -84,10 +92,12 @@ router.post('/users/login', async (req, res, next) => {
             res.status(200).json(user);
         } else {
             next({ status: 401, message: 'Invalid credentials' });
+            return;
         }
     }
     else{
-        next({ status: 401, message: 'Invalid credentials' });
+        next({ status: 401, message: 'Username not found' });
+        return;
     }
 })
 
@@ -129,6 +139,7 @@ router.patch('/user', isAuthenticated, async (req, res, next) => {
             data: updatedFields
         });
         if (newUser) {
+            req.session.user = newUser;
             res.status(200).json(newUser)
         } else {
             next({ status: 404, message: `No user found with ID ${userId}` })

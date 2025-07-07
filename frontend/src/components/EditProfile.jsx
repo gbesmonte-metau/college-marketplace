@@ -3,12 +3,15 @@ import { useState } from 'react'
 import UploadImage from './UploadImage'
 import AddressForm from './AddressForm'
 import '../components-css/EditProfile.css'
+import { useContext } from 'react'
+import { UserContext } from '../App';
 
 export default function EditProfile({userInfo, setIsEditOpen}) {
     const [icon, setIcon] = useState(userInfo.icon);
     const [bio, setBio] = useState(userInfo.bio);
     const [location, setLocation] = useState(userInfo.location);
     const [address, setAddress] = useState(userInfo.address);
+    const {setUser} = useContext(UserContext);
 
     async function HandleEdit(e) {
         e.preventDefault();
@@ -32,6 +35,7 @@ export default function EditProfile({userInfo, setIsEditOpen}) {
             if (response.ok){
                 alert("User edit");
                 setIsEditOpen(false);
+                setUser(result);
             }
             else{
                 alert(result.message);
@@ -60,6 +64,7 @@ export default function EditProfile({userInfo, setIsEditOpen}) {
                         <div>
                             <p>Location</p>
                             <AddressForm setLocation={setLocation} setFormattedAddr={setAddress}/>
+                            {location && <p>{userInfo.formatted_address}</p>}
                         </div>
                         <button type='submit'>Save</button>
                         <button onClick={() => setIsEditOpen(false)}>Close</button>

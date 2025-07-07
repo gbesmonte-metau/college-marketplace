@@ -67,13 +67,13 @@ export default function ProfilePage() {
         getLikedPosts();
         getSavedPosts();
         getBoughtPosts();
-    }, [])
+    }, [isEditOpen])
 
     return (
         <div className='page'>
             <div className='profile-body'>
                 <div className='profile-info'>
-                    <img className='profile-pic-large' src={userInfo.icon} alt="profile_pic" />
+                    <img className='profile-pic-large' src={userInfo.icon || "../../public/placeholder.png"} alt="profile_pic" />
                     <div>
                         <h3>{userInfo.username}</h3>
                         <p>Bio: {userInfo.bio}</p>
