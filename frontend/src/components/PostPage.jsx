@@ -49,7 +49,6 @@ export default function PostPage() {
 
         const queryString = params.toString();
         const fetchUrl = queryString ? `${url}?${queryString}` : url.toString();
-        console.log(fetchUrl);
         const response = await fetch(fetchUrl, {
             method: 'GET',
             credentials: 'include',
