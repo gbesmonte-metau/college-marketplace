@@ -6,7 +6,6 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../generated/prisma"
 }
 
 datasource db {
@@ -19,8 +18,8 @@ model User {
   email String @unique
   username String @unique
   password String
-  location String?
-  formatted_address String?
+  location String? /// @encrypted
+  formatted_address String? /// @encrypted
   icon String?
   bio String?
   createdPosts Post[] @relation("UserCreatedPosts")
@@ -36,8 +35,8 @@ model Post {
   name String
   time_created String
   time_sold String?
-  location String
-  formatted_address String @default("unknown")
+  location String /// @encrypted
+  formatted_address String @default("No address available.") /// @encrypted
   description String?
   image_url String?
   condition String?

@@ -330,7 +330,7 @@ const fakeData = {
 };
 
 async function main() {
-  /*for (const user of fakeData.users) {
+  for (const user of fakeData.users) {
     const newUser = user;
         //hash password
         const hash = await hashPassword(newUser.password)
@@ -338,7 +338,7 @@ async function main() {
         const created = await prisma.user.create({
             data: {...newUser, password: hash}
         })
-      }*/
+      }
   for (const post of fakeData.posts){
     const newPost = post;
         //create post
@@ -348,10 +348,10 @@ async function main() {
 
 async function resetDatabase() {
   await prisma.post.deleteMany()
-  //await prisma.user.deleteMany()
+  await prisma.user.deleteMany()
 }
 
-resetDatabase();
+//resetDatabase();
 
 
 main()

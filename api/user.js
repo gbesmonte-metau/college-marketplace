@@ -1,8 +1,13 @@
 import express from 'express';
-import { PrismaClient } from '../generated/prisma/index.js'
+import { PrismaClient } from '@prisma/client'
 import { hashPassword, verifyPassword } from './bcrypt.js';
+import { fieldEncryptionExtension } from 'prisma-field-encryption'
 
-const prisma = new PrismaClient()
+const client = new PrismaClient()
+export const prisma = client.$extends(
+    fieldEncryptionExtension()
+)
+
 export const router = express.Router();
 router.use(express.json())
 
