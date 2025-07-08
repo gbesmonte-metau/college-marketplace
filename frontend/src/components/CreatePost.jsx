@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import '../components-css/CreatePost.css'
 import { categoryArr, GetCategoryIdByName, conditionArr, colorArr} from '../../utils'
 import { useState, useContext } from 'react'
@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router';
 import { fetchCreatePost } from '../api';
 import AddressForm from './AddressForm';
 import UploadImage from './UploadImage';
+import { MdErrorOutline } from 'react-icons/md';
 
 export default function CreatePost({setIsCreatePostOpen}) {
     const { user, setUser } = useContext(UserContext);
@@ -24,15 +25,23 @@ export default function CreatePost({setIsCreatePostOpen}) {
     const [formattedAddr, setFormattedAddr] = useState("");
     const [url, setUrl] = useState("");
 
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        if (!user){
+            navigate('/login');
+        }
+    }, [user]);
+
     async function HandleCreate(e) {
         e.preventDefault()
         if (!user){
-            alert("You must be logged in to create a post");
+            setError("You must be logged in to create a post");
             return;
         }
         const isPostComplete = price && category && name && location;
         if (!isPostComplete){
-            alert("Please fill out all required fields");
+            setError("Please fill out all required fields");
             return;
         }
         const body = {
@@ -117,6 +126,9 @@ export default function CreatePost({setIsCreatePostOpen}) {
                         </div>
                         <button type='submit'>Create</button>
                         <button onClick={() => setIsCreatePostOpen(false)}>Close</button>
+                        <div className={`error-box ${error ? 'visible' : 'hidden'}`}>
+                            <MdErrorOutline/> <p> Error: {error || 'No error'}</p>
+                        </div>
                     </form>
                 </div>
             </div>

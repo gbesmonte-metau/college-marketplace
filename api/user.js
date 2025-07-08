@@ -96,7 +96,7 @@ router.post('/users/login', async (req, res, next) => {
         }
     }
     else{
-        next({ status: 401, message: 'Username not found' });
+        next({ status: 401, message: 'Email not found' });
         return;
     }
 })

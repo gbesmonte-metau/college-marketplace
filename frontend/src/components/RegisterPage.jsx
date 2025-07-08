@@ -1,5 +1,5 @@
 import React from 'react'
-import { useNavigate } from 'react-router';
+import { useNavigate, Link } from 'react-router';
 import '../components-css/RegisterPage.css'
 
 import { MdErrorOutline } from "react-icons/md";
@@ -75,6 +75,9 @@ export default function RegisterPage() {
                     </form>
                     <div className={`error-box ${error ? 'visible' : 'hidden'}`}>
                         <MdErrorOutline/> <p> Error: {error || 'No error'}</p>
+                    </div>
+                    <div>
+                        <p>Already a user? <Link to="/login">Login Here</Link></p>
                     </div>
                 </div>
             </div>

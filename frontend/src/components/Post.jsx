@@ -13,19 +13,21 @@ import "../components-css/Post.css"
 export default function Post({post}) {
     const [isLiked, setIsLiked] = useState(false);
     const [isSaved, setIsSaved] = useState(false);
-    const [isLoading, setIsLoading] = useState(true);
     const { user, setUser } = useContext(UserContext);
 
     useEffect(() => {
         Initialize();
-    }, []);
+    }, [user]);
 
     async function Initialize(){
         if (user){
             await GetIsLiked();
             await GetIsSaved();
         }
-        setIsLoading(false);
+        else {
+            setIsLiked(false);
+            setIsSaved(false);
+        }
     }
 
     const navigate = useNavigate();
@@ -71,6 +73,9 @@ export default function Post({post}) {
             if (response.ok){
                 setIsLiked(!isLiked);
             }
+            else {
+                alert("You must be logged in to like a post");
+            }
         }
         catch (e){
             alert(e);
@@ -88,6 +93,9 @@ export default function Post({post}) {
             });
             if (response.ok){
                 setIsSaved(!isSaved);
+            }
+            else {
+                alert("You must be logged in to save a post");
             }
         }
         catch (e){
