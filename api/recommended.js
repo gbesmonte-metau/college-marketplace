@@ -86,11 +86,10 @@ const exampleUserPosts =
     {id: 1, interact: "viewed"}
 ]
 
-
 //Content based recommendation----------
 
 //Get k most similar posts to a given post post_id
-export function GetRecommendationsForPost(post_id, posts, k){
+export function GetRecommendationsForPost(post_id, posts, amount){
     //Get Vectors for all posts
     const postVectors = CalculateTFIDF(posts);
 
@@ -108,13 +107,13 @@ export function GetRecommendationsForPost(post_id, posts, k){
     }
 
     //Calculate cosine similarity
-    const topK = GetKCosineSimilarity(currPost.vector, postVectors, k);
+    const topK = GetKCosineSimilarity(currPost.vector, postVectors, amount);
     return topK;
 }
 
 //Get k most similar posts to a given user user_id
 //userPosts is an object with multiple arrays of the posts that the user has viewed, liked, saved, purchased
-export function GetRecommendationsForUser(userPosts, posts, k){
+export function GetRecommendationsForUser(userPosts, posts, amount){
     //Get Vectors for all posts
     const postVectors = CalculateTFIDF(posts);
 
@@ -131,28 +130,28 @@ export function GetRecommendationsForUser(userPosts, posts, k){
     }
 
     //Calculate cosine similarity
-    const topK = GetKCosineSimilarity(userProfileVector, postVectors, k);
+    const topK = GetKCosineSimilarity(userProfileVector, postVectors, amount);
     return topK;
 }
 
-function GetKCosineSimilarity(currVector, allVectors, k){
+function GetKCosineSimilarity(currVector, allVectors, amount){
     //Calculate cosine similarity
     //Maintain an ordered min heap
-    const csmCmp = (a, b) => a.csim - b.csim;
-    const csimHeap = new Heap(csmCmp);
-    csimHeap.init([]);
+    const cosineSimilarityComparator = (profileA, profileB) => profileA.cosineSimilarity - profileB.cosineSimilarity;
+    const cosineSimilarityHeap = new Heap(cosineSimilarityComparator);
+    cosineSimilarityHeap.init([]);
     for (let i = 0; i < allVectors.length; i++) {
-        const csim = currVector.getCosineSimilarity(allVectors[i].vector);
+        const cosineSimilarity = currVector.getCosineSimilarity(allVectors[i].vector);
         //heap only needs to be k size
-        csimHeap.push({ id: allVectors[i].id, csim });
-        if (csimHeap.size() > k) {
-            csimHeap.pop();
+        cosineSimilarityHeap.push({ id: allVectors[i].id, cosineSimilarity: cosineSimilarity });
+        if (cosineSimilarityHeap.size() > amount) {
+            cosineSimilarityHeap.pop();
         }
     }
     //Get top k recommendations
     const topK = [];
-    while (csimHeap.size() > 0) {
-        topK.push(csimHeap.pop());
+    while (cosineSimilarityHeap.size() > 0) {
+        topK.push(cosineSimilarityHeap.pop());
     }
     return topK;
 }
@@ -175,6 +174,7 @@ function CalculateTFIDF(posts){
     const postVectors = [];
     let tfidf = new TfIdf();
     for (const post of formattedData) {
+        //adds the words inside of post.content to the tfidf body (so word frequency can be calculated)
         tfidf.addDocument(post.content);
     }
     for (let i = 0; i < formattedData.length; i++) {
@@ -222,7 +222,3 @@ function CalculateUserProfileVector(userPosts, postVectors){
     }
     return (new Vector(userProfileObj));
 }
-
-
-console.log(GetRecommendationsForPost(1, tempPosts, 10));
-console.log(GetRecommendationsForUser(exampleUserPosts, tempPosts, 10));
