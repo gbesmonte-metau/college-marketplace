@@ -320,4 +320,36 @@ router.post('/user/unsave/:id', isAuthenticated, async (req, res, next) => {
     catch (err) {
         next(err)
     }
-});
+})
+
+//View a post
+router.post('/user/view/:id', isAuthenticated, async (req, res, next) => {
+    const userId = req.session.user.id;
+    const postId = req.params.id;
+    try {
+        const post = await prisma.userViewedPosts.findUnique({
+            where: {
+                userId_postId: {
+                    userId: userId,
+                    postId: parseInt(postId),
+                }
+            }
+        })
+        if (post){
+            //TODO: update time viewed
+            res.status(200).json({message: 'Post viewed'})
+        }
+        else{
+            await prisma.userViewedPosts.create({
+                data: {
+                    userId: userId,
+                    postId: parseInt(postId),
+                }
+            })
+            res.status(200).json({message: 'Post viewed'})
+        }
+    }
+    catch (err) {
+        next(err)
+    }
+})

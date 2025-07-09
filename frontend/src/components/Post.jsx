@@ -31,8 +31,25 @@ export default function Post({post}) {
     }
 
     const navigate = useNavigate();
-    function OpenPost(){
-        navigate(`/posts/${post.id}`);
+    async function OpenPost(){
+        if (!user){
+            navigate("/login");
+        }
+        else {
+            try {
+                const response = await fetch(import.meta.env.VITE_URL + `/user/view/${post.id}`, {
+                    method: 'POST',
+                    credentials: 'include',
+                });
+                const result = await response.json();
+                if (response.ok){
+                    navigate(`/posts/${post.id}`);
+                }
+            }
+            catch (e){
+                alert(e);
+            }
+        }
     }
 
     async function GetIsLiked(){
