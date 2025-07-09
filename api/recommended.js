@@ -1,159 +1,137 @@
 import natural from 'natural';
 const { TfIdf } = natural;
 import Vector from 'vector-object';
-import {Heap} from 'heap-js';
+import { PrismaClient } from '@prisma/client'
+import { fieldEncryptionExtension } from 'prisma-field-encryption'
 
-const tempPosts = [
-    {
-      "id": 1,
-      "price": 129.99,
-      "category": 0,
-      "name": "Regular Razor Scooter",
-      "time_created": "1687785600",
-      "time_sold": null,
-      "location": "{\"lat\": 37.8044, \"lng\": -122.2711}",    // Oakland (~8 miles)
-      "description": "A sleek, modern scooter with smart features and voice control.",
-      "image_url": "https://res.cloudinary.com/doeql5cyb/image/upload/v1751565221/microwave_rwntzs.jpg",
-      "condition": "New",
-      "brand": "Razor",
-      "color": "Silver",
-      "authorId": 1
-    },
-    {
-      "id": 2,
-      "price": 299.99,
-      "category": 1,
-      "name": "Electric Scooter X200",
-      "time_created": "1687785600",
-      "time_sold": null,
-      "location": "{\"lat\": 37.6879, \"lng\": -122.4702}",    // Daly City (~10 miles)
-      "description": "High-speed electric scooter with a 25-mile range.",
-      "image_url": "https://res.cloudinary.com/doeql5cyb/image/upload/v1751565212/electric_scooter_r8gzzy.jpg",
-      "condition": "Like New",
-      "brand": "EcoRide",
-      "color": "Red",
-      "authorId": 2
-    },
-    {
-      "id": 3,
-      "price": 49.99,
-      "category": 2,
-      "name": "Non-Stick Frying Pan",
-      "time_created": "1687785600",
-      "time_sold": null,
-      "location": "{\"lat\": 37.4419, \"lng\": -122.1430}",    // Palo Alto (~33 miles)
-      "description": "Durable non-stick frying pan for everyday cooking.",
-      "image_url": "https://res.cloudinary.com/doeql5cyb/image/upload/v1751565317/pan-554072_1280_pxwc0z.jpg",
-      "condition": "Good",
-      "brand": "CookMaster",
-      "color": "Black",
-      "authorId": 3
-    },
-    {
-      "id": 4,
-      "price": 199.99,
-      "category": 3,
-      "name": "Memory Foam Mattress Topper",
-      "time_created": "1687785600",
-      "time_sold": null,
-      "location": "{\"lat\": 38.1041, \"lng\": -122.2566}",    // Santa Rosa (~56 miles, a bit further but close enough)
-      "description": "Enhance your sleep with this comfortable memory foam topper.",
-      "image_url": "https://res.cloudinary.com/doeql5cyb/image/upload/v1751565361/comfort-8069094_1280_bh7jod.jpg",
-      "condition": "Fair",
-      "brand": "SleepWell",
-      "color": "Blue",
-      "authorId": 4
-    },
-    {
-      "id": 5,
-      "price": 15.99,
-      "category": 4,
-      "name": "Djungelskog Plush Bear",
-      "time_created": "1687785600",
-      "time_sold": null,
-      "location": "{\"lat\": 37.3382, \"lng\": -121.8863}",    // San Jose (~48 miles)
-      "description": "Soft and cuddly plush bear from the Djungelskog collection.",
-      "image_url": "https://res.cloudinary.com/doeql5cyb/image/upload/v1751565480/giant-teddy-4353077_1280_rg0xww.jpg",
-      "condition": "Unspecified",
-      "brand": "IKEA",
-      "color": "Brown",
-      "authorId": 5
-    },
-]
+const client = new PrismaClient()
+export const prisma = client.$extends(
+    fieldEncryptionExtension()
+)
 
-const exampleUserPosts =
-[
-    {id: 1, interact: "viewed"}
-]
+GetRecommendations(1);
 
-//Content based recommendation----------
+export async function GetRecommendations(user_id){
+    const posts = await prisma.post.findMany();
+    const interactions = await GetUserInteractions(user_id);
 
-//Get k most similar posts to a given post post_id
-export function GetRecommendationsForPost(post_id, posts, amount){
-    //Get Vectors for all posts
-    const postVectors = CalculateTFIDF(posts);
+    //Part 1: Content based recommendation
+    const postInformationScores = GetRecommendationsByPostInformation(interactions, posts);
+    const categoryScores = GetRecommendationsByCategory(interactions, posts);
 
-    //Find the post with post id
-    let currPost;
-    for (let i = 0; i < postVectors.length; i++) {
-        if (postVectors[i].id == post_id){
-            currPost = postVectors[i];
-            //filter out the current post from the list of posts
-            postVectors.splice(i, 1);
-        }
-    }
-    if (currPost == null){
-        return;
-    }
+    //Part 2: Collaborative filtering recommendation
+    const trendingScores = await GetTrendingScores(posts);
 
-    //Calculate cosine similarity
-    const topK = GetKCosineSimilarity(currPost.vector, postVectors, amount);
-    return topK;
+    //Merge all scores
 }
 
-//Get k most similar posts to a given user user_id
+//HELPER FUNCTIONS
+/*
+GetUserInteractions
+Input: userId
+Output:
+{
+  viewed: [{userId, postId, viewedAt}],
+  liked: [],
+  saved: [],
+  purchased: []
+}
+*/
+async function GetUserInteractions(userId){
+    let interactions = {};
+    //Get viewed
+    const views = await prisma.userViewedPosts.findMany({
+        where: {
+            userId: userId
+        }
+    });
+    interactions["viewed"] = views;
+    //Get liked
+    const likes = await prisma.userLikedPosts.findMany({
+        where: {
+            userId: userId
+        }
+    });
+    interactions["liked"] = likes;
+    //Get saved
+    const saves = await prisma.userSavedPosts.findMany({
+        where: {
+            userId: userId
+        }
+    });
+    interactions["saved"] = saves;
+    //Get purchased
+    const purchases = await prisma.post.findMany({
+        where: {
+            buyerId: userId
+        }
+    });
+    interactions["purchased"] = purchases;
+    return interactions;
+}
+
+async function GetAllInteractions(){
+    let interactions = {};
+    //Get viewed
+    const views = await prisma.userViewedPosts.findMany();
+    interactions["viewed"] = views;
+    //Get liked
+    const likes = await prisma.userLikedPosts.findMany();
+    interactions["liked"] = likes;
+    //Get saved
+    const saves = await prisma.userSavedPosts.findMany();
+    interactions["saved"] = saves;
+    return interactions;
+}
+
+//PART 1-- CONTENT BASED RECOMMENDATIONS
+/*
+GetRecommendationsByPostInformation
+Input: userPosts, posts
+Output: {postId: score}
+*/
 //userPosts is an object with multiple arrays of the posts that the user has viewed, liked, saved, purchased
-export function GetRecommendationsForUser(userPosts, posts, amount){
+function GetRecommendationsByPostInformation(userPosts, posts){
     //Get Vectors for all posts
     const postVectors = CalculateTFIDF(posts);
-
     //Calculate user profile vector
     const userProfileVector = CalculateUserProfileVector(userPosts, postVectors);
-
-    //Filter out posts that the user has already viewed, liked, saved, purchased
-    for (const userPost of userPosts) {
+    //Filter out posts that the user has already liked, saved, purchased
+    for (const userPost of userPosts.liked) {
         for (let i = 0; i < postVectors.length; i++) {
             if (postVectors[i].id === userPost.id) {
                 postVectors.splice(i, 1);
             }
         }
     }
-
+    for (const userPost of userPosts.saved) {
+        for (let i = 0; i < postVectors.length; i++) {
+            if (postVectors[i].id === userPost.id) {
+                postVectors.splice(i, 1);
+            }
+        }
+    }
+    for (const userPost of userPosts.purchased) {
+        for (let i = 0; i < postVectors.length; i++) {
+            if (postVectors[i].id === userPost.id) {
+                postVectors.splice(i, 1);
+            }
+        }
+    }
     //Calculate cosine similarity
-    const topK = GetKCosineSimilarity(userProfileVector, postVectors, amount);
-    return topK;
+    const result = GetPostsCosineSimilarity(userProfileVector, postVectors);
+    return result;
 }
 
-function GetKCosineSimilarity(currVector, allVectors, amount){
+function GetPostsCosineSimilarity(currVector, allVectors){
+    const cosineSimilarityDict = {};
     //Calculate cosine similarity
-    //Maintain an ordered min heap
-    const cosineSimilarityComparator = (profileA, profileB) => profileA.cosineSimilarity - profileB.cosineSimilarity;
-    const cosineSimilarityHeap = new Heap(cosineSimilarityComparator);
-    cosineSimilarityHeap.init([]);
     for (let i = 0; i < allVectors.length; i++) {
         const cosineSimilarity = currVector.getCosineSimilarity(allVectors[i].vector);
         //heap only needs to be k size
-        cosineSimilarityHeap.push({ id: allVectors[i].id, cosineSimilarity: cosineSimilarity });
-        if (cosineSimilarityHeap.size() > amount) {
-            cosineSimilarityHeap.pop();
-        }
+        cosineSimilarityDict[allVectors[i].id] = cosineSimilarity;
     }
-    //Get top k recommendations
-    const topK = [];
-    while (cosineSimilarityHeap.size() > 0) {
-        topK.push(cosineSimilarityHeap.pop());
-    }
-    return topK;
+    return cosineSimilarityDict;
 }
 
 function FilterString(str) {
@@ -195,30 +173,118 @@ function CalculateTFIDF(posts){
 
 function CalculateUserProfileVector(userPosts, postVectors){
     let userProfileObj = {};
+    //set weights
+    const viewedWeight = 1;
+    const likedWeight = 2;
+    const savedWeight = 3;
+    const purchasedWeight = 4;
+
     //find each post in postVectors. then add the tf-idf score of each word to the user profile vector
-    //Viewed posts
-    for (const userPost of userPosts) {
+    //viewed posts
+    for (const viewed of userPosts.viewed) {
         for (const post of postVectors) {
-            if (post.id === userPost.id) {
+            if (post.id === viewed.postId) {
                 const postWords = post.vector.getComponents();
                 for (const word of postWords) {
-                    switch (userPost.interact) {
-                        case "viewed":
-                            userProfileObj[word] = (userProfileObj[word] || 0) + post.vector.get(word);
-                            break;
-                        case "liked":
-                            userProfileObj[word] = (userProfileObj[word] || 0) + post.vector.get(word) * 2;
-                            break;
-                        case "saved":
-                            userProfileObj[word] = (userProfileObj[word] || 0) + post.vector.get(word) * 3;
-                            break;
-                        case "purchased":
-                            userProfileObj[word] = (userProfileObj[word] || 0) + post.vector.get(word) * 4;
-                            break;
-                    }
+                    userProfileObj[word] = (userProfileObj[word] || 0) + post.vector.get(word) * viewedWeight;
                 }
             }
         }
     }
+    //liked posts
+    for (const liked of userPosts.liked) {
+        for (const post of postVectors) {
+            if (post.id === liked.postId) {
+                const postWords = post.vector.getComponents();
+                for (const word of postWords) {
+                    userProfileObj[word] = (userProfileObj[word] || 0) + post.vector.get(word) * likedWeight;
+                }
+            }
+        }
+    }
+    //saved posts
+    for (const saved of userPosts.saved) {
+        for (const post of postVectors) {
+            if (post.id === saved.postId) {
+                const postWords = post.vector.getComponents();
+                for (const word of postWords) {
+                    userProfileObj[word] = (userProfileObj[word] || 0) + post.vector.get(word) * savedWeight;
+                }
+            }
+        }
+    }
+    //purchased posts
+    for (const purchased of userPosts.purchased) {
+        for (const post of postVectors) {
+            if (post.id === purchased.id) {
+                const postWords = post.vector.getComponents();
+                for (const word of postWords) {
+                    userProfileObj[word] = (userProfileObj[word] || 0) + post.vector.get(word) * purchasedWeight;
+                }
+            }
+        }
+    }
+
     return (new Vector(userProfileObj));
+}
+
+/*
+GetRecommendationsByCategory
+*/
+function GetRecommendationsByCategory(userPosts, posts){
+    //Get post category vectors
+    const postCategoryVectors = GetCategoryVectors(posts);
+
+    //Calculate user profile vector
+    const userProfileVector = CalculateUserProfileVector(userPosts, postCategoryVectors);
+
+    //Calculate cosine similarity
+    const result = GetPostsCosineSimilarity(userProfileVector, postCategoryVectors);
+
+    return result;
+}
+function GetCategoryVectors(posts){
+    let postVectors = [];
+    for (const post of posts) {
+        const postCategoryObj = {};
+        postCategoryObj[post.category] = 1;
+        postVectors.push({
+            id: post.id,
+            vector: new Vector(postCategoryObj),
+        });
+    }
+    return postVectors;
+}
+
+//PART 2-- COLLABORATIVE FILTERING RECOMMENDATIONS
+/*
+GetTrendingScores
+*/
+async function GetTrendingScores(posts){
+    let trendingScores = {};
+    for (const post of posts) {
+        trendingScores[post.id] = 0;
+    }
+    //set weights
+    const viewedWeight = 1;
+    const likedWeight = 2;
+    const savedWeight = 3;
+
+    const allInteractions = await GetAllInteractions();
+    for (const viewed of allInteractions.viewed) {
+        trendingScores[viewed.postId] += CalculateScore(viewed.viewedAt, viewedWeight);
+    }
+    for (const liked of allInteractions.liked) {
+        trendingScores[liked.postId] += CalculateScore(liked.likedAt, likedWeight);
+    }
+    for (const saved of allInteractions.saved) {
+        trendingScores[saved.postId] += CalculateScore(saved.savedAt, savedWeight);
+    }
+    return trendingScores;
+}
+function CalculateScore(interactTime, weight){
+    //Calculate score
+    const UNIX_WEEK = 604800000;
+    const score = weight * (Date.now() - interactTime.getTime()) / UNIX_WEEK;
+    return score;
 }
