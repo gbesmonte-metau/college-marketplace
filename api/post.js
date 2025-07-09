@@ -138,10 +138,10 @@ router.get('/posts/:id/likes', async (req, res, next) => {
                 id: parseInt(postId)
             },
             include: {
-                User_UserLikedPosts: true
+                UserLikedPosts: true
             }
         })
-        const usersLiked = post.User_UserLikedPosts;
+        const usersLiked = post.UserLikedPosts;
         if (usersLiked){
           res.status(200).json(usersLiked);
         }
