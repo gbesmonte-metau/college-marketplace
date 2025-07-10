@@ -35,7 +35,7 @@ function haversine(l1, l2) {
 	var d = R * c;
 	return d;
 }
-function getDistanceCoords(coord1, coord2){
+export function getDistanceCoords(coord1, coord2){
     const distanceKM = haversine(coord1, coord2);
     return kmToMiles(distanceKM);
 }

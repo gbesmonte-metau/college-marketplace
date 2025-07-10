@@ -3,6 +3,7 @@ const { TfIdf } = natural;
 import Vector from 'vector-object';
 import { PrismaClient } from '@prisma/client'
 import { fieldEncryptionExtension } from 'prisma-field-encryption'
+import { getDistanceCoords } from './post.js';
 
 const client = new PrismaClient()
 export const prisma = client.$extends(
@@ -17,12 +18,29 @@ export async function GetRecommendations(user_id){
 
     //Part 1: Content based recommendation
     const postInformationScores = GetRecommendationsByPostInformation(interactions, posts);
+    const informationVector = new Vector(postInformationScores);
+    informationVector.normalize().multiply(30);
+
     const categoryScores = GetRecommendationsByCategory(interactions, posts);
+    const categoryVector = new Vector(categoryScores);
+    categoryVector.normalize().multiply(10);
+
+    const user = await prisma.user.findUnique({
+        where: {
+            id: user_id
+        }
+    });
+    const locationScores = await GetLocationScores(user);
+    const locationVector = new Vector(locationScores);
+    locationVector.normalize().multiply(10);
 
     //Part 2: Collaborative filtering recommendation
     const trendingScores = await GetTrendingScores(posts);
+    const trendingVector = new Vector(trendingScores);
+    trendingVector.normalize().multiply(25);
 
     //Merge all scores
+    return informationVector.add(categoryVector).add(trendingVector);
 }
 
 //HELPER FUNCTIONS
@@ -93,31 +111,15 @@ Output: {postId: score}
 //userPosts is an object with multiple arrays of the posts that the user has viewed, liked, saved, purchased
 function GetRecommendationsByPostInformation(userPosts, posts){
     //Get Vectors for all posts
-    const postVectors = CalculateTFIDF(posts);
+    let postVectors = CalculateTFIDF(posts);
     //Calculate user profile vector
     const userProfileVector = CalculateUserProfileVector(userPosts, postVectors);
     //Filter out posts that the user has already liked, saved, purchased
-    for (const userPost of userPosts.liked) {
-        for (let i = 0; i < postVectors.length; i++) {
-            if (postVectors[i].id === userPost.id) {
-                postVectors.splice(i, 1);
-            }
-        }
-    }
-    for (const userPost of userPosts.saved) {
-        for (let i = 0; i < postVectors.length; i++) {
-            if (postVectors[i].id === userPost.id) {
-                postVectors.splice(i, 1);
-            }
-        }
-    }
-    for (const userPost of userPosts.purchased) {
-        for (let i = 0; i < postVectors.length; i++) {
-            if (postVectors[i].id === userPost.id) {
-                postVectors.splice(i, 1);
-            }
-        }
-    }
+    postVectors = postVectors.filter(post =>
+        !(userPosts.liked.some(liked => liked.postId === post.id) ||
+        userPosts.saved.some(saved => saved.postId === post.id) ||
+        userPosts.purchased.some(purchased => purchased.id === post.id))
+    );
     //Calculate cosine similarity
     const result = GetPostsCosineSimilarity(userProfileVector, postVectors);
     return result;
@@ -180,51 +182,31 @@ function CalculateUserProfileVector(userPosts, postVectors){
     const purchasedWeight = 4;
 
     //find each post in postVectors. then add the tf-idf score of each word to the user profile vector
-    //viewed posts
-    for (const viewed of userPosts.viewed) {
-        for (const post of postVectors) {
-            if (post.id === viewed.postId) {
-                const postWords = post.vector.getComponents();
+    //consolidate posts
+    const allPosts = userPosts.viewed.concat(userPosts.liked, userPosts.saved, userPosts.purchased);
+    for (const post of allPosts) {
+        for (const postVector of postVectors) {
+            if (postVector.id === post.postId || postVector.id === post.id) {
+                const postWords = postVector.vector.getComponents();
+                let weight = 0;
+                if ('viewedAt' in post){
+                    weight = viewedWeight;
+                }
+                else if ('likedAt' in post){
+                    weight = likedWeight;
+                }
+                else if ('savedAt' in post){
+                    weight = savedWeight;
+                }
+                else if ('buyerId' in post){
+                    weight = purchasedWeight;
+                }
                 for (const word of postWords) {
-                    userProfileObj[word] = (userProfileObj[word] || 0) + post.vector.get(word) * viewedWeight;
+                    userProfileObj[word] = (userProfileObj[word] || 0) + postVector.vector.get(word) * weight;
                 }
             }
         }
     }
-    //liked posts
-    for (const liked of userPosts.liked) {
-        for (const post of postVectors) {
-            if (post.id === liked.postId) {
-                const postWords = post.vector.getComponents();
-                for (const word of postWords) {
-                    userProfileObj[word] = (userProfileObj[word] || 0) + post.vector.get(word) * likedWeight;
-                }
-            }
-        }
-    }
-    //saved posts
-    for (const saved of userPosts.saved) {
-        for (const post of postVectors) {
-            if (post.id === saved.postId) {
-                const postWords = post.vector.getComponents();
-                for (const word of postWords) {
-                    userProfileObj[word] = (userProfileObj[word] || 0) + post.vector.get(word) * savedWeight;
-                }
-            }
-        }
-    }
-    //purchased posts
-    for (const purchased of userPosts.purchased) {
-        for (const post of postVectors) {
-            if (post.id === purchased.id) {
-                const postWords = post.vector.getComponents();
-                for (const word of postWords) {
-                    userProfileObj[word] = (userProfileObj[word] || 0) + post.vector.get(word) * purchasedWeight;
-                }
-            }
-        }
-    }
-
     return (new Vector(userProfileObj));
 }
 
@@ -257,6 +239,26 @@ function GetCategoryVectors(posts){
 }
 
 //PART 2-- COLLABORATIVE FILTERING RECOMMENDATIONS
+/*
+GetLocationScores
+*/
+
+async function GetLocationScores(currUser){
+    let locationScores = {};
+    let users = await prisma.user.findMany();
+
+    users = users.filter(user => getDistanceCoords(user.location, currUser.location) < 100 && user.id !== currUser.id);
+    for (const user of users) {
+        const interactions = await GetUserInteractions(user.id);
+        const allInteractions = interactions.viewed.concat(interactions.liked, interactions.saved);
+        for (const interaction of allInteractions) {
+            locationScores[interaction.postId] = (locationScores[interaction.postId] || 0) + 1;
+        }
+    }
+
+    return locationScores;
+}
+
 /*
 GetTrendingScores
 */

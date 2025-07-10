@@ -32,7 +32,7 @@ export default function LoginPage() {
             const result = await response.json();
             if (response.ok){
                 setUser(result);
-                navigate("/", result);
+                navigate("/home", result);
             }
             else {
                 setError(result.message);

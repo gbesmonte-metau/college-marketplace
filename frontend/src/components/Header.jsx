@@ -38,7 +38,7 @@ export default function Header() {
     <div className="app-header">
        <h1 onClick={HandleTitleClick}>College Marketplace</h1>
        <nav className='nav-bar'>
-        <Link to='/'>Home</Link>
+        <Link to='/home'>Home</Link>
         {!user && <Link to='/login'>Login</Link>}
         {!user && <Link to='/register'>Register</Link>}
         {user && <Link to='/profile'>Profile</Link>}
