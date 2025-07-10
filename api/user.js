@@ -1,8 +1,13 @@
 import express from 'express';
-import { PrismaClient } from '../generated/prisma/index.js'
+import { PrismaClient } from '@prisma/client'
 import { hashPassword, verifyPassword } from './bcrypt.js';
+import { fieldEncryptionExtension } from 'prisma-field-encryption'
 
-const prisma = new PrismaClient()
+const client = new PrismaClient()
+export const prisma = client.$extends(
+    fieldEncryptionExtension()
+)
+
 export const router = express.Router();
 router.use(express.json())
 
@@ -58,8 +63,16 @@ router.post('/users/register', async (req, res, next) => {
             }
         })
         if (userExists.length > 0) {
-          next({ status: 409, message: 'Username or email already exists' })
-          return;
+            if (userExists[0].email === newUser.email) {
+                next({ status: 409, message: 'Email already exists' })
+                return;
+            }
+            if (userExists[0].username === newUser.username) {
+                next({ status: 409, message: 'Username already exists' })
+                return;
+            }
+            next({ status: 409, message: 'Email or username already exists' })
+            return;
         }
         //hash password
         const hash = await hashPassword(newUser.password)
@@ -84,10 +97,12 @@ router.post('/users/login', async (req, res, next) => {
             res.status(200).json(user);
         } else {
             next({ status: 401, message: 'Invalid credentials' });
+            return;
         }
     }
     else{
-        next({ status: 401, message: 'Invalid credentials' });
+        next({ status: 401, message: 'Email not found' });
+        return;
     }
 })
 
@@ -129,6 +144,7 @@ router.patch('/user', isAuthenticated, async (req, res, next) => {
             data: updatedFields
         });
         if (newUser) {
+            req.session.user = newUser;
             res.status(200).json(newUser)
         } else {
             next({ status: 404, message: `No user found with ID ${userId}` })
@@ -142,16 +158,16 @@ router.patch('/user', isAuthenticated, async (req, res, next) => {
 router.get('/user/likes', isAuthenticated, async (req, res, next) => {
     const userId = req.session.user.id;
     try {
-        const user = await prisma.user.findUnique({
+        const likedPostsData = await prisma.userLikedPosts.findMany({
             where: {
-                id: parseInt(userId)
+                userId: userId
             },
             include: {
-                Post_UserLikedPosts: true
+                post: true
             }
         })
-        const likedPosts = user.Post_UserLikedPosts;
-        if (likedPosts){
+        if (likedPostsData){
+            const likedPosts = likedPostsData.map(data => data.post);
             res.status(200).json(likedPosts);
         }
         else{
@@ -169,16 +185,14 @@ router.get('/user/like/:id', isAuthenticated, async (req, res, next) => {
     const userId = req.session.user.id;
     const postId = req.params.id;
     try {
-        const user = await prisma.user.findUnique({
-            where: {id : userId},
-            include: {
-                Post_UserLikedPosts: true,
+        const post = await prisma.userLikedPosts.findUnique({
+            where: {
+                userId_postId: {
+                    userId: userId,
+                    postId: parseInt(postId),
+                }
             }
         })
-        if (!user){
-            next({ status: 404, message: `No user found with ID ${userId}` })
-        }
-        const post = user.Post_UserLikedPosts.find(post => post.id === parseInt(postId));
         res.status(200).json({liked: post});
     }
     catch (err) {
@@ -191,12 +205,10 @@ router.post('/user/like/:id', isAuthenticated, async (req, res, next) => {
     const userId = req.session.user.id;
     const postId = req.params.id;
     try {
-        await prisma.user.update({
-            where: {id: userId},
+        await prisma.userLikedPosts.create({
             data: {
-                Post_UserLikedPosts: {
-                    connect: {id: parseInt(postId)}
-                }
+                userId: userId,
+                postId: parseInt(postId),
             }
         })
         res.status(200).json({message: 'Post liked'})
@@ -211,11 +223,11 @@ router.post('/user/unlike/:id', isAuthenticated, async (req, res, next) => {
     const userId = req.session.user.id;
     const postId = req.params.id;
     try {
-        await prisma.user.update({
-            where: {id: userId},
-            data: {
-                Post_UserLikedPosts: {
-                    disconnect: {id: parseInt(postId)}
+        await prisma.userLikedPosts.delete({
+            where: {
+                userId_postId: {
+                    userId: userId,
+                    postId: parseInt(postId),
                 }
             }
         });
@@ -231,16 +243,14 @@ router.get('/user/save/:id', isAuthenticated, async (req, res, next) => {
     const userId = req.session.user.id;
     const postId = req.params.id;
     try {
-        const user = await prisma.user.findUnique({
-            where: {id : userId},
-            include: {
-                Post_UserSavedPosts: true,
+        const post = await prisma.userSavedPosts.findUnique({
+            where: {
+                userId_postId: {
+                    userId: userId,
+                    postId: parseInt(postId),
+                }
             }
         })
-        if (!user){
-            next({ status: 404, message: `No user found with ID ${userId}` })
-        }
-        const post = user.Post_UserSavedPosts.find(post => post.id === parseInt(postId));
         res.status(200).json({saved: post});
     }
     catch (err) {
@@ -253,16 +263,16 @@ router.get('/user/save/:id', isAuthenticated, async (req, res, next) => {
 router.get('/user/saves', isAuthenticated, async (req, res, next) => {
     const userId = req.session.user.id;
     try {
-        const user = await prisma.user.findUnique({
+        const savedPostsData = await prisma.userSavedPosts.findMany({
             where: {
-                id: parseInt(userId)
+                userId: userId
             },
             include: {
-                Post_UserSavedPosts: true
+                post: true
             }
         })
-        const savedPosts = user.Post_UserSavedPosts;
-        if (savedPosts){
+        if (savedPostsData){
+            const savedPosts = savedPostsData.map(data => data.post);
             res.status(200).json(savedPosts);
         }
         else{
@@ -279,12 +289,10 @@ router.post('/user/save/:id', isAuthenticated, async (req, res, next) => {
     const userId = req.session.user.id;
     const postId = req.params.id;
     try {
-        await prisma.user.update({
-            where: {id: userId},
+        await prisma.userSavedPosts.create({
             data: {
-                Post_UserSavedPosts: {
-                    connect: {id: parseInt(postId)}
-                }
+                userId: userId,
+                postId: parseInt(postId),
             }
         })
         res.status(200).json({message: 'Post saved'})
@@ -299,11 +307,11 @@ router.post('/user/unsave/:id', isAuthenticated, async (req, res, next) => {
     const userId = req.session.user.id;
     const postId = req.params.id;
     try {
-        await prisma.user.update({
-            where: {id: userId},
-            data: {
-                Post_UserSavedPosts: {
-                    disconnect: {id: parseInt(postId)}
+        await prisma.userSavedPosts.delete({
+            where: {
+                userId_postId: {
+                    userId: userId,
+                    postId: parseInt(postId),
                 }
             }
         });
@@ -312,4 +320,36 @@ router.post('/user/unsave/:id', isAuthenticated, async (req, res, next) => {
     catch (err) {
         next(err)
     }
-});
+})
+
+//View a post
+router.post('/user/view/:id', isAuthenticated, async (req, res, next) => {
+    const userId = req.session.user.id;
+    const postId = req.params.id;
+    try {
+        const post = await prisma.userViewedPosts.findUnique({
+            where: {
+                userId_postId: {
+                    userId: userId,
+                    postId: parseInt(postId),
+                }
+            }
+        })
+        if (post){
+            //TODO: update time viewed
+            res.status(200).json({message: 'Post viewed'})
+        }
+        else{
+            await prisma.userViewedPosts.create({
+                data: {
+                    userId: userId,
+                    postId: parseInt(postId),
+                }
+            })
+            res.status(200).json({message: 'Post viewed'})
+        }
+    }
+    catch (err) {
+        next(err)
+    }
+})

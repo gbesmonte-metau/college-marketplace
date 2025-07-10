@@ -1,7 +1,12 @@
 import express from 'express';
-import { PrismaClient } from '../generated/prisma/index.js'
+import { PrismaClient } from '@prisma/client'
+import { fieldEncryptionExtension } from 'prisma-field-encryption'
 
-const prisma = new PrismaClient()
+const client = new PrismaClient()
+export const prisma = client.$extends(
+    fieldEncryptionExtension()
+)
+
 export const router = express.Router();
 router.use(express.json())
 
@@ -30,7 +35,7 @@ function haversine(l1, l2) {
 	var d = R * c;
 	return d;
 }
-function getDistanceCoords(coord1, coord2){
+export function getDistanceCoords(coord1, coord2){
     const distanceKM = haversine(coord1, coord2);
     return kmToMiles(distanceKM);
 }
@@ -133,10 +138,10 @@ router.get('/posts/:id/likes', async (req, res, next) => {
                 id: parseInt(postId)
             },
             include: {
-                User_UserLikedPosts: true
+                UserLikedPosts: true
             }
         })
-        const usersLiked = post.User_UserLikedPosts;
+        const usersLiked = post.UserLikedPosts;
         if (usersLiked){
           res.status(200).json(usersLiked);
         }

@@ -43,7 +43,7 @@ export default function EditPost({postDetails, setIsEditOpen}) {
             const response = await fetch(import.meta.env.VITE_URL + `/posts/${postDetails.id}`, settings);
             const result = await response.json();
             if (response.ok){
-                alert("Post edit");
+                alert("Post edited successfully");
                 setIsEditOpen(false);
             }
             else{
@@ -104,13 +104,14 @@ export default function EditPost({postDetails, setIsEditOpen}) {
                         </div>
                         <div className='edit-option'>
                             <p>Location</p>
+                            {formattedAddr}
                             <AddressForm setLocation={setLocation} setFormattedAddr={setFormattedAddr}/>
                         </div>
                         <div className='edit-option'>
                             <p>Image</p>
                             <UploadImage url={url} setUrl={setUrl}/>
                         </div>
-                        <button type='submit'>Edit</button>
+                        <button type='submit'>Save</button>
                         <button onClick={() => setIsEditOpen(false)}>Close</button>
                     </form>
                 </div>

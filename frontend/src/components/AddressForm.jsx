@@ -44,7 +44,6 @@ export default function AddressForm({setLocation, setFormattedAddr}) {
               </StandaloneSearchBox>
             )}
           </div>
-          <p>{address && address[0].formatted_address}</p>
       </>
     )
 }

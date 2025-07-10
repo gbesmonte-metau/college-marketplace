@@ -278,7 +278,7 @@ const fakeData = {
       "time_sold": null,
       "location": "{\"lat\": 37.8716, \"lng\": -122.2727}",    // Berkeley (~9 miles)
       "description": "Adjustable smart LED desk lamp with touch controls and color temperature settings.",
-      "image_url": "https://picsum.photos/200/300?random=17",
+      "image_url": "https://res.cloudinary.com/doeql5cyb/image/upload/v1751566671/james-coleman-yxgZAm6kYQo-unsplash_ybwr9v.jpg",
       "condition": "Like New",
       "brand": "LumaTech",
       "color": "White",
@@ -330,7 +330,7 @@ const fakeData = {
 };
 
 async function main() {
-  /*for (const user of fakeData.users) {
+  for (const user of fakeData.users) {
     const newUser = user;
         //hash password
         const hash = await hashPassword(newUser.password)
@@ -338,7 +338,7 @@ async function main() {
         const created = await prisma.user.create({
             data: {...newUser, password: hash}
         })
-      }*/
+      }
   for (const post of fakeData.posts){
     const newPost = post;
         //create post
@@ -348,10 +348,10 @@ async function main() {
 
 async function resetDatabase() {
   await prisma.post.deleteMany()
-  //await prisma.user.deleteMany()
+  await prisma.user.deleteMany()
 }
 
-resetDatabase();
+//resetDatabase();
 
 
 main()

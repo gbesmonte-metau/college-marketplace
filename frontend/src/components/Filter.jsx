@@ -29,7 +29,7 @@ export default function Filter({filter, setFilter}) {
     function ClearFilter(){
         setPrice(0);
         setDistance("All");
-        setFilter({...filter, price: undefined, distance: undefined, category: null, color: null, condition: null});
+        setFilter({...filter, price: undefined, distance: "All", category: null, color: null, condition: null});
         setTriggerClear(!triggerClear);
     }
 

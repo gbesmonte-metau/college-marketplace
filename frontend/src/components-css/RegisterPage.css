@@ -12,7 +12,7 @@
     align-items: center;
     background-color: white;
     width: 300px;
-    height: 400px;
+    height: 550px;
     border-radius: 10px;
 }
 .register-form{
@@ -25,4 +25,27 @@
 }
 .register-form button {
     margin-top: 20px;
+}
+.error-box {
+    height: 30px;
+    padding: 5px;
+    color: red;
+    background-color: lightpink;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.error-box p {
+    text-align: center;
+}
+
+.visible {
+    visibility: visible;
+    opacity: 1;
+}
+.hidden {
+    visibility: hidden;
+    opacity: 0;
 }

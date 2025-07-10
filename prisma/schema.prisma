@@ -6,7 +6,6 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../generated/prisma"
 }
 
 datasource db {
@@ -19,14 +18,15 @@ model User {
   email String @unique
   username String @unique
   password String
-  location String?
-  formatted_address String?
+  location String? /// @encrypted
+  formatted_address String? /// @encrypted
   icon String?
   bio String?
   createdPosts Post[] @relation("UserCreatedPosts")
   boughtPosts Post[] @relation("UserBoughtPosts")
-  Post_UserLikedPosts Post[] @relation("UserLikedPosts")
-  Post_UserSavedPosts Post[] @relation("UserSavedPosts")
+  viewedPosts UserViewedPosts[] @relation("UserViewedPosts")
+  likedPosts UserLikedPosts[] @relation("UserLikedPosts")
+  savedPosts UserSavedPosts[] @relation("UserSavedPosts")
 }
 
 model Post {
@@ -36,8 +36,8 @@ model Post {
   name String
   time_created String
   time_sold String?
-  location String
-  formatted_address String @default("unknown")
+  location String /// @encrypted
+  formatted_address String @default("No address available.") /// @encrypted
   description String?
   image_url String?
   condition String?
@@ -47,6 +47,34 @@ model Post {
   authorId Int
   buyer User? @relation("UserBoughtPosts", fields: [buyerId], references: [id])
   buyerId Int?
-  User_UserLikedPosts User[] @relation("UserLikedPosts")
-  User_UserSavedPosts User[] @relation("UserSavedPosts")
+  usersViewed UserViewedPosts[] @relation("UserViewedPosts")
+  usersLiked UserLikedPosts[] @relation("UserLikedPosts")
+  usersSaved UserSavedPosts[] @relation("UserSavedPosts")
+}
+
+model UserViewedPosts {
+  user User @relation("UserViewedPosts", fields: [userId], references: [id])
+  userId Int
+  post Post @relation("UserViewedPosts", fields: [postId], references: [id])
+  postId Int
+  viewedAt DateTime @default(now())
+  @@id([userId, postId])
+}
+
+model UserLikedPosts {
+  user User @relation("UserLikedPosts", fields: [userId], references: [id])
+  userId Int
+  post Post @relation("UserLikedPosts", fields: [postId], references: [id])
+  postId Int
+  likedAt DateTime @default(now())
+  @@id([userId, postId])
+}
+
+model UserSavedPosts {
+  user User @relation("UserSavedPosts", fields: [userId], references: [id])
+  userId Int
+  post Post @relation("UserSavedPosts", fields: [postId], references: [id])
+  postId Int
+  savedAt DateTime @default(now())
+  @@id([userId, postId])
 }

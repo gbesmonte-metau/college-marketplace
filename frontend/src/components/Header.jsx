@@ -38,13 +38,13 @@ export default function Header() {
     <div className="app-header">
        <h1 onClick={HandleTitleClick}>College Marketplace</h1>
        <nav className='nav-bar'>
-        <Link to='/'>Home</Link>
+        <Link to='/home'>Home</Link>
         {!user && <Link to='/login'>Login</Link>}
         {!user && <Link to='/register'>Register</Link>}
         {user && <Link to='/profile'>Profile</Link>}
         {user && <Link to='/myposts'>My Posts</Link>}
         {user && <button onClick={HandleLogout}>Logout</button>}
-        {user && <img className="profile-pic" src={user.icon} alt="profile pic" />}
+        {user && <img className="profile-pic" src={user.icon || "../../public/placeholder.png"} alt="profile pic" />}
        </nav>
     </div>
   )
