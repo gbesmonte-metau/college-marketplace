@@ -15,14 +15,14 @@ const opts = {
   overwrite: true,
   invalidate: true,
   resource_type: "auto",
+  categorization: "google_tagging",
 };
 
 const uploadImageByUrl = (url) => {
   return new Promise((resolve, reject) => {
-    console.log(cloudinary.config)
     cloudinary.uploader.upload(url, opts, (error, result) => {
       if (result && result.secure_url) {
-        return resolve(result.secure_url);
+        return resolve(result);
       }
       return reject({ message: error.message });
     });
@@ -63,13 +63,19 @@ async function convertToPost(data, cities){
     const cleanPrice = data.actual_price ? data.actual_price.replace(/₹|,/g, '') : '0';
     //upload image
     let image = data.image;
+    let tags = [];
     try{
-        image = await uploadImageByUrl(data.image);
+        const response = await uploadImageByUrl(data.image);
+        image = response.secure_url;
+        if (response.info.categorization.google_tagging.data != null){
+            for (const tag of response.info.categorization.google_tagging.data) {
+                tags.push(tag.tag);
+            }
+        }
     }
     catch(e){
-        console.log(e);
+        console.error(e);
     }
-    console.log(image);
     const newPost = {
         price: parseFloat((parseFloat(cleanPrice) / 85.83167).toFixed(2)),
         category: GetCategoryIdByName(data.category),
@@ -77,7 +83,8 @@ async function convertToPost(data, cities){
         time_created: Date.now().toString(),
         location: `{\"lat\": ${randomCity.Latitude}, \"lng\": ${randomCity.Longitude}}`,
         formatted_address: randomCity.Name + ", California, United States",
-        image_url: data.image,
+        image_url: image,
+        tags: tags,
         authorId: Math.floor(Math.random() * 5),
     }
     return newPost;
@@ -97,12 +104,11 @@ async function main(){
     //write file
     const jsonString = JSON.stringify(posts, null, 2); // Pretty-print with 2-space indentation
 
-    fs.writeFile('./data/data.json', jsonString, (err) => {
+    fs.writeFile('./data/posts.json', jsonString, (err) => {
         if (err) {
             console.error('Error writing file:', err);
             return;
         }
-        console.log('JSON data written to data.json successfully!');
     });
 }
 
