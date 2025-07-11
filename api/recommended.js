@@ -290,3 +290,10 @@ function CalculateScore(interactTime, weight){
     const score = weight * (Date.now() - interactTime.getTime()) / UNIX_WEEK;
     return score;
 }
+
+/*
+GetOutsideTrendingScores
+*/
+async function GetOutsideTrendingScores(posts){
+    let trendingScores = {};
+}
