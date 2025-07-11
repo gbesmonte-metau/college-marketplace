@@ -43,6 +43,7 @@ export default function Header() {
         {!user && <Link to='/register'>Register</Link>}
         {user && <Link to='/profile'>Profile</Link>}
         {user && <Link to='/myposts'>My Posts</Link>}
+        {user && <Link to='/foryou'>For You</Link>}
         {user && <button onClick={HandleLogout}>Logout</button>}
         {user && <img className="profile-pic" src={user.icon || "../../public/placeholder.png"} alt="profile pic" />}
        </nav>

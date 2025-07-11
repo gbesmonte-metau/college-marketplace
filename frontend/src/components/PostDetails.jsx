@@ -6,6 +6,7 @@ import { useContext } from 'react'
 import { UserContext } from '../App';
 import EditPost from './EditPost';
 import "../components-css/PostDetails.css"
+import RatePurchase from './RatePurchase';
 
 export default function PostDetails() {
     const id = useParams().id;
@@ -85,7 +86,7 @@ export default function PostDetails() {
                             <h2>{postDetails.name}</h2>
                             <h3>${postDetails.price}</h3>
                             <div>
-                                {postDetails.buyerId ? <p>Already Purchased</p> : <button onClick={HandlePurchase}>Purchase</button>}
+                                {postDetails.purchase ? <p>Already Purchased</p> : <button onClick={HandlePurchase}>Purchase</button>}
                             </div>
                             <p>
                                 {user && user.id === postDetails.authorId ?
@@ -103,6 +104,7 @@ export default function PostDetails() {
                         <p>Brand: {postDetails.brand}</p>
                         <p>Condition: {postDetails.condition}</p>
                         <p>Category: {categoryArr[postDetails.category]}</p>
+                        {postDetails.purchase && postDetails.purchase.buyerId === user.id && <RatePurchase postDetails={postDetails}/>}
                     </div>
                 </div>
             </div>

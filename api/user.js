@@ -2,6 +2,7 @@ import express from 'express';
 import { PrismaClient } from '@prisma/client'
 import { hashPassword, verifyPassword } from './bcrypt.js';
 import { fieldEncryptionExtension } from 'prisma-field-encryption'
+import { GetRecommendations } from './recommended.js';
 
 const client = new PrismaClient()
 export const prisma = client.$extends(
@@ -352,4 +353,20 @@ router.post('/user/view/:id', isAuthenticated, async (req, res, next) => {
     catch (err) {
         next(err)
     }
+})
+
+//Get recommendations for current user
+router.get('/user/recommendations', isAuthenticated, async (req, res, next) => {
+    const userId = req.session.user.id;
+    const recommendedPosts = [];
+    const postIdArr = await GetRecommendations(userId);
+    for (const postId of postIdArr) {
+        const post = await prisma.post.findUnique({
+            where: {
+                id: postId
+            }
+        })
+        recommendedPosts.push(post);
+    }
+    res.status(200).json(recommendedPosts);
 })
