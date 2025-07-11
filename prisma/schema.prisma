@@ -23,10 +23,11 @@ model User {
   icon String?
   bio String?
   createdPosts Post[] @relation("UserCreatedPosts")
-  boughtPosts Post[] @relation("UserBoughtPosts")
   viewedPosts UserViewedPosts[] @relation("UserViewedPosts")
   likedPosts UserLikedPosts[] @relation("UserLikedPosts")
   savedPosts UserSavedPosts[] @relation("UserSavedPosts")
+  purchases Purchase[] @relation("PurchaseBuyer")
+  soldPosts Purchase[] @relation("PurchaseSeller")
 }
 
 model Post {
@@ -46,11 +47,10 @@ model Post {
   color String?
   author   User @relation("UserCreatedPosts", fields: [authorId], references: [id])
   authorId Int
-  buyer User? @relation("UserBoughtPosts", fields: [buyerId], references: [id])
-  buyerId Int?
   usersViewed UserViewedPosts[] @relation("UserViewedPosts")
   usersLiked UserLikedPosts[] @relation("UserLikedPosts")
   usersSaved UserSavedPosts[] @relation("UserSavedPosts")
+  purchase Purchase? @relation("PurchasePost")
 }
 
 model UserViewedPosts {
@@ -78,4 +78,16 @@ model UserSavedPosts {
   postId Int
   savedAt DateTime @default(now())
   @@id([userId, postId])
+}
+
+model Purchase {
+  id Int @id @default(autoincrement())
+  buyer User @relation("PurchaseBuyer", fields: [buyerId], references: [id])
+  buyerId Int
+  seller User @relation("PurchaseSeller", fields: [sellerId], references: [id])
+  sellerId Int
+  post Post @relation("PurchasePost", fields: [postId], references: [id])
+  postId Int @unique
+  purchasedAt DateTime @default(now())
+  rating Int?
 }

@@ -40,7 +40,21 @@ export async function GetRecommendations(user_id){
     trendingVector.normalize().multiply(25);
 
     //Merge all scores
-    return informationVector.add(categoryVector).add(trendingVector);
+    const totalVectorObj = informationVector.add(categoryVector).add(trendingVector).toObject();
+
+    const k = 5; // Number of greatest values to find
+    let sortedEntries = Object.entries(totalVectorObj).sort(([, valA], [, valB]) => valB - valA);
+
+    // Filter out posts the user has already interacted with
+    sortedEntries = sortedEntries.filter(([key]) =>
+        //!interactions.viewed.some(viewed => viewed.postId === parseInt(key)) &&
+        !interactions.liked.some(liked => liked.postId === parseInt(key)) &&
+        !interactions.saved.some(saved => saved.postId === parseInt(key)) &&
+        !interactions.purchased.some(purchased => purchased.id === parseInt(key))
+    );
+
+    //Get top k
+    return sortedEntries.slice(0, k).map(([key]) => parseInt(key));
 }
 
 //HELPER FUNCTIONS
@@ -79,12 +93,15 @@ async function GetUserInteractions(userId){
     });
     interactions["saved"] = saves;
     //Get purchased
-    const purchases = await prisma.post.findMany({
+    const purchases = await prisma.purchase.findMany({
         where: {
             buyerId: userId
+        },
+        include: {
+            post: true
         }
     });
-    interactions["purchased"] = purchases;
+    interactions["purchased"] = purchases.map(purchase => purchase.post);
     return interactions;
 }
 
@@ -296,4 +313,5 @@ GetOutsideTrendingScores
 */
 async function GetOutsideTrendingScores(posts){
     let trendingScores = {};
+
 }
