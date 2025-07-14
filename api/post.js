@@ -48,6 +48,9 @@ router.get('/posts/:id', async (req, res, next) => {
         const post = await prisma.post.findUnique({
             where: {
                 id: parseInt(postId)
+            },
+            include: {
+                purchase: true
             }
         })
         if (post) {
@@ -65,8 +68,6 @@ router.get('/posts/:id', async (req, res, next) => {
 router.get('/posts', async (req, res, next) => {
     try {
         const whereClause = {};
-        //exclude purchased posts
-        whereClause.buyerId = null;
         //price
         if (req.query?.price) {
             whereClause.price = { lte: parseFloat(req.query.price) };
@@ -106,7 +107,10 @@ router.get('/posts', async (req, res, next) => {
             ]
         }
         let posts = await prisma.post.findMany({
-            where: whereClause
+            where: whereClause,
+            include: {
+                purchase: true
+            }
         })
         //distance
         if (posts && req.query.distance && req.query.distance != 'undefined' && req.session.user && req.session.user.location) {
@@ -118,6 +122,8 @@ router.get('/posts', async (req, res, next) => {
                 return actualDistance <= distance;
             })
         }
+        //filter out sold items
+        posts = posts.filter(post => post.purchase == null);
         if (posts.length > 0) {
             res.status(200).json(posts)
         } else {
@@ -277,13 +283,11 @@ router.post('/posts/:id/purchase', isAuthenticated, async (req, res, next) => {
             next({ status: 403, message: `You are the author of this post` });
             return;
         }
-        const newPost = await prisma.post.update({
-            where: {
-                id: parseInt(postId)
-            },
+        const newPost = await prisma.purchase.create({
             data: {
                 buyerId: userId,
-                time_sold: Date.now().toString()
+                sellerId: getPost.authorId,
+                postId: parseInt(postId),
             }
         });
         if (newPost) {
@@ -302,13 +306,17 @@ router.post('/posts/:id/purchase', isAuthenticated, async (req, res, next) => {
 router.get('/bought', isAuthenticated, async (req, res, next) => {
     const userId = req.session.user.id;
     try {
-        const posts = await prisma.post.findMany({
+        const posts = await prisma.purchase.findMany({
             where: {
                 buyerId: parseInt(userId)
+            },
+            include: {
+                post: true
             }
         })
         if (posts.length > 0) {
-            res.status(200).json(posts)
+            const allPosts = posts.map(post => post.post);
+            res.status(200).json(allPosts)
         } else {
             next({ status: 404, message: `No posts found with user ID ${userId}` })
         }
@@ -317,6 +325,31 @@ router.get('/bought', isAuthenticated, async (req, res, next) => {
         next(err)
     }
 })
+
+//Get all posts a user sold
+router.get('/sold', isAuthenticated, async (req, res, next) => {
+    const userId = req.session.user.id;
+    try {
+        const posts = await prisma.purchase.findMany({
+            where: {
+                sellerId: parseInt(userId)
+            },
+            include: {
+                post: true
+            }
+        })
+        if (posts.length > 0) {
+            const allPosts = posts.map(post => post.post);
+            res.status(200).json(allPosts)
+        } else {
+            next({ status: 404, message: `No posts found with user ID ${userId}` })
+        }
+    }
+    catch (err) {
+        next(err)
+    }
+})
+
 
 //Edit a post
 router.patch('/posts/:id', isAuthenticated, async (req, res, next) => {
@@ -352,3 +385,37 @@ router.patch('/posts/:id', isAuthenticated, async (req, res, next) => {
         next(err)
     }
 })
+
+//Update a rating
+router.patch('/purchases/:id/rating', isAuthenticated, async (req, res, next) => {
+    const userId = req.session.user.id
+    const post = req.params.id;
+
+    const updatedFields = req.body;
+    try {
+        const getPost = await prisma.purchase.findUnique({
+            where: {
+                postId: parseInt(post)
+            }
+        });
+        if (!getPost) {
+            next({ status: 404, message: `No post found with ID ${post}` });
+        }
+        if (getPost.buyerId !== userId) {
+            next({ status: 403, message: `You are not the buyer of this post` });
+        }
+        const newPost = await prisma.purchase.update({
+            where: {
+                postId: parseInt(post)
+            },
+            data: updatedFields
+        });
+        if (newPost) {
+            res.status(200).json(newPost)
+        } else {
+            next({ status: 404, message: `No post found with ID ${post}` })
+        }
+    } catch (err) {
+        next(err)
+    }
+});

@@ -10,6 +10,7 @@ import PostDetails from './components/PostDetails';
 import MyPostsPage from './components/MyPostsPage';
 import OtherProfilePage from './components/OtherProfilePage';
 import LandingPage from './components/LandingPage';
+import ForYouPage from './components/ForYouPage';
 
 export const UserContext = createContext();
 
@@ -49,6 +50,10 @@ const routes = createBrowserRouter([
       {
         path: '/profile/:id',
         element: <OtherProfilePage/>
+      },
+      {
+        path: '/foryou',
+        element: <ForYouPage/>
       }
     ]
   },

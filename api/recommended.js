@@ -11,20 +11,18 @@ export const prisma = client.$extends(
 )
 
 GetRecommendations(1);
-
 export async function GetRecommendations(user_id){
     const posts = await prisma.post.findMany();
     const interactions = await GetUserInteractions(user_id);
-
-    //Part 1: Content based recommendation
+    //keyword based recommendation
     const postInformationScores = GetRecommendationsByPostInformation(interactions, posts);
     const informationVector = new Vector(postInformationScores);
     informationVector.normalize().multiply(30);
-
+    //category based recommendation
     const categoryScores = GetRecommendationsByCategory(interactions, posts);
     const categoryVector = new Vector(categoryScores);
     categoryVector.normalize().multiply(10);
-
+    //other users based recommendation
     const user = await prisma.user.findUnique({
         where: {
             id: user_id
@@ -33,14 +31,39 @@ export async function GetRecommendations(user_id){
     const locationScores = await GetLocationScores(user);
     const locationVector = new Vector(locationScores);
     locationVector.normalize().multiply(10);
-
-    //Part 2: Collaborative filtering recommendation
     const trendingScores = await GetTrendingScores(posts);
     const trendingVector = new Vector(trendingScores);
     trendingVector.normalize().multiply(25);
-
-    //Merge all scores
-    return informationVector.add(categoryVector).add(trendingVector);
+    //seller score
+    const sellerToScore = {};
+    const sellerArr = {};
+    for (const p of posts){
+        if (!(p.authorId in sellerToScore)){
+            sellerToScore[p.authorId] = await GetSellerScore(user_id, p.authorId);
+        }
+    }
+    for (const entry of Object.entries(sellerToScore)){
+        for (const post of posts){
+            if (entry[0] == post.authorId){
+                sellerArr[post.id] = entry[1];
+            }
+        }
+    }
+    const sellerVector = new Vector(sellerArr);
+    sellerVector.normalize();
+    //calculate final score
+    const totalVectorObj = informationVector.add(categoryVector).add(trendingVector).add(sellerVector).toObject();
+    const k = 5; // Number of greatest values to find
+    let sortedEntries = Object.entries(totalVectorObj).sort(([, valA], [, valB]) => valB - valA);
+    // Filter out posts the user has already interacted with
+    sortedEntries = sortedEntries.filter(([key]) =>
+        //!interactions.viewed.some(viewed => viewed.postId === parseInt(key)) &&
+        !interactions.liked.some(liked => liked.postId === parseInt(key)) &&
+        !interactions.saved.some(saved => saved.postId === parseInt(key)) &&
+        !interactions.purchased.some(purchased => purchased.id === parseInt(key))
+    );
+    //Get top k
+    return sortedEntries.slice(0, k).map(([key]) => parseInt(key));
 }
 
 //HELPER FUNCTIONS
@@ -79,12 +102,15 @@ async function GetUserInteractions(userId){
     });
     interactions["saved"] = saves;
     //Get purchased
-    const purchases = await prisma.post.findMany({
+    const purchases = await prisma.purchase.findMany({
         where: {
             buyerId: userId
+        },
+        include: {
+            post: true
         }
     });
-    interactions["purchased"] = purchases;
+    interactions["purchased"] = purchases.map(purchase => purchase.post);
     return interactions;
 }
 
@@ -274,26 +300,72 @@ async function GetTrendingScores(posts){
 
     const allInteractions = await GetAllInteractions();
     for (const viewed of allInteractions.viewed) {
-        trendingScores[viewed.postId] += CalculateScore(viewed.viewedAt, viewedWeight);
+        trendingScores[viewed.postId] += CalculateTrendingScore(viewed.viewedAt, viewedWeight);
     }
     for (const liked of allInteractions.liked) {
-        trendingScores[liked.postId] += CalculateScore(liked.likedAt, likedWeight);
+        trendingScores[liked.postId] += CalculateTrendingScore(liked.likedAt, likedWeight);
     }
     for (const saved of allInteractions.saved) {
-        trendingScores[saved.postId] += CalculateScore(saved.savedAt, savedWeight);
+        trendingScores[saved.postId] += CalculateTrendingScore(saved.savedAt, savedWeight);
     }
     return trendingScores;
 }
-function CalculateScore(interactTime, weight){
+function CalculateTrendingScore(interactTime, weight){
     //Calculate score
     const UNIX_WEEK = 604800000;
-    const score = weight * (Date.now() - interactTime.getTime()) / UNIX_WEEK;
+    const age = Date.now() - interactTime.getTime();
+    const score = weight * Math.exp(-age/UNIX_WEEK);
     return score;
 }
 
 /*
-GetOutsideTrendingScores
+GetSellerScore
 */
-async function GetOutsideTrendingScores(posts){
-    let trendingScores = {};
+async function GetSellerScore(user_id, seller_id){
+    let score = 0;
+    const ratingWeights = {
+        1: -1,
+        2: -.5,
+        3: .5,
+        4: .8,
+        5: 1,
+        "missing": 1,
+    }
+    //if the user has purchased from the seller
+    //take score into consideration
+    const userBought = await prisma.purchase.findMany({
+        where: {
+            sellerId: seller_id,
+            buyerId: user_id
+        }
+    });
+    const UNIX_WEEK = 604800000;
+    for (let i = 0; i < userBought.length; i++){
+        const age = Date.now() - userBought[i].purchasedAt.getTime();
+        if (userBought[i].rating != null){
+            score += Math.exp(-age / UNIX_WEEK) * ratingWeights[userBought[i].rating];
+        }
+        else{
+            score += Math.exp(-age / UNIX_WEEK) * ratingWeights["missing"];
+        }
+    }
+    //if seller has recent sold posts from other users, add to score
+    const soldPosts = await prisma.purchase.findMany({
+        where: {
+            sellerId: seller_id,
+            NOT: {
+                buyerId: user_id,
+            }
+        }
+    });
+    for (let i = 0; i < soldPosts.length; i++){
+        const age = Date.now() - soldPosts[i].purchasedAt.getTime();
+        if (soldPosts[i].rating != null){
+            score += Math.exp(-age/ UNIX_WEEK) * ratingWeights[soldPosts[i].rating];
+        }
+        else{
+            score += Math.exp(-age / UNIX_WEEK) * ratingWeights["missing"];
+        }
+    }
+    return score;
 }

@@ -1,0 +1,9 @@
+.star-btn {
+  color: #f1a817;
+  font-size: 1.5rem;
+  background-color: transparent;
+}
+
+.purchase-body form {
+  display: flex;
+}
