@@ -10,6 +10,7 @@ export const prisma = client.$extends(
     fieldEncryptionExtension()
 )
 
+GetRecommendations(1);
 export async function GetRecommendations(user_id){
     const posts = await prisma.post.findMany();
     const interactions = await GetUserInteractions(user_id);
@@ -322,6 +323,14 @@ GetSellerScore
 */
 async function GetSellerScore(user_id, seller_id){
     let score = 0;
+    const ratingWeights = {
+        1: -1,
+        2: -.5,
+        3: .5,
+        4: .8,
+        5: 1,
+        "missing": 1,
+    }
     //if the user has purchased from the seller
     //take score into consideration
     const userBought = await prisma.purchase.findMany({
@@ -333,7 +342,12 @@ async function GetSellerScore(user_id, seller_id){
     const UNIX_WEEK = 604800000;
     for (let i = 0; i < userBought.length; i++){
         const age = Date.now() - userBought[i].purchasedAt.getTime();
-        score += Math.exp(-age / UNIX_WEEK) * 5;
+        if (userBought[i].rating != null){
+            score += Math.exp(-age / UNIX_WEEK) * ratingWeights[userBought[i].rating];
+        }
+        else{
+            score += Math.exp(-age / UNIX_WEEK) * ratingWeights["missing"];
+        }
     }
     //if seller has recent sold posts from other users, add to score
     const soldPosts = await prisma.purchase.findMany({
@@ -345,7 +359,13 @@ async function GetSellerScore(user_id, seller_id){
         }
     });
     for (let i = 0; i < soldPosts.length; i++){
-        score += Math.exp(-soldPosts[i].purchasedAt.getTime()/ UNIX_WEEK);
+        const age = Date.now() - soldPosts[i].purchasedAt.getTime();
+        if (soldPosts[i].rating != null){
+            score += Math.exp(-age/ UNIX_WEEK) * ratingWeights[soldPosts[i].rating];
+        }
+        else{
+            score += Math.exp(-age / UNIX_WEEK) * ratingWeights["missing"];
+        }
     }
     return score;
 }
