@@ -2,6 +2,7 @@ import React from 'react'
 import { useState } from 'react';
 import { FaRegStar } from "react-icons/fa";
 import { FaStar } from "react-icons/fa";
+import '../components-css/RatePurchase.css'
 
 export default function RatePurchase({postDetails}) {
     const ratingOptions = [1, 2, 3, 4, 5];
@@ -18,7 +19,7 @@ export default function RatePurchase({postDetails}) {
             body: JSON.stringify({rating}),
         });
         const data = await response.json();
-        console.log(data);
+        alert("Submitted rating!");
     }
     return (
         <div className='purchase-modal'>
@@ -27,11 +28,13 @@ export default function RatePurchase({postDetails}) {
                 <p>How would you rate your seller?</p>
                 <p>Your rating will be used to recommend you posts in the future.</p>
                 <form onSubmit={UpdateRating}>
+                    <div>
                     {ratingOptions.map((option, idx) => (
-                        <button key={idx} type="button" onClick={() => setRating(option)}>
+                        <button key={idx} type="button" className="star-btn" onClick={() => setRating(option)}>
                             <span className="star">{rating && option <= rating ? <FaStar/> : <FaRegStar/>}</span>
                         </button>)
                     )}
+                    </div>
                     <button type="submit">Submit</button>
                 </form>
             </div>
