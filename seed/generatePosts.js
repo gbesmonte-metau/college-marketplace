@@ -48,7 +48,7 @@ async function processCSV(fileName){
 
 async function chooseRandom(data, category){
     let count = 0;
-    const amount = 1; //number of items to choose from each category
+    const amount = 10; //number of items to choose from each category
     while (count < amount) {
         const randomInt = Math.floor(Math.random() * data.length);
         const selectedItem = { ...data[randomInt], category: category };
@@ -105,7 +105,7 @@ async function main(){
     //write file
     const jsonString = JSON.stringify(posts, null, 2); // Pretty-print with 2-space indentation
 
-    fs.writeFile('../data/posts.json', jsonString, (err) => {
+    fs.writeFile('./data/posts.json', jsonString, (err) => {
         if (err) {
             return;
         }
