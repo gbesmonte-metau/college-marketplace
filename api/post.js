@@ -1,6 +1,7 @@
 import express from 'express';
 import { PrismaClient } from '@prisma/client'
 import { fieldEncryptionExtension } from 'prisma-field-encryption'
+import { GetTrendingScores } from './recommended.js';
 
 const client = new PrismaClient()
 export const prisma = client.$extends(
@@ -416,6 +417,36 @@ router.patch('/purchases/:id/rating', isAuthenticated, async (req, res, next) =>
             next({ status: 404, message: `No post found with ID ${post}` })
         }
     } catch (err) {
+        next(err)
+    }
+});
+
+//get trending posts
+router.get('/trending', async (req, res, next) => {
+    try{
+        const posts = await prisma.post.findMany();
+        const trendingScores = await GetTrendingScores(posts);
+        let sorted = Object.entries(trendingScores).sort(([, valA], [, valB]) => valB - valA);
+        const postIdArr = sorted.map(([key, ]) => parseInt(key));
+        let trendingPosts = [];
+        for (const postId of postIdArr) {
+            const post = await prisma.post.findUnique({
+                where: {
+                    id: postId
+                }
+            })
+            if (post){
+                trendingPosts.push(post);
+            }
+        }
+        trendingPosts = trendingPosts.slice(0, 10);
+        if (trendingPosts.length > 0) {
+            res.status(200).json(trendingPosts)
+        } else {
+            next({ status: 404, message: 'No trending posts found' })
+        }
+    }
+    catch (err) {
         next(err)
     }
 });

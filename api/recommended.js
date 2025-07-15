@@ -289,7 +289,7 @@ async function GetLocationScores(currUser){
 /*
 GetTrendingScores
 */
-async function GetTrendingScores(posts){
+export async function GetTrendingScores(posts){
     let trendingScores = {};
     for (const post of posts) {
         trendingScores[post.id] = 0;

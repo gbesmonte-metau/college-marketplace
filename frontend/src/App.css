@@ -2,10 +2,13 @@
   height: 100vh;
   display: grid;
   grid-template-rows: auto 1fr;
+  width: 100%;
+  overflow: scroll;
 }
 .page {
   height: 100%;
-  overflow: scroll;
+  overflow-y: scroll;
+  width: 100%;
 }
 .app-footer {
   height: 5vh;
