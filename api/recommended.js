@@ -50,14 +50,13 @@ export async function GetRecommendations(user_id){
         }
     }
     const sellerVector = new Vector(sellerArr);
-    sellerVector.normalize();
+    sellerVector.normalize().multiply(25);
     //calculate final score
-    const totalVectorObj = informationVector.add(categoryVector).add(trendingVector).add(sellerVector).toObject();
+    const totalVectorObj = informationVector.add(categoryVector).add(trendingVector).add(locationVector).add(sellerVector).toObject();
     const k = 5; // Number of greatest values to find
     let sortedEntries = Object.entries(totalVectorObj).sort(([, valA], [, valB]) => valB - valA);
     // Filter out posts the user has already interacted with
     sortedEntries = sortedEntries.filter(([key]) =>
-        //!interactions.viewed.some(viewed => viewed.postId === parseInt(key)) &&
         !interactions.liked.some(liked => liked.postId === parseInt(key)) &&
         !interactions.saved.some(saved => saved.postId === parseInt(key)) &&
         !interactions.purchased.some(purchased => purchased.id === parseInt(key))
@@ -163,6 +162,9 @@ function GetPostsCosineSimilarity(currVector, allVectors){
 }
 
 function FilterString(str) {
+    if (!str){
+        return "";
+    }
     str = str.toLowerCase();
     return str.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g,"");
 }
@@ -206,7 +208,6 @@ function CalculateUserProfileVector(userPosts, postVectors){
     const likedWeight = 2;
     const savedWeight = 3;
     const purchasedWeight = 4;
-
     //find each post in postVectors. then add the tf-idf score of each word to the user profile vector
     //consolidate posts
     const allPosts = userPosts.viewed.concat(userPosts.liked, userPosts.saved, userPosts.purchased);
@@ -272,23 +273,23 @@ GetLocationScores
 async function GetLocationScores(currUser){
     let locationScores = {};
     let users = await prisma.user.findMany();
-
+    const MAX_SCORE = 100;
     users = users.filter(user => getDistanceCoords(user.location, currUser.location) < 100 && user.id !== currUser.id);
     for (const user of users) {
+        const distance = getDistanceCoords(user.location, currUser.location);
         const interactions = await GetUserInteractions(user.id);
         const allInteractions = interactions.viewed.concat(interactions.liked, interactions.saved);
         for (const interaction of allInteractions) {
-            locationScores[interaction.postId] = (locationScores[interaction.postId] || 0) + 1;
+            locationScores[interaction.postId] = (locationScores[interaction.postId] || 0) + MAX_SCORE / (1 + distance);
         }
     }
-
     return locationScores;
 }
 
 /*
 GetTrendingScores
 */
-async function GetTrendingScores(posts){
+export async function GetTrendingScores(posts){
     let trendingScores = {};
     for (const post of posts) {
         trendingScores[post.id] = 0;
@@ -312,9 +313,9 @@ async function GetTrendingScores(posts){
 }
 function CalculateTrendingScore(interactTime, weight){
     //Calculate score
-    const UNIX_WEEK = 604800000;
+    const MILLISECONDS_PER_WEEK = 604800000;
     const age = Date.now() - interactTime.getTime();
-    const score = weight * Math.exp(-age/UNIX_WEEK);
+    const score = weight * Math.exp(-age/MILLISECONDS_PER_WEEK);
     return score;
 }
 
@@ -339,14 +340,14 @@ async function GetSellerScore(user_id, seller_id){
             buyerId: user_id
         }
     });
-    const UNIX_WEEK = 604800000;
+    const MILLISECONDS_PER_WEEK = 604800000;
     for (let i = 0; i < userBought.length; i++){
         const age = Date.now() - userBought[i].purchasedAt.getTime();
         if (userBought[i].rating != null){
-            score += Math.exp(-age / UNIX_WEEK) * ratingWeights[userBought[i].rating];
+            score += Math.exp(-age / MILLISECONDS_PER_WEEK) * ratingWeights[userBought[i].rating];
         }
         else{
-            score += Math.exp(-age / UNIX_WEEK) * ratingWeights["missing"];
+            score += Math.exp(-age / MILLISECONDS_PER_WEEK);
         }
     }
     //if seller has recent sold posts from other users, add to score
@@ -361,11 +362,17 @@ async function GetSellerScore(user_id, seller_id){
     for (let i = 0; i < soldPosts.length; i++){
         const age = Date.now() - soldPosts[i].purchasedAt.getTime();
         if (soldPosts[i].rating != null){
-            score += Math.exp(-age/ UNIX_WEEK) * ratingWeights[soldPosts[i].rating];
+            score += Math.exp(-age/ MILLISECONDS_PER_WEEK) * ratingWeights[soldPosts[i].rating];
         }
         else{
-            score += Math.exp(-age / UNIX_WEEK) * ratingWeights["missing"];
+            score += Math.exp(-age / MILLISECONDS_PER_WEEK);
         }
     }
+    //if seller has a lot of posts
+    const posts = await prisma.post.findMany({
+        where: {authorId: seller_id}
+    })
+    //10 posts to increase score by 1
+    score += posts.length * .1;
     return score;
 }
