@@ -106,6 +106,8 @@ router.get('/posts', async (req, res, next) => {
                 { description: { contains: req.query.search, mode: 'insensitive'} },
             ]
         }
+        //filter out sold items
+        whereClause.purchase = null;
         let posts = await prisma.post.findMany({
             where: whereClause,
             include: {
@@ -122,8 +124,6 @@ router.get('/posts', async (req, res, next) => {
                 return actualDistance <= distance;
             })
         }
-        //filter out sold items
-        posts = posts.filter(post => post.purchase == null);
         if (posts.length > 0) {
             res.status(200).json(posts)
         } else {

@@ -52,12 +52,11 @@ export async function GetRecommendations(user_id){
     const sellerVector = new Vector(sellerArr);
     sellerVector.normalize();
     //calculate final score
-    const totalVectorObj = informationVector.add(categoryVector).add(trendingVector).add(sellerVector).toObject();
+    const totalVectorObj = informationVector.add(categoryVector).add(trendingVector).add(locationVector).add(sellerVector).toObject();
     const k = 5; // Number of greatest values to find
     let sortedEntries = Object.entries(totalVectorObj).sort(([, valA], [, valB]) => valB - valA);
     // Filter out posts the user has already interacted with
     sortedEntries = sortedEntries.filter(([key]) =>
-        //!interactions.viewed.some(viewed => viewed.postId === parseInt(key)) &&
         !interactions.liked.some(liked => liked.postId === parseInt(key)) &&
         !interactions.saved.some(saved => saved.postId === parseInt(key)) &&
         !interactions.purchased.some(purchased => purchased.id === parseInt(key))
@@ -163,6 +162,9 @@ function GetPostsCosineSimilarity(currVector, allVectors){
 }
 
 function FilterString(str) {
+    if (!str){
+        return "";
+    }
     str = str.toLowerCase();
     return str.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g,"");
 }
@@ -312,9 +314,9 @@ async function GetTrendingScores(posts){
 }
 function CalculateTrendingScore(interactTime, weight){
     //Calculate score
-    const UNIX_WEEK = 604800000;
+    const MILLISECONDS_PER_WEEK = 604800000;
     const age = Date.now() - interactTime.getTime();
-    const score = weight * Math.exp(-age/UNIX_WEEK);
+    const score = weight * Math.exp(-age/MILLISECONDS_PER_WEEK);
     return score;
 }
 
@@ -339,14 +341,14 @@ async function GetSellerScore(user_id, seller_id){
             buyerId: user_id
         }
     });
-    const UNIX_WEEK = 604800000;
+    const MILLISECONDS_PER_WEEK = 604800000;
     for (let i = 0; i < userBought.length; i++){
         const age = Date.now() - userBought[i].purchasedAt.getTime();
         if (userBought[i].rating != null){
-            score += Math.exp(-age / UNIX_WEEK) * ratingWeights[userBought[i].rating];
+            score += Math.exp(-age / MILLISECONDS_PER_WEEK) * ratingWeights[userBought[i].rating];
         }
         else{
-            score += Math.exp(-age / UNIX_WEEK) * ratingWeights["missing"];
+            score += Math.exp(-age / MILLISECONDS_PER_WEEK);
         }
     }
     //if seller has recent sold posts from other users, add to score
@@ -364,7 +366,7 @@ async function GetSellerScore(user_id, seller_id){
             score += Math.exp(-age/ UNIX_WEEK) * ratingWeights[soldPosts[i].rating];
         }
         else{
-            score += Math.exp(-age / UNIX_WEEK) * ratingWeights["missing"];
+            score += Math.exp(-age / UNIX_WEEK);
         }
     }
     return score;

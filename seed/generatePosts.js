@@ -2,8 +2,10 @@ import dotenv from "dotenv";
 dotenv.config();
 import { promises as fs } from "fs";
 import { parse } from "csv-parse/sync";
-import { categoryArr, GetCategoryIdByName } from "./frontend/utils.js";
+import { categoryArr, GetCategoryIdByName } from "../frontend/utils.js";
 import { v2 as cloudinary } from 'cloudinary';
+import { PrismaClient } from '@prisma/client'
+const prisma = new PrismaClient()
 
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD,
@@ -15,7 +17,7 @@ const opts = {
   overwrite: true,
   invalidate: true,
   resource_type: "auto",
-  categorization: "google_tagging",
+  //categorization: "google_tagging",
 };
 
 const uploadImageByUrl = (url) => {
@@ -67,14 +69,13 @@ async function convertToPost(data, cities){
     try{
         const response = await uploadImageByUrl(data.image);
         image = response.secure_url;
-        if (response.info.categorization.google_tagging.data != null){
+        /*if (response.info.categorization.google_tagging.data != null){
             for (const tag of response.info.categorization.google_tagging.data) {
                 tags.push(tag.tag);
             }
-        }
+        }*/
     }
     catch(e){
-        console.error(e);
     }
     const newPost = {
         price: parseFloat((parseFloat(cleanPrice) / 85.83167).toFixed(2)),
@@ -84,8 +85,8 @@ async function convertToPost(data, cities){
         location: `{\"lat\": ${randomCity.Latitude}, \"lng\": ${randomCity.Longitude}}`,
         formatted_address: randomCity.Name + ", California, United States",
         image_url: image,
-        tags: tags,
-        authorId: Math.floor(Math.random() * 5),
+        //image_tags: tags,
+        authorId: Math.floor(Math.random() * 10) + 1,
     }
     return newPost;
 }
@@ -104,9 +105,8 @@ async function main(){
     //write file
     const jsonString = JSON.stringify(posts, null, 2); // Pretty-print with 2-space indentation
 
-    fs.writeFile('./data/posts.json', jsonString, (err) => {
+    fs.writeFile('../data/posts.json', jsonString, (err) => {
         if (err) {
-            console.error('Error writing file:', err);
             return;
         }
     });

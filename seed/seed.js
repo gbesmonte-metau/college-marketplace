@@ -1,5 +1,6 @@
-import { PrismaClient } from './generated/prisma/index.js'
-import { hashPassword, verifyPassword } from './api/bcrypt.js';
+import { PrismaClient } from '@prisma/client'
+import { hashPassword, verifyPassword } from '../api/bcrypt.js';
+import { promises as fs } from 'fs';
 const prisma = new PrismaClient()
 const fakeData = {
   users: [
@@ -42,9 +43,48 @@ const fakeData = {
       icon: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/39.png",
       bio: "Jigglypuff",
       location: '{"lat": 36.9741, "lng": -122.0308}'
+    },
+    {
+      email: "bulbasaur@gmail.com",
+      username: "bulbasaur",
+      password: "bulbasaur",
+      icon: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/1.png",
+      bio: "Bulbasaur",
+      location: '{"lat": 37.3382, "lng": -121.8863}'
+    },
+    {
+      email: "squirtle@gmail.com",
+      username: "squirtle",
+      password: "squirtle",
+      icon: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/7.png",
+      bio: "Squirtle",
+      location: '{"lat": 37.7749, "lng": -122.4194}'
+    },
+    {
+      email: "snorlax@gmail.com",
+      username: "snorlax",
+      password: "snorlax",
+      icon: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/143.png",
+      bio: "Snorlax",
+      location: '{"lat": 37.8716, "lng": -122.2727}'
+    },
+    {
+      email: "gengar@gmail.com",
+      username: "gengar",
+      password: "gengar",
+      icon: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/94.png",
+      bio: "Gengar",
+      location: '{"lat": 37.8044, "lng": -122.2712}'
+    },
+    {
+      email: "lapras@gmail.com",
+      username: "lapras",
+      password: "lapras",
+      icon: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/131.png",
+      bio: "Lapras",
+      location: '{"lat": 37.3382, "lng": -121.8856}'
     }
   ],
-
   posts: [
     {
       "price": 129.99,
@@ -330,7 +370,7 @@ const fakeData = {
 };
 
 async function main() {
-  for (const user of fakeData.users) {
+  /*for (const user of fakeData.users) {
     const newUser = user;
         //hash password
         const hash = await hashPassword(newUser.password)
@@ -339,26 +379,31 @@ async function main() {
             data: {...newUser, password: hash}
         })
       }
-  for (const post of fakeData.posts){
+*/
+  const fileContent = await fs.readFile('./data/posts.json', 'utf-8');
+  const posts = JSON.parse(fileContent);
+  for (const post of posts) {
+    const created = await prisma.post.create({data:post})
+  }
+  /*for (const post of fakeData.posts){
     const newPost = post;
         //create post
         const created = await prisma.post.create({data:newPost})
-  }
+  }*/
 }
 
 async function resetDatabase() {
+  await prisma.userViewedPosts.deleteMany()
+  await prisma.userLikedPosts.deleteMany()
+  await prisma.userSavedPosts.deleteMany()
+  await prisma.purchase.deleteMany()
+
   await prisma.post.deleteMany()
+
   await prisma.user.deleteMany()
 }
 
 //resetDatabase();
 
 
-main()
-  .catch((e) => {
-    console.error(e)
-    process.exit(1)
-  })
-  .finally(async () => {
-    await prisma.$disconnect()
-  })
+main();
