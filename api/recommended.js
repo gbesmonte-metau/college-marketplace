@@ -27,6 +27,13 @@ const RATING_WEIGHTS = {
         "missing": 1,
     }
 const USER_SOLD_WEIGHT = 3;
+const WEIGHTS = {
+    "information": 30,
+    "category": 10,
+    "location": 10,
+    "trending": 25,
+    "seller": 25,
+}
 
 // MAIN FUNCTION
 export async function GetRecommendations(user_id){
@@ -35,11 +42,11 @@ export async function GetRecommendations(user_id){
     // keyword based recommendation
     const postInformationScores = GetRecommendationsByPostInformation(interactions, posts);
     const informationVector = new Vector(postInformationScores);
-    informationVector.normalize().multiply(30);
+    informationVector.normalize().multiply(WEIGHTS.information);
     // category based recommendation
     const categoryScores = GetRecommendationsByCategory(interactions, posts);
     const categoryVector = new Vector(categoryScores);
-    categoryVector.normalize().multiply(10);
+    categoryVector.normalize().multiply(WEIGHTS.category);
     // other users based recommendation
     const user = await prisma.user.findUnique({
         where: {
@@ -48,10 +55,10 @@ export async function GetRecommendations(user_id){
     });
     const locationScores = await GetLocationScores(user);
     const locationVector = new Vector(locationScores);
-    locationVector.normalize().multiply(10);
+    locationVector.normalize().multiply(WEIGHTS.location);
     const trendingScores = await GetTrendingScores(posts);
     const trendingVector = new Vector(trendingScores);
-    trendingVector.normalize().multiply(25);
+    trendingVector.normalize().multiply(WEIGHTS.trending);
     // seller score
     const sellerToScore = {};
     const sellerArr = {};
@@ -68,7 +75,7 @@ export async function GetRecommendations(user_id){
         }
     }
     const sellerVector = new Vector(sellerArr);
-    sellerVector.normalize().multiply(25);
+    sellerVector.normalize().multiply(WEIGHTS.seller);
     // calculate final score
     const totalVectorObj = informationVector.add(categoryVector).add(trendingVector).add(locationVector).add(sellerVector).toObject();
     let sortedEntries = Object.entries(totalVectorObj).sort(([, scoreA], [, scoreB]) => scoreB - scoreA);
