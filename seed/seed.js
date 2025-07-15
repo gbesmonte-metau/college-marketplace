@@ -370,7 +370,7 @@ const fakeData = {
 };
 
 async function main() {
-  for (const user of fakeData.users) {
+  /*for (const user of fakeData.users) {
     const newUser = user;
         //hash password
         const hash = await hashPassword(newUser.password)
@@ -379,16 +379,18 @@ async function main() {
             data: {...newUser, password: hash}
         })
       }
-  /*const fileContent = await fs.readFile('./data/posts.json', 'utf-8');
+    */
+  const fileContent = await fs.readFile('./data/posts.json', 'utf-8');
   const posts = JSON.parse(fileContent);
   for (const post of posts) {
     const created = await prisma.post.create({data:post})
-  }*/
+  }
+  /*
   for (const post of fakeData.posts){
     const newPost = post;
         //create post
         const created = await prisma.post.create({data:newPost})
-  }
+  }*/
 }
 
 async function resetDatabase() {
