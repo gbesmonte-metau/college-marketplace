@@ -30,9 +30,11 @@ export default function ForYouPage() {
 
     return (
         <div className='page'>
-            <h2>Recommended Posts</h2>
-            <div className='recommended-container'>
-            {posts && posts.map((post, idx) => <Post key={idx} post={post}></Post>)}
+            <div className='recommended-body'>
+                <h2>Recommended Posts</h2>
+                <div className='recommended-container'>
+                {posts && posts.map((post, idx) => <Post key={idx} post={post}></Post>)}
+                </div>
             </div>
         </div>
     )

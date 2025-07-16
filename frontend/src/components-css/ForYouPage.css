@@ -2,3 +2,7 @@
     display: flex;
     flex-wrap: wrap;
 }
+
+.recommended-body {
+    margin: 20px;
+}
