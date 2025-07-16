@@ -1,87 +1,101 @@
 import fuzzy from 'fuzzy';
+import { GetRecommendations } from './recommended.js';
 
 //Test Data
-const items =
+const tempItems =
 [
     {
-      "item_id": 1,
-      "item_name": "Modern Desk Lamp",
+      "id": 1,
+      "name": "Modern Desk Lamp",
       "recommend_score": 0.4,
-      "item_price": 49.99
+      "price": 49.99
     },
     {
-      "item_id": 2,
-      "item_name": "LED Table Lamp",
+      "id": 2,
+      "name": "LED Table Lamp",
       "recommend_score": 0.9,
-      "item_price": 52.00
+      "price": 52.00
     },
     {
-      "item_id": 3,
-      "item_name": "Minimalist Floor Lamp",
+      "id": 3,
+      "name": "Minimalist Floor Lamp",
       "recommend_score": 0.1,
-      "item_price": 30.75
+      "price": 30.75
     },
     {
-      "item_id": 4,
-      "item_name": "Classic Wood Bedframe",
+      "id": 4,
+      "name": "Classic Wood Bedframe",
       "recommend_score": 0.3,
-      "item_price": 229.00
+      "price": 229.00
     },
     {
-      "item_id": 5,
-      "item_name": "Oak Frame Bed",
+      "id": 5,
+      "name": "Oak Frame Bed",
       "recommend_score": 0.6,
-      "item_price": 270.25
+      "price": 270.25
     },
     {
-      "item_id": 6,
-      "item_name": "Compact Metal Bed Frame",
+      "id": 6,
+      "name": "Compact Metal Bed Frame",
       "recommend_score": 0.9,
-      "item_price": 300.80
+      "price": 300.80
     },
     {
-      "item_id": 7,
-      "item_name": "Three-Seater Couch",
+      "id": 7,
+      "name": "Three-Seater Couch",
       "recommend_score": 0.8,
-      "item_price": 580.50
+      "price": 580.50
     },
     {
-      "item_id": 8,
-      "item_name": "Deluxe Fabric Couch",
+      "id": 8,
+      "name": "Deluxe Fabric Couch",
       "recommend_score": 0.9,
-      "item_price": 550.00
+      "price": 550.00
     },
     {
-      "item_id": 9,
-      "item_name": "Modern Living Room Couch",
+      "id": 9,
+      "name": "Modern Living Room Couch",
       "recommend_score": 0.5,
-      "item_price": 505.00
+      "price": 505.00
     }
 ]
 
-async function calculateBundle(itemQueries, budget){
+export async function CalculateBundles(posts, itemQueries, budget, user_id){
     let results = {};
     // find all items that match each query
     for (let i = 0; i < itemQueries.length; i++) {
-        results[itemQueries[i]] = FindSimilarItems(itemQueries[i], items);
+        const similarItems = FindSimilarItems(itemQueries[i], posts);
+        // if no items found for a query, return null
+        if (similarItems.length == 0){
+            return null;
+        }
+        results[itemQueries[i]] = similarItems;
     }
+
     // get cheapest bundle
     let cheapestBundle = GetCheapestBundle(results, budget);
 
     //get most recommended bundle
+    const recommendations = await GetRecommendations(user_id, posts.length);
+    posts.forEach(post => {
+        recommendations.forEach(recommendation => {
+            (post.id == recommendation[0] && recommendation[1]) ? post.recommend_score = recommendation[1] : post.recommend_score = 0;
+        });
+    });
     let recommendedBundle = GetMostRecommendedBundle(results, budget);
 
-    return {cheapestBundle, recommendedBundle};
+    return {cheapestBundle, recommendedBundle}
 }
 
 function GetCheapestBundle(results, budget){
     // get cheapest bundle
     let bundle = [];
     let total = 0;
-    const priceCompare = (itemA, itemB) => itemA.item_price - itemB.item_price;
+    const priceCompare = (itemA, itemB) => itemA.price - itemB.price;
     Object.entries(results).forEach(([query, matches]) => {
        // create object list
        let items = [];
+       // matches are guaranteed to be non-empty
        for (let i = 0; i < matches.length; i++) {
            items.push(matches[i].original);
        }
@@ -90,7 +104,7 @@ function GetCheapestBundle(results, budget){
 
        // add to bundle
        bundle.push(items[0]);
-       total += items[0].item_price;
+       total += items[0].price;
     });
     return total > budget ? null : bundle;
 }
@@ -134,12 +148,12 @@ function CreateAllBundles(results, budget, currBundle, currTotal, currRec, allBu
     // recursively explore options
     matches.forEach(match => {
         currBundle.push(match.original);
-        currTotal += match.original.item_price;
+        currTotal += match.original.price;
         currRec += match.original.recommend_score;
         const newResults = {...results};
         delete newResults[query];
         CreateAllBundles(newResults, budget, currBundle, currTotal, currRec, allBundles);
-        currTotal -= match.original.item_price;
+        currTotal -= match.original.price;
         currRec -= match.original.recommend_score;
         currBundle.pop();
     });
@@ -153,11 +167,8 @@ function CreateAllBundles(results, budget, currBundle, currTotal, currRec, allBu
  */
 function FindSimilarItems(item, listItems){
     var options = {
-        extract: function(item) { return item.item_name; }
+        extract: function(item) { return item.name; }
     }
     var results = fuzzy.filter(item, listItems, options);
     return results;
 }
-
-// Test Cases
-calculateBundle(['lamp', 'couch'], 540);

@@ -3,6 +3,7 @@ import { PrismaClient } from '@prisma/client'
 import { hashPassword, verifyPassword } from './bcrypt.js';
 import { fieldEncryptionExtension } from 'prisma-field-encryption'
 import { GetRecommendations } from './recommended.js';
+import { CalculateBundles } from './bundles.js';
 
 const client = new PrismaClient()
 export const prisma = client.$extends(
@@ -359,14 +360,44 @@ router.post('/user/view/:id', isAuthenticated, async (req, res, next) => {
 router.get('/user/recommendations', isAuthenticated, async (req, res, next) => {
     const userId = req.session.user.id;
     const recommendedPosts = [];
-    const postIdArr = await GetRecommendations(userId);
-    for (const postId of postIdArr) {
+    const postArr = await GetRecommendations(userId);
+    for (const p of postArr) {
         const post = await prisma.post.findUnique({
             where: {
-                id: postId
+                id: p[0]
             }
         })
         recommendedPosts.push(post);
     }
     res.status(200).json(recommendedPosts);
 })
+
+//Get bundles for current user
+router.get('/user/bundles', isAuthenticated, async (req, res, next) => {
+    const userId = req.session.user.id;
+    try{
+        const posts = await prisma.post.findMany({
+            where: {
+                time_sold: null,
+                NOT: {
+                    authorId: userId
+                }
+            }
+        });
+        if (!posts) {
+            next({ status: 404, message: 'No posts found' });
+            return;
+        }
+        if (!Array.isArray(req.query.item) || !req.query.budget) {
+            next({ status: 422, message: 'Invalid query parameters' });
+            return;
+        }
+        const queries = req.query.item.map(String);
+        const budget = parseFloat(req.query.budget);
+        const bundles = await CalculateBundles(posts, queries, budget, userId);
+        res.status(200).json(bundles);
+    }
+    catch (err) {
+        next(err);
+    }
+});

@@ -11,7 +11,6 @@ export const prisma = client.$extends(
 )
 
 // Global variables
-const K_RECOMMENDATIONS = 5;
 const VIEWED_WEIGHT = 1;
 const LIKED_WEIGHT = 2;
 const SAVED_WEIGHT = 3;
@@ -36,7 +35,7 @@ const WEIGHTS = {
 }
 
 // MAIN FUNCTION
-export async function GetRecommendations(user_id){
+export async function GetRecommendations(user_id, k){
     const posts = await prisma.post.findMany();
     const interactions = await GetUserInteractions(user_id);
     // keyword based recommendation
@@ -86,7 +85,7 @@ export async function GetRecommendations(user_id){
         !interactions.purchased.some(purchased => purchased.id === parseInt(key))
     );
     // Get top k
-    return sortedEntries.slice(0, K_RECOMMENDATIONS).map(([key]) => parseInt(key));
+    return sortedEntries.slice(0, k).map(([key, value]) => [parseInt(key), value]);
 }
 
 // HELPER FUNCTIONS
