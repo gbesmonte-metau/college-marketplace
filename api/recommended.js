@@ -337,17 +337,10 @@ async function GetSellerScore(user_id, seller_id){
         }
     });
     for (let i = 0; i < soldPosts.length; i++){
-        let weight = 1;
-        if (soldPosts[i].buyerId == user_id){
-            weight = USER_SOLD_WEIGHT;
-        }
+        let weight = soldPosts[i].buyerId == user_id ? USER_SOLD_WEIGHT : 1;
         const age = Date.now() - soldPosts[i].purchasedAt.getTime();
-        if (soldPosts[i].rating != null){
-            score += Math.exp(-age/ MILLISECONDS_PER_WEEK) * RATING_WEIGHTS[soldPosts[i].rating] * weight;
-        }
-        else{
-            score += Math.exp(-age / MILLISECONDS_PER_WEEK) * weight;
-        }
+        const post_weight = soldPosts[i].rating != null ? RATING_WEIGHTS[soldPosts[i].rating] * weight : weight;
+        score += Math.exp(-age / MILLISECONDS_PER_WEEK) * post_weight;
     }
     // if seller has a lot of posts
     const posts = await prisma.post.findMany({

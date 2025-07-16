@@ -369,42 +369,50 @@ const fakeData = {
   ]
 };
 
-async function main() {
-  /*for (const user of fakeData.users) {
-    const newUser = user;
-        //hash password
-        const hash = await hashPassword(newUser.password)
-        //create user
-        const created = await prisma.user.create({
-            data: {...newUser, password: hash}
-        })
-      }
-    */
-  const fileContent = await fs.readFile('./data/posts.json', 'utf-8');
-  const posts = JSON.parse(fileContent);
-  for (const post of posts) {
-    const created = await prisma.post.create({data:post})
+async function main(isUsers, isPosts, isFromFile, isReset) {
+  if (isReset) {
+    await resetDatabase();
   }
-  /*
-  for (const post of fakeData.posts){
-    const newPost = post;
-        //create post
-        const created = await prisma.post.create({data:newPost})
-  }*/
+  if (isUsers) {
+    await createUsers(fakeData.users);
+  }
+  if (isPosts) {
+    let posts = fakeData.posts;
+    if (isFromFile){
+      const fileContent = await fs.readFile('./data/posts.json', 'utf-8');
+      posts = JSON.parse(fileContent);
+    }
+    await createPosts(posts);
+  }
+  return;
 }
 
 async function resetDatabase() {
-  await prisma.userViewedPosts.deleteMany()
-  await prisma.userLikedPosts.deleteMany()
-  await prisma.userSavedPosts.deleteMany()
-  await prisma.purchase.deleteMany()
-
-  await prisma.post.deleteMany()
-
-  await prisma.user.deleteMany()
+    await prisma.userViewedPosts.deleteMany()
+    await prisma.userLikedPosts.deleteMany()
+    await prisma.userSavedPosts.deleteMany()
+    await prisma.purchase.deleteMany()
+    await prisma.post.deleteMany()
+    await prisma.user.deleteMany()
 }
 
-//resetDatabase();
+async function createUsers(users){
+    for (const user of fakeData.users) {
+      const newUser = user;
+        // hash password
+        const hash = await hashPassword(newUser.password)
+        // create user
+        const created = await prisma.user.create({
+            data: {...newUser, password: hash}
+        })
+    }
+}
 
+async function createPosts(posts){
+  for (const post of posts) {
+    const created = await prisma.post.create({data:post})
+  }
+}
 
-main();
+// call main
+main(true, true, false, false);
