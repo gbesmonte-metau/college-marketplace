@@ -80,7 +80,7 @@ export async function CalculateBundles(posts, itemQueries, budget, user_id){
     posts.forEach(post => {
         recommendations.forEach(recommendation => {
             // if post id matches recommendation id and score is not null, set recommend score
-            (post.id == recommendation[0] && recommendation[1]) ? post.recommend_score = recommendation[1] : post.recommend_score = 0;
+            post.id == recommendation[0] && (recommendation[1] != null ? post.recommend_score = recommendation[1] : post.recommend_score = 0);
         });
     });
     let recommendedBundle = GetMostRecommendedBundle(results, budget);
@@ -114,12 +114,12 @@ function GetMostRecommendedBundle(results, budget){
     const allBundles = [];
     CreateAllBundles(results, budget, [], 0, 0, allBundles);
 
-    if (allBundles.length == 0){
+    if (Object.keys(allBundles).length == 0){
         return null;
     }
 
     // sort by recommend score
-    allBundles.sort((a, b) => b[1] - a[1]);
+    allBundles.sort((a, b) => b.currentRecommend - a.currentRecommend);
 
     return allBundles[0];
 }
@@ -141,22 +141,21 @@ function CreateAllBundles(results, budget, currentBundle, currentTotal, currentR
     }
     // base case #2: no more items to add
     if (Object.keys(results).length == 0){
-        allBundles.push([currentTotal, currentRecommend, ...currentBundle]);
+        allBundles.push({currentTotal, currentRecommend, currentBundle});
         return;
     }
     // get first query in results
     const [query, matches] = Object.entries(results)[0];
     // recursively explore options
     matches.forEach(match => {
-        currentBundle.push(match.original);
         currentTotal += match.original.price;
         currentRecommend += match.original.recommend_score;
         const newResults = {...results};
         delete newResults[query];
-        CreateAllBundles(newResults, budget, currentBundle, currentTotal, currentRecommend, allBundles);
+        const newBundle = [...currentBundle, match.original];
+        CreateAllBundles(newResults, budget, newBundle, currentTotal, currentRecommend, allBundles);
         currentTotal -= match.original.price;
         currentRecommend -= match.original.recommend_score;
-        currentBundle.pop();
     });
 }
 
