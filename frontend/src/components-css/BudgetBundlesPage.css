@@ -1,0 +1,28 @@
+.bundle-page {
+    margin: 2rem;
+    display: grid;
+    grid-template-columns: 1fr 3fr;
+}
+.bundle-page input {
+    width: 50%;
+    font-family: 'Montserrat', sans-serif;
+    padding: 5px;
+    border-radius: 5px;
+    border: 1px solid lightgray
+}
+.bundles {
+    margin-left: 20px;
+    width: 100%;
+    max-width: 100%;
+    overflow: scroll;
+}
+.add-items-container {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+.bundle-container {
+    display: flex;
+    width: 100%;
+    max-width: 100%;
+}

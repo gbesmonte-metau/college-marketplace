@@ -1,6 +1,7 @@
 import React from 'react'
 import { useState } from 'react'
 import Bundle from './Bundle';
+import '../components-css/BudgetBundlesPage.css'
 
 export default function BudgetBundlesPage() {
     const [items, setItems] = useState([null, null]);
@@ -17,6 +18,20 @@ export default function BudgetBundlesPage() {
     function AddItem(e) {
         e.preventDefault();
         setItems([...items, null]);
+    }
+
+    function RemoveItem(e) {
+        e.preventDefault();
+        const newItems = [...items];
+        newItems.pop();
+        setItems(newItems);
+    }
+
+    function ClearBundles(e) {
+        e.preventDefault();
+        setBundles({});
+        setItems([null, null]);
+        setBudget(null);
     }
 
     async function FindBundles(e) {
@@ -53,20 +68,32 @@ export default function BudgetBundlesPage() {
 
     return (
         <div className='page'>
-            <h2>Budget Bundles</h2>
-            <form onSubmit={FindBundles}>
-                <p>Add Items</p>
-                {items.map((item, index) => <input key={index} className='bundle-input' type="text" value={item ? item : ""} onChange={(e) => ChangeItem(e,index)}/>)}
-                <button type="button" onClick={AddItem}>Add Item</button>
-                <p>Specify Budget</p>
-                <input type="text" value={budget ? budget : ""} onChange={(e) => setBudget(e.target.value)} required/>
-                <button type="submit">Submit</button>
-            </form>
-            <div className='bundles'>
-                <p>Cheapest Bundle:</p>
-                {bundles.cheapestBundle && <Bundle bundleInfo={bundles.cheapestBundle}/>}
-                <p>Recommended Bundle:</p>
-                {bundles.recommendedBundle && <Bundle bundleInfo={bundles.recommendedBundle.slice(2)}/>}
+            <div className='bundle-page'>
+                <div>
+                    <h2>Budget Bundles</h2>
+                    <form onSubmit={FindBundles}>
+                        <p>Add Items</p>
+                        <div className='add-items-container'>
+                            {items.map((item, index) => <input key={index} className='bundle-input' type="text" value={item ? item : ""} onChange={(e) => ChangeItem(e,index)}/>)}
+                            <div>
+                                <button type="button" onClick={AddItem}>Add Item</button>
+                                <button type="button" onClick={RemoveItem}>Remove Item</button>
+                            </div>
+                        </div>
+                        <div className='add-items-container'>
+                            <p>Specify Budget</p>
+                            <input type="text" value={budget ? budget : ""} onChange={(e) => setBudget(e.target.value)} required/>
+                            <div>
+                                <button type="submit">Submit</button>
+                                <button type="button" onClick={ClearBundles}>Clear</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div className='bundles'>
+                    {bundles && bundles.cheapestBundle && <Bundle bundleInfo={bundles.cheapestBundle} type="Cheapest Bundle"/>}
+                    {bundles && bundles.recommendedBundle && <Bundle bundleInfo={bundles.recommendedBundle.slice(2)} type="Recommended Bundle"/>}
+                </div>
             </div>
         </div>
     )

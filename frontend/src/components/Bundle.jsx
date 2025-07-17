@@ -1,10 +1,12 @@
-import React from 'react'
 import Post from './Post'
 
-export default function Bundle({bundleInfo}) {
+export default function Bundle({bundleInfo, type}) {
     return (
         <div>
-            {bundleInfo && bundleInfo.map((post, index) => <Post key={index} post={post}></Post>)}
+            {type}
+            <div className='bundle-container'>
+                {bundleInfo && bundleInfo.map((post, index) => <Post key={index} post={post}></Post>)}
+            </div>
         </div>
     )
 }
