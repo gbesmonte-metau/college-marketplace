@@ -199,20 +199,6 @@ const fakeData = {
       "authorId": 3
     },
     {
-      "price": 24.99,
-      "category": 8,
-      "name": "LED Desk Lamp",
-      "time_created": "1687785600",
-      "time_sold": null,
-      "location": "{\"lat\": 37.8044, \"lng\": -122.2712}",    // Oakland (~8 miles)
-      "description": "Energy-efficient LED desk lamp with adjustable brightness.",
-      "image_url": "https://res.cloudinary.com/doeql5cyb/image/upload/v1751566187/oscar-ivan-esquivel-arteaga-at5-1nW3UCY-unsplash_jtwxsw.jpg",
-      "condition": "Fair",
-      "brand": "BrightLight",
-      "color": "Pink",
-      "authorId": 4
-    },
-    {
       "price": 5.99,
       "category": 9,
       "name": "Reusable Shopping Bag",
@@ -297,34 +283,6 @@ const fakeData = {
       "authorId": 3
     },
     {
-      "price": 129.99,
-      "category": 3,
-      "name": "Adjustable Bed Frame",
-      "time_created": "1687785600",
-      "time_sold": null,
-      "location": "{\"lat\": 37.8043, \"lng\": -122.2710}",    // Oakland (~8 miles)
-      "description": "Adjustable bed frame with wireless remote and USB charging ports.",
-      "image_url": "https://res.cloudinary.com/doeql5cyb/image/upload/v1751566635/indoor-4148891_1280_tvuk7v.jpg",
-      "condition": "New",
-      "brand": "SleepTech",
-      "color": "Blue",
-      "authorId": 4
-    },
-    {
-      "price": 89.99,
-      "category": 8,
-      "name": "Smart LED Desk Lamp",
-      "time_created": "1687785600",
-      "time_sold": null,
-      "location": "{\"lat\": 37.8716, \"lng\": -122.2727}",    // Berkeley (~9 miles)
-      "description": "Adjustable smart LED desk lamp with touch controls and color temperature settings.",
-      "image_url": "https://res.cloudinary.com/doeql5cyb/image/upload/v1751566671/james-coleman-yxgZAm6kYQo-unsplash_ybwr9v.jpg",
-      "condition": "Like New",
-      "brand": "LumaTech",
-      "color": "White",
-      "authorId": 5
-    },
-    {
       "price": 39.99,
       "category": 9,
       "name": "Stainless Steel Water Bottle",
@@ -365,6 +323,132 @@ const fakeData = {
       "brand": "RideFast",
       "color": "Red",
       "authorId": 3
+    },
+    {
+      "price": 49.99,
+      "category": 8,
+      "name": "Modern Desk Lamp",
+      "time_created": "1720704000000",
+      "time_sold": null,
+      "location": "{\"lat\": 37.7065, \"lng\": -122.4532}",
+      "description": "A sleek and modern desk lamp perfect for study or workspaces.",
+      "image_url": "https://res.cloudinary.com/doeql5cyb/image/upload/v1751566671/james-coleman-yxgZAm6kYQo-unsplash_ybwr9v.jpg",
+      "condition": "Unspecified",
+      "brand": "BrightLite",
+      "color": "White",
+      "authorId": 3
+    },
+    {
+      "price": 52.00,
+      "category": 8,
+      "name": "LED Table Lamp",
+      "time_created": "1720483200000",
+      "time_sold": null,
+      "location": "{\"lat\": 37.6921, \"lng\": -122.4812}",
+      "description": "Energy-efficient LED lamp with adjustable brightness.",
+      "image_url": "https://res.cloudinary.com/doeql5cyb/image/upload/v1751566187/oscar-ivan-esquivel-arteaga-at5-1nW3UCY-unsplash_jtwxsw.jpg",
+      "condition": "Unspecified",
+      "brand": "GlowTech",
+      "color": "Black",
+      "authorId": 6
+    },
+    {
+      "price": 48.75,
+      "category": 8,
+      "name": "Minimalist Floor Lamp",
+      "time_created": "1720137600000",
+      "time_sold": null,
+      "location": "{\"lat\": 37.6810, \"lng\": -122.4709}",
+      "description": "Tall, minimalist lamp that fits any modern room.",
+      "image_url": "https://res.cloudinary.com/doeql5cyb/image/upload/v1752703565/mk-s-3LdrBCdUqVA-unsplash_lvowm7.jpg",
+      "condition": "Unspecified",
+      "brand": "LiteZone",
+      "color": "Silver",
+      "authorId": 2
+    },
+    {
+      "price": 229.00,
+      "category": 7,
+      "name": "Classic Wood Bedframe",
+      "time_created": "1719964800000",
+      "time_sold": null,
+      "location": "{\"lat\": 37.7102, \"lng\": -122.4873}",
+      "description": "Solid wood bedframe with timeless design.",
+      "image_url": "https://res.cloudinary.com/doeql5cyb/image/upload/v1752703711/m-antoine-vignon-qNMnsf5KHCU-unsplash_krob6g.jpg",
+      "condition": "Unspecified",
+      "brand": "SleepWell",
+      "color": "Brown",
+      "authorId": 5
+    },
+    {
+      "price": 235.25,
+      "category": 7,
+      "name": "Oak Frame Bed",
+      "time_created": "1719878400000",
+      "time_sold": null,
+      "location": "{\"lat\": 37.6849, \"lng\": -122.4561}",
+      "description": "Sturdy oak frame bed with smooth finish.",
+      "image_url": "https://res.cloudinary.com/doeql5cyb/image/upload/v1752703708/alexander-ugolkov-9TpIC-jSXrM-unsplash_gewpix.jpg",
+      "condition": "Unspecified",
+      "brand": "DreamOak",
+      "color": "Natural",
+      "authorId": 9
+    },
+    {
+      "price": 222.80,
+      "category": 7,
+      "name": "Compact Metal Bed Frame",
+      "time_created": "1719792000000",
+      "time_sold": null,
+      "location": "{\"lat\": 37.6991, \"lng\": -122.4678}",
+      "description": "Metal bed frame ideal for compact bedrooms.",
+      "image_url": "https://res.cloudinary.com/doeql5cyb/image/upload/v1751566635/indoor-4148891_1280_tvuk7v.jpg",
+      "condition": "Unspecified",
+      "brand": "SteelNest",
+      "color": "Gray",
+      "authorId": 4
+    },
+    {
+      "price": 499.50,
+      "category": 7,
+      "name": "Three-Seater Couch",
+      "time_created": "1719446400000",
+      "time_sold": null,
+      "location": "{\"lat\": 37.6880, \"lng\": -122.4590}",
+      "description": "Comfortable three-seater couch with plush cushions.",
+      "image_url": "https://res.cloudinary.com/doeql5cyb/image/upload/v1752703702/paul-weaver-nWidMEQsnAQ-unsplash_epkbsh.jpg",
+      "condition": "Unspecified",
+      "brand": "CozyHaus",
+      "color": "Navy",
+      "authorId": 10
+    },
+    {
+      "price": 515.00,
+      "category": 7,
+      "name": "Deluxe Fabric Couch",
+      "time_created": "1719360000000",
+      "time_sold": null,
+      "location": "{\"lat\": 37.6934, \"lng\": -122.4743}",
+      "description": "Deluxe sofa with premium fabric and deep seating.",
+      "image_url": "https://res.cloudinary.com/doeql5cyb/image/upload/v1752703707/phillip-goldsberry-fZuleEfeA1Q-unsplash_olcvlp.jpg",
+      "condition": "Unspecified",
+      "brand": "ComfyLiving",
+      "color": "Beige",
+      "authorId": 7
+    },
+    {
+      "price": 505.99,
+      "category": 7,
+      "name": "Modern Living Room Couch",
+      "time_created": "1719187200000",
+      "time_sold": null,
+      "location": "{\"lat\": 37.7003, \"lng\": -122.4697}",
+      "description": "Stylish modern couch, ideal for urban homes.",
+      "image_url": "https://res.cloudinary.com/doeql5cyb/image/upload/v1752703703/christian-kaindl-4uD9w-pxBTA-unsplash_ousdbc.jpg",
+      "condition": "Unspecified",
+      "brand": "UrbanNest",
+      "color": "Gray",
+      "authorId": 8
     }
   ]
 };

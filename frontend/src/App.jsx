@@ -11,6 +11,7 @@ import MyPostsPage from './components/MyPostsPage';
 import OtherProfilePage from './components/OtherProfilePage';
 import LandingPage from './components/LandingPage';
 import ForYouPage from './components/ForYouPage';
+import BudgetBundlesPage from './components/BudgetBundlesPage';
 
 export const UserContext = createContext();
 
@@ -54,6 +55,10 @@ const routes = createBrowserRouter([
       {
         path: '/foryou',
         element: <ForYouPage/>
+      },
+      {
+        path: '/bundles',
+        element: <BudgetBundlesPage/>
       }
     ]
   },
