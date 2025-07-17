@@ -92,7 +92,7 @@ export default function BudgetBundlesPage() {
                 </div>
                 <div className='bundles'>
                     {bundles && bundles.cheapestBundle && <Bundle bundleInfo={bundles.cheapestBundle} type="Cheapest Bundle"/>}
-                    {bundles && bundles.recommendedBundle && <Bundle bundleInfo={bundles.recommendedBundle.currentBundle} type="Recommended Bundle"/>}
+                    {bundles && bundles.recommendedBundle && <Bundle bundleInfo={bundles.recommendedBundle} type="Recommended Bundle"/>}
                 </div>
             </div>
         </div>

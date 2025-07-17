@@ -111,17 +111,16 @@ function GetCheapestBundle(results, budget){
 }
 
 function GetMostRecommendedBundle(results, budget){
-    const allBundles = [];
-    CreateAllBundles(results, budget, [], 0, 0, allBundles);
+    const allBundles = CreateAllBundles2(results, budget);
 
     if (Object.keys(allBundles).length == 0){
         return null;
     }
 
     // sort by recommend score
-    allBundles.sort((a, b) => b.currentRecommend - a.currentRecommend);
+    allBundles.sort((a, b) => b.recommended - a.recommended);
 
-    return allBundles[0];
+    return allBundles[0].bundle;
 }
 
 /**
@@ -157,6 +156,32 @@ function CreateAllBundles(results, budget, currentBundle, currentTotal, currentR
         currentTotal -= match.original.price;
         currentRecommend -= match.original.recommend_score;
     });
+}
+
+/**
+ * Recursively generates all possible bundles
+ * @param {Object[]} results
+ * @param {Number} budget
+ * @returns
+ */
+function CreateAllBundles2(results, budget){
+    //Base Case: if results are empty
+    if (Object.keys(results).length == 0){
+        return [{price: 0, recommended: 0, bundle: []}];
+    }
+    const [query, matches] = Object.entries(results)[0];
+    const newResults = {...results};
+    delete newResults[query];
+    const combinations = CreateAllBundles2(newResults, budget);
+    const newCombinations = [];
+    for (const c of combinations){
+        for (const match of matches){
+            if (c.price + match.original.price <= budget){
+                 newCombinations.push({price: c.price + match.original.price, recommended: c.recommended + match.original.recommend_score, bundle: [...c.bundle, match.original]});
+            }
+        }
+    }
+    return newCombinations;
 }
 
 /**
