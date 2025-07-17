@@ -79,6 +79,7 @@ export async function CalculateBundles(posts, itemQueries, budget, user_id){
     const recommendations = await GetRecommendations(user_id, posts.length);
     posts.forEach(post => {
         recommendations.forEach(recommendation => {
+            // if post id matches recommendation id and score is not null, set recommend score
             (post.id == recommendation[0] && recommendation[1]) ? post.recommend_score = recommendation[1] : post.recommend_score = 0;
         });
     });
@@ -117,7 +118,7 @@ function GetMostRecommendedBundle(results, budget){
         return null;
     }
 
-    // sort by rec score
+    // sort by recommend score
     allBundles.sort((a, b) => b[1] - a[1]);
 
     return allBundles[0];
@@ -127,40 +128,45 @@ function GetMostRecommendedBundle(results, budget){
  * Recursively creates all possible bundles
  * @param {Object} results
  * @param {Number} budget
- * @param {Object[]} currBundle
- * @param {Number} currTotal
- * @param {Number} currRec
+ * @param {Object[]} currentBundle
+ * @param {Number} currentTotal
+ * @param {Number} currentRecommend
  * @param {Array[]} allBundles
  * @returns
  */
-function CreateAllBundles(results, budget, currBundle, currTotal, currRec, allBundles){
+function CreateAllBundles(results, budget, currentBundle, currentTotal, currentRecommend, allBundles){
     // base case #1: budget exceeded
-    if (currTotal > budget){
+    if (currentTotal > budget){
         return;
     }
     // base case #2: no more items to add
     if (Object.keys(results).length == 0){
-        allBundles.push([currTotal, currRec, ...currBundle]);
+        allBundles.push([currentTotal, currentRecommend, ...currentBundle]);
         return;
     }
     // get first query in results
     const [query, matches] = Object.entries(results)[0];
     // recursively explore options
     matches.forEach(match => {
-        currBundle.push(match.original);
-        currTotal += match.original.price;
-        currRec += match.original.recommend_score;
+        currentBundle.push(match.original);
+        currentTotal += match.original.price;
+        currentRecommend += match.original.recommend_score;
         const newResults = {...results};
         delete newResults[query];
-        CreateAllBundles(newResults, budget, currBundle, currTotal, currRec, allBundles);
-        currTotal -= match.original.price;
-        currRec -= match.original.recommend_score;
-        currBundle.pop();
+        CreateAllBundles(newResults, budget, currentBundle, currentTotal, currentRecommend, allBundles);
+        currentTotal -= match.original.price;
+        currentRecommend -= match.original.recommend_score;
+        currentBundle.pop();
     });
 }
 
 /**
  * Finds the items with similar names to the item passed in
+ * Fuzzy returns:
+ * - string: the matched string
+ * - score: the score of the match
+ * - index: the index of the match
+ * - original: the original item
  * @param {String} item
  * @param {Object[]} listItems
  * @returns {Object[]}

@@ -41,9 +41,10 @@ export default function Header() {
         <Link to='/home'>Home</Link>
         {!user && <Link to='/login'>Login</Link>}
         {!user && <Link to='/register'>Register</Link>}
-        {user && <Link to='/profile'>Profile</Link>}
-        {user && <Link to='/myposts'>My Posts</Link>}
         {user && <Link to='/foryou'>For You</Link>}
+        {user && <Link to='/bundles'>Bundles</Link>}
+        {user && <Link to='/myposts'>My Posts</Link>}
+        {user && <Link to='/profile'>Profile</Link>}
         {user && <button onClick={HandleLogout}>Logout</button>}
         {user && <img className="profile-pic" src={user.icon || "../../public/placeholder.png"} alt="profile pic" />}
        </nav>

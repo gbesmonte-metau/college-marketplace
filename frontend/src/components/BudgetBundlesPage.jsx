@@ -21,7 +21,7 @@ export default function BudgetBundlesPage() {
 
     async function FindBundles(e) {
         e.preventDefault();
-        const filteredItems = items.filter(item => item != null);
+        const filteredItems = items.filter(item => item != null && item != '');
         if (filteredItems.length < 2) {
             alert("Please add more items.");
             return;
