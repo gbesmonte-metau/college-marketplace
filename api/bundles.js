@@ -8,55 +8,55 @@ const tempItems =
       "id": 1,
       "name": "Modern Desk Lamp",
       "recommend_score": 0.4,
-      "price": 49.99
+      "price": 10,
     },
     {
       "id": 2,
       "name": "LED Table Lamp",
       "recommend_score": 0.9,
-      "price": 52.00
+      "price": 10,
     },
     {
       "id": 3,
       "name": "Minimalist Floor Lamp",
       "recommend_score": 0.1,
-      "price": 30.75
+      "price": 10,
     },
     {
       "id": 4,
       "name": "Classic Wood Bedframe",
       "recommend_score": 0.3,
-      "price": 229.00
+      "price": 20,
     },
     {
       "id": 5,
       "name": "Oak Frame Bed",
       "recommend_score": 0.6,
-      "price": 270.25
+      "price": 20,
     },
     {
       "id": 6,
       "name": "Compact Metal Bed Frame",
       "recommend_score": 0.9,
-      "price": 300.80
+      "price": 20,
     },
     {
       "id": 7,
       "name": "Three-Seater Couch",
       "recommend_score": 0.8,
-      "price": 580.50
+      "price": 15,
     },
     {
       "id": 8,
       "name": "Deluxe Fabric Couch",
       "recommend_score": 0.9,
-      "price": 550.00
+      "price": 15,
     },
     {
       "id": 9,
       "name": "Modern Living Room Couch",
       "recommend_score": 0.5,
-      "price": 505.00
+      "price": 15,
     }
 ]
 
@@ -84,12 +84,12 @@ export async function CalculateBundles(posts, itemQueries, budget, user_id){
         });
     });
     let recommendedBundle = GetMostRecommendedBundle(results, budget);
-
     if (cheapestBundle != null && recommendedBundle != null){
         return {"isValid": true, "cheapestBundle": cheapestBundle, "recommendedBundle": recommendedBundle}
     }
-
     const items = TransformDataToObjects(results);
+    const oneBundle = GetOneBundleMemoized(items, {items: [], total: 0, priority: 0}, 0, new Set(), budget, new Map());
+
     const allBundles = [];
     GetAnyBundlesRecursion(items, {items: [], total: 0, priority: 0}, 0, new Set(), budget, allBundles);
     const sortedBundles = allBundles.sort((bundleA, bundleB) => bundleB.priority - bundleA.priority).filter(bundle => bundle.items.length > 0);
@@ -270,6 +270,41 @@ function GetOneBundleRecursion(items, currentBundle, index, usedQueries, budget)
     // Case 2
     const option2 = GetOneBundleRecursion(items, currentBundle, index + 1, usedQueries, budget);
     return option1 != null && option1.priority > option2.priority ? option1 : option2;
+}
+
+function GetOneBundleMemoized(items, currentBundle, index, usedQueries, budget, memoizationMap){
+    // Move up index until we find a query that hasn't been used yet
+    while (index < items.length && usedQueries.has(items[index].query)){
+        index++;
+    }
+    // Base Case: if no more items are left
+    if (index == items.length){
+        return currentBundle;
+    }
+    // Recursive Case: explore two cases, one with object and one without
+    // memoization check:
+    // If we have previously checked this state, return result
+    // state: index, total
+    const key = index.toString() + " " + currentBundle.total.toString();
+    if (memoizationMap.has(key)){
+        return memoizationMap.get(key);
+    }
+    // Case 1: add item to bundle ONLY IF it doesn't exceed budget
+    let option1 = null;
+    if (currentBundle.total + items[index].price <= budget){
+        const newCurrentBundle = {...currentBundle};
+        newCurrentBundle.items = [...currentBundle.items, items[index]];
+        newCurrentBundle.total += items[index].price;
+        newCurrentBundle.priority += items[index].priority;
+        const newQueries = new Set(usedQueries);
+        newQueries.add(items[index].query);
+        option1 = GetOneBundleMemoized(items, newCurrentBundle, index + 1, newQueries, budget, memoizationMap);
+    }
+    // Case 2
+    const option2 = GetOneBundleMemoized(items, currentBundle, index + 1, usedQueries, budget, memoizationMap);
+    const result = option1 != null && option1.priority > option2.priority ? option1 : option2;
+    memoizationMap.set(key, result);
+    return result;
 }
 
 /**
