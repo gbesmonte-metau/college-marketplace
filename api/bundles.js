@@ -60,8 +60,6 @@ const tempItems =
     }
 ]
 
-CalculateBundles(tempItems, ["lamp", "bed", "couch"], 1000, 1);
-
 export async function CalculateBundles(posts, itemQueries, budget, user_id){
     let results = {};
     // find all items that match each query
@@ -73,23 +71,11 @@ export async function CalculateBundles(posts, itemQueries, budget, user_id){
         }
         results[itemQueries[i]] = similarItems;
     }
-
-    TransformDataToObjects(results);
-
-    // get cheapest bundle
-    let cheapestBundle = GetCheapestBundle(results, budget);
-
-    //get most recommended bundle
-    const recommendations = await GetRecommendations(user_id, posts.length);
-    posts.forEach(post => {
-        recommendations.forEach(recommendation => {
-            // if post id matches recommendation id and score is not null, set recommend score
-            post.id == recommendation[0] && (recommendation[1] != null ? post.recommend_score = recommendation[1] : post.recommend_score = 0);
-        });
-    });
-    let recommendedBundle = GetMostRecommendedBundle(results, budget);
-
-    return {cheapestBundle, recommendedBundle}
+    const items = TransformDataToObjects(results);
+    const allBundles = [];
+    GetAnyBundlesRecursion(items, {items: [], total: 0, priority: 0}, 0, new Set(), budget, allBundles);
+    const sortedBundles = allBundles.sort((bundleA, bundleB) => bundleB.priority - bundleA.priority);
+    return sortedBundles;
 }
 
 function GetCheapestBundle(results, budget){
@@ -204,20 +190,44 @@ function TransformDataToObjects(results){
 }
 
 /**
- * Partial Bundles
- * @param {*} items
- * @param {*} currentItems
- * @param {*} index
- * @param {*} usedQueries
- * @param {*} budget
+ *  Return all bundles, even if partial
+ *  All bundles are under budget
+ * @param {Object[]} items
+ * @param {Object} currentBundle
+ * @param {Number} index
+ * @param {Set} usedQueries
+ * @param {Number} budget
+ * @param {Object[]} allBundles
  * @returns
  */
-function GetAnyBundles(items, currentItems, index, usedQueries, budget){
+function GetAnyBundlesRecursion(items, currentBundle, index, usedQueries, budget, allBundles){
+    // Move up index until we find a query that hasn't been used yet
+    while (index < items.length && usedQueries.has(items[index].query)){
+        index++;
+    }
+    // Base Case: if over budget
+    if (currentBundle.total > budget){
+        return;
+    }
     // Base Case: if no more items are left
     if (index == items.length){
-        return currentItems;
+        allBundles.push(currentBundle)
+        return;
     }
+    // Recursive Case: explore two cases, one with object and one without
+    // Case 1
+    const newCurrentBundle = {...currentBundle};
+    newCurrentBundle.items = [...currentBundle.items, items[index]];
+    newCurrentBundle.total += items[index].price;
+    newCurrentBundle.priority += items[index].priority;
+    const newQueries = new Set(usedQueries);
+    newQueries.add(items[index].query);
+    GetAnyBundlesRecursion(items, newCurrentBundle, index + 1, newQueries, budget, allBundles);
+    // Case 2
+    GetAnyBundlesRecursion(items, currentBundle, index + 1, usedQueries, budget, allBundles);
 }
+
+
 
 /**
  * Finds the items with similar names to the item passed in

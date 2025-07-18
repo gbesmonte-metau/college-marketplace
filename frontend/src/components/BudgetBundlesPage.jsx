@@ -91,8 +91,7 @@ export default function BudgetBundlesPage() {
                     </form>
                 </div>
                 <div className='bundles'>
-                    {bundles && bundles.cheapestBundle && <Bundle bundleInfo={bundles.cheapestBundle} type="Cheapest Bundle"/>}
-                    {bundles && bundles.recommendedBundle && <Bundle bundleInfo={bundles.recommendedBundle} type="Recommended Bundle"/>}
+                    {bundles && bundles.length > 0 ? bundles.slice(0,2).map((bundle, index) => <Bundle key={index} bundleItems={bundle.items}/>) : <p>No bundles found.</p>}
                 </div>
             </div>
         </div>
