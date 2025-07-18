@@ -71,11 +71,29 @@ export async function CalculateBundles(posts, itemQueries, budget, user_id){
         }
         results[itemQueries[i]] = similarItems;
     }
+
+    // get cheapest bundle
+    let cheapestBundle = GetCheapestBundle(results, budget);
+
+    //get most recommended bundle
+    const recommendations = await GetRecommendations(user_id, posts.length);
+    posts.forEach(post => {
+        recommendations.forEach(recommendation => {
+            // if post id matches recommendation id and score is not null, set recommend score
+            post.id == recommendation[0] && (recommendation[1] != null ? post.recommend_score = recommendation[1] : post.recommend_score = 0);
+        });
+    });
+    let recommendedBundle = GetMostRecommendedBundle(results, budget);
+
+    if (cheapestBundle != null && recommendedBundle != null){
+        return {"isValid": true, "cheapestBundle": cheapestBundle, "recommendedBundle": recommendedBundle}
+    }
+
     const items = TransformDataToObjects(results);
     const allBundles = [];
     GetAnyBundlesRecursion(items, {items: [], total: 0, priority: 0}, 0, new Set(), budget, allBundles);
-    const sortedBundles = allBundles.sort((bundleA, bundleB) => bundleB.priority - bundleA.priority);
-    return sortedBundles;
+    const sortedBundles = allBundles.sort((bundleA, bundleB) => bundleB.priority - bundleA.priority).filter(bundle => bundle.items.length > 0);
+    return {"isValid": false, "partialBundle": sortedBundles};
 }
 
 function GetCheapestBundle(results, budget){
@@ -227,7 +245,32 @@ function GetAnyBundlesRecursion(items, currentBundle, index, usedQueries, budget
     GetAnyBundlesRecursion(items, currentBundle, index + 1, usedQueries, budget, allBundles);
 }
 
-
+// Returns one bundle with the most priority
+function GetOneBundleRecursion(items, currentBundle, index, usedQueries, budget){
+    // Move up index until we find a query that hasn't been used yet
+    while (index < items.length && usedQueries.has(items[index].query)){
+        index++;
+    }
+    // Base Case: if no more items are left
+    if (index == items.length){
+        return currentBundle;
+    }
+    // Recursive Case: explore two cases, one with object and one without
+    // Case 1: add item to bundle ONLY IF it doesn't exceed budget
+    let option1 = null;
+    if (currentBundle.total + items[index].price <= budget){
+        const newCurrentBundle = {...currentBundle};
+        newCurrentBundle.items = [...currentBundle.items, items[index]];
+        newCurrentBundle.total += items[index].price;
+        newCurrentBundle.priority += items[index].priority;
+        const newQueries = new Set(usedQueries);
+        newQueries.add(items[index].query);
+        option1 = GetOneBundleRecursion(items, newCurrentBundle, index + 1, newQueries, budget);
+    }
+    // Case 2
+    const option2 = GetOneBundleRecursion(items, currentBundle, index + 1, usedQueries, budget);
+    return option1 != null && option1.priority > option2.priority ? option1 : option2;
+}
 
 /**
  * Finds the items with similar names to the item passed in
