@@ -6,7 +6,8 @@ import '../components-css/BudgetBundlesPage.css'
 export default function BudgetBundlesPage() {
     const [items, setItems] = useState([null, null]);
     const [budget, setBudget] = useState(null);
-    const [bundles, setBundles] = useState({});
+    const [bundles, setBundles] = useState(null);
+    const [bundlesValid, setBundlesValid] = useState(false);
 
     function ChangeItem(e, index) {
         const value = e.target.value;
@@ -29,7 +30,7 @@ export default function BudgetBundlesPage() {
 
     function ClearBundles(e) {
         e.preventDefault();
-        setBundles({});
+        setBundles(null);
         setItems([null, null]);
         setBudget(null);
     }
@@ -59,6 +60,7 @@ export default function BudgetBundlesPage() {
         });
         const result = await response.json();
         if (response.ok) {
+            setBundlesValid(result.isValid);
             setBundles(result);
         }
         else{
@@ -91,8 +93,14 @@ export default function BudgetBundlesPage() {
                     </form>
                 </div>
                 <div className='bundles'>
-                    {bundles && bundles.cheapestBundle && <Bundle bundleInfo={bundles.cheapestBundle} type="Cheapest Bundle"/>}
-                    {bundles && bundles.recommendedBundle && <Bundle bundleInfo={bundles.recommendedBundle} type="Recommended Bundle"/>}
+                    {bundles && (bundlesValid ?
+                        <div>
+                            <Bundle bundleItems={bundles.cheapestBundle} type={"Cheapest Bundle"}/>
+                            <Bundle bundleItems={bundles.recommendedBundle} type={"Recommended Bundle"}/>
+                        </div>
+                        :
+                        bundles.partialBundle.map((bundle, index) => <Bundle key={index} bundleItems={bundle.items} type={"Partial Bundle " + (index + 1)}/>)
+                    )}
                 </div>
             </div>
         </div>
