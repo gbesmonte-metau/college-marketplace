@@ -254,7 +254,7 @@ function GetWeight(interaction){
     else if ('savedAt' in interaction){
         return SAVED_WEIGHT;
     }
-    else if ('buyerId' in interaction){
+    else {
         return PURCHASED_WEIGHT;
     }
 }

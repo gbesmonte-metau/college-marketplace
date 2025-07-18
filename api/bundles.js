@@ -60,6 +60,8 @@ const tempItems =
     }
 ]
 
+CalculateBundles(tempItems, ["lamp", "bed", "couch"], 1000, 1);
+
 export async function CalculateBundles(posts, itemQueries, budget, user_id){
     let results = {};
     // find all items that match each query
@@ -72,6 +74,8 @@ export async function CalculateBundles(posts, itemQueries, budget, user_id){
         results[itemQueries[i]] = similarItems;
     }
 
+    TransformDataToObjects(results);
+
     // get cheapest bundle
     let cheapestBundle = GetCheapestBundle(results, budget);
 
@@ -80,7 +84,7 @@ export async function CalculateBundles(posts, itemQueries, budget, user_id){
     posts.forEach(post => {
         recommendations.forEach(recommendation => {
             // if post id matches recommendation id and score is not null, set recommend score
-            (post.id == recommendation[0] && recommendation[1]) ? post.recommend_score = recommendation[1] : post.recommend_score = 0;
+            post.id == recommendation[0] && (recommendation[1] != null ? post.recommend_score = recommendation[1] : post.recommend_score = 0);
         });
     });
     let recommendedBundle = GetMostRecommendedBundle(results, budget);
@@ -94,34 +98,33 @@ function GetCheapestBundle(results, budget){
     let total = 0;
     const priceCompare = (itemA, itemB) => itemA.price - itemB.price;
     Object.entries(results).forEach(([query, matches]) => {
-       // create object list
-       let items = [];
-       // matches are guaranteed to be non-empty
-       for (let i = 0; i < matches.length; i++) {
-           items.push(matches[i].original);
-       }
-       // sort by price
-       items.sort(priceCompare);
+        // create object list
+        let items = [];
+        // matches are guaranteed to be non-empty
+        for (let i = 0; i < matches.length; i++) {
+            items.push(matches[i].original);
+        }
+        // sort by price
+        items.sort(priceCompare);
 
-       // add to bundle
-       bundle.push(items[0]);
-       total += items[0].price;
+        // add to bundle
+        bundle.push(items[0]);
+        total += items[0].price;
     });
     return total > budget ? null : bundle;
 }
 
 function GetMostRecommendedBundle(results, budget){
-    const allBundles = [];
-    CreateAllBundles(results, budget, [], 0, 0, allBundles);
+    const allBundles = CreateAllBundles2(results, budget);
 
-    if (allBundles.length == 0){
+    if (Object.keys(allBundles).length == 0){
         return null;
     }
 
     // sort by recommend score
-    allBundles.sort((a, b) => b[1] - a[1]);
+    allBundles.sort((a, b) => b.recommended - a.recommended);
 
-    return allBundles[0];
+    return allBundles[0].bundle;
 }
 
 /**
@@ -141,23 +144,79 @@ function CreateAllBundles(results, budget, currentBundle, currentTotal, currentR
     }
     // base case #2: no more items to add
     if (Object.keys(results).length == 0){
-        allBundles.push([currentTotal, currentRecommend, ...currentBundle]);
+        allBundles.push({currentTotal, currentRecommend, currentBundle});
         return;
     }
     // get first query in results
     const [query, matches] = Object.entries(results)[0];
     // recursively explore options
     matches.forEach(match => {
-        currentBundle.push(match.original);
         currentTotal += match.original.price;
         currentRecommend += match.original.recommend_score;
         const newResults = {...results};
         delete newResults[query];
-        CreateAllBundles(newResults, budget, currentBundle, currentTotal, currentRecommend, allBundles);
+        const newBundle = [...currentBundle, match.original];
+        CreateAllBundles(newResults, budget, newBundle, currentTotal, currentRecommend, allBundles);
         currentTotal -= match.original.price;
         currentRecommend -= match.original.recommend_score;
-        currentBundle.pop();
     });
+}
+
+/**
+ * Recursively generates all possible bundles
+ * @param {Object[]} results
+ * @param {Number} budget
+ * @returns
+ */
+function CreateAllBundles2(results, budget){
+    //Base Case: if results are empty
+    if (Object.keys(results).length == 0){
+        return [{price: 0, recommended: 0, bundle: []}];
+    }
+    const [query, matches] = Object.entries(results)[0];
+    const newResults = {...results};
+    delete newResults[query];
+    const combinations = CreateAllBundles2(newResults, budget);
+    const newCombinations = [];
+    for (const c of combinations){
+        for (const match of matches){
+            if (c.price + match.original.price <= budget){
+                 newCombinations.push({price: c.price + match.original.price, recommended: c.recommended + match.original.recommend_score, bundle: [...c.bundle, match.original]});
+            }
+        }
+    }
+    return newCombinations;
+}
+
+function TransformDataToObjects(results){
+    const items = [];
+    for (const [query, matches] of Object.entries(results)){
+        for (const match of matches){
+            const newItem = {
+                ...match.original,
+                priority: 1,
+                query: query
+            }
+            items.push(newItem);
+        }
+    }
+    return items;
+}
+
+/**
+ * Partial Bundles
+ * @param {*} items
+ * @param {*} currentItems
+ * @param {*} index
+ * @param {*} usedQueries
+ * @param {*} budget
+ * @returns
+ */
+function GetAnyBundles(items, currentItems, index, usedQueries, budget){
+    // Base Case: if no more items are left
+    if (index == items.length){
+        return currentItems;
+    }
 }
 
 /**
