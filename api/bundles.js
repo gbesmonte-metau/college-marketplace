@@ -60,6 +60,8 @@ const tempItems =
     }
 ]
 
+CalculateBundles(tempItems, ["lamp", "bed", "couch"], 1000, 1);
+
 export async function CalculateBundles(posts, itemQueries, budget, user_id){
     let results = {};
     // find all items that match each query
@@ -71,6 +73,8 @@ export async function CalculateBundles(posts, itemQueries, budget, user_id){
         }
         results[itemQueries[i]] = similarItems;
     }
+
+    TransformDataToObjects(results);
 
     // get cheapest bundle
     let cheapestBundle = GetCheapestBundle(results, budget);
@@ -94,18 +98,18 @@ function GetCheapestBundle(results, budget){
     let total = 0;
     const priceCompare = (itemA, itemB) => itemA.price - itemB.price;
     Object.entries(results).forEach(([query, matches]) => {
-       // create object list
-       let items = [];
-       // matches are guaranteed to be non-empty
-       for (let i = 0; i < matches.length; i++) {
-           items.push(matches[i].original);
-       }
-       // sort by price
-       items.sort(priceCompare);
+        // create object list
+        let items = [];
+        // matches are guaranteed to be non-empty
+        for (let i = 0; i < matches.length; i++) {
+            items.push(matches[i].original);
+        }
+        // sort by price
+        items.sort(priceCompare);
 
-       // add to bundle
-       bundle.push(items[0]);
-       total += items[0].price;
+        // add to bundle
+        bundle.push(items[0]);
+        total += items[0].price;
     });
     return total > budget ? null : bundle;
 }
@@ -182,6 +186,37 @@ function CreateAllBundles2(results, budget){
         }
     }
     return newCombinations;
+}
+
+function TransformDataToObjects(results){
+    const items = [];
+    for (const [query, matches] of Object.entries(results)){
+        for (const match of matches){
+            const newItem = {
+                ...match.original,
+                priority: 1,
+                query: query
+            }
+            items.push(newItem);
+        }
+    }
+    return items;
+}
+
+/**
+ * Partial Bundles
+ * @param {*} items
+ * @param {*} currentItems
+ * @param {*} index
+ * @param {*} usedQueries
+ * @param {*} budget
+ * @returns
+ */
+function GetAnyBundles(items, currentItems, index, usedQueries, budget){
+    // Base Case: if no more items are left
+    if (index == items.length){
+        return currentItems;
+    }
 }
 
 /**
