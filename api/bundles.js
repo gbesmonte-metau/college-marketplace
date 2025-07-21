@@ -88,6 +88,9 @@ export async function CalculateBundles(posts, itemQueries, budget, user_id){
         return {"isValid": true, "cheapestBundle": cheapestBundle, "recommendedBundle": recommendedBundle}
     }
     const items = TransformDataToObjects(results);
+	//TODO: add oneBundle to front end
+    const oneBundle = GetOneBundleMemoized(items, {items: [], total: 0, priority: 0}, 0, new Set(), budget, new Map());
+
     const allBundles = [];
     GetAnyBundlesRecursion(items, {items: [], total: 0, priority: 0}, 0, new Set(), budget, allBundles);
     const sortedBundles = allBundles.sort((bundleA, bundleB) => bundleB.priority - bundleA.priority).filter(bundle => bundle.items.length > 0);
@@ -127,41 +130,6 @@ function GetMostRecommendedBundle(results, budget){
     allBundles.sort((a, b) => b.recommended - a.recommended);
 
     return allBundles[0].bundle;
-}
-
-/**
- * Recursively creates all possible bundles
- * @param {Object} results
- * @param {Number} budget
- * @param {Object[]} currentBundle
- * @param {Number} currentTotal
- * @param {Number} currentRecommend
- * @param {Array[]} allBundles
- * @returns
- */
-function CreateAllBundles(results, budget, currentBundle, currentTotal, currentRecommend, allBundles){
-    // base case #1: budget exceeded
-    if (currentTotal > budget){
-        return;
-    }
-    // base case #2: no more items to add
-    if (Object.keys(results).length == 0){
-        allBundles.push({currentTotal, currentRecommend, currentBundle});
-        return;
-    }
-    // get first query in results
-    const [query, matches] = Object.entries(results)[0];
-    // recursively explore options
-    matches.forEach(match => {
-        currentTotal += match.original.price;
-        currentRecommend += match.original.recommend_score;
-        const newResults = {...results};
-        delete newResults[query];
-        const newBundle = [...currentBundle, match.original];
-        CreateAllBundles(newResults, budget, newBundle, currentTotal, currentRecommend, allBundles);
-        currentTotal -= match.original.price;
-        currentRecommend -= match.original.recommend_score;
-    });
 }
 
 /**
@@ -241,6 +209,41 @@ function GetAnyBundlesRecursion(items, currentBundle, index, usedQueries, budget
     GetAnyBundlesRecursion(items, newCurrentBundle, index + 1, newQueries, budget, allBundles);
     // Case 2
     GetAnyBundlesRecursion(items, currentBundle, index + 1, usedQueries, budget, allBundles);
+}
+
+function GetOneBundleMemoized(items, currentBundle, index, usedQueries, budget, memoizationMap){
+    // Move up index until we find a query that hasn't been used yet
+    while (index < items.length && usedQueries.has(items[index].query)){
+        index++;
+    }
+    // Base Case: if no more items are left
+    if (index == items.length){
+        return currentBundle;
+    }
+    // Recursive Case: explore two cases, one with object and one without
+    // memoization check:
+    // If we have previously checked this state, return result
+    // state: index, total
+    const key = index.toString() + " " + currentBundle.total.toString();
+    if (memoizationMap.has(key)){
+        return memoizationMap.get(key);
+    }
+    // Case 1: add item to bundle ONLY IF it doesn't exceed budget
+    let option1 = null;
+    if (currentBundle.total + items[index].price <= budget){
+        const newCurrentBundle = {...currentBundle};
+        newCurrentBundle.items = [...currentBundle.items, items[index]];
+        newCurrentBundle.total += items[index].price;
+        newCurrentBundle.priority += items[index].priority;
+        const newQueries = new Set(usedQueries);
+        newQueries.add(items[index].query);
+        option1 = GetOneBundleMemoized(items, newCurrentBundle, index + 1, newQueries, budget, memoizationMap);
+    }
+    // Case 2
+    const option2 = GetOneBundleMemoized(items, currentBundle, index + 1, usedQueries, budget, memoizationMap);
+    const result = option1 != null && option1.priority > option2.priority ? option1 : option2;
+    memoizationMap.set(key, result);
+    return result;
 }
 
 /**
