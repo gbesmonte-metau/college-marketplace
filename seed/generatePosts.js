@@ -17,7 +17,6 @@ const opts = {
   overwrite: true,
   invalidate: true,
   resource_type: "auto",
-  //categorization: "google_tagging",
 };
 
 const uploadImageByUrl = (url) => {
@@ -69,11 +68,6 @@ async function convertToPost(data, cities){
     try{
         const response = await uploadImageByUrl(data.image);
         image = response.secure_url;
-        /*if (response.info.categorization.google_tagging.data != null){
-            for (const tag of response.info.categorization.google_tagging.data) {
-                tags.push(tag.tag);
-            }
-        }*/
     }
     catch(e){
     }
@@ -85,7 +79,6 @@ async function convertToPost(data, cities){
         location: `{\"lat\": ${randomCity.Latitude}, \"lng\": ${randomCity.Longitude}}`,
         formatted_address: randomCity.Name + ", California, United States",
         image_url: image,
-        //image_tags: tags,
         authorId: Math.floor(Math.random() * 10) + 1,
     }
     return newPost;

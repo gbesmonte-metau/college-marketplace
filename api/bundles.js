@@ -38,13 +38,13 @@ const tempItems =
       "id": 6,
       "name": "Compact Metal Bed Frame",
       "recommend_score": 0.9,
-      "price": 20,
+      "price": 2,
     },
     {
       "id": 7,
       "name": "Three-Seater Couch",
       "recommend_score": 0.8,
-      "price": 15,
+      "price": 1,
     },
     {
       "id": 8,
@@ -65,17 +65,19 @@ export async function CalculateBundles(posts, itemQueries, budget, user_id){
     // find all items that match each query
     for (let i = 0; i < itemQueries.length; i++) {
         const similarItems = FindSimilarItems(itemQueries[i], posts);
-        // if no items found for a query, return null
+        // if no items found for a query, remove the query
         if (similarItems.length == 0){
-            return null;
+            itemQueries.splice(i, 1);
         }
-        results[itemQueries[i]] = similarItems;
+		else {
+        	results[itemQueries[i]] = similarItems;
+		}
     }
 
     // get cheapest bundle
     let cheapestBundle = GetCheapestBundle(results, budget);
 
-    //get most recommended bundle
+	// match items to recommendations
     const recommendations = await GetRecommendations(user_id, posts.length);
     posts.forEach(post => {
         recommendations.forEach(recommendation => {
@@ -83,18 +85,11 @@ export async function CalculateBundles(posts, itemQueries, budget, user_id){
             post.id == recommendation[0] && (recommendation[1] != null ? post.recommend_score = recommendation[1] : post.recommend_score = 0);
         });
     });
-    let recommendedBundle = GetMostRecommendedBundle(results, budget);
-    if (cheapestBundle != null && recommendedBundle != null){
-        return {"isValid": true, "cheapestBundle": cheapestBundle, "recommendedBundle": recommendedBundle}
-    }
-    const items = TransformDataToObjects(results);
-	//TODO: add oneBundle to front end
-    const oneBundle = GetOneBundleMemoized(items, {items: [], total: 0, priority: 0}, 0, new Set(), budget, new Map());
 
-    const allBundles = [];
-    GetAnyBundlesRecursion(items, {items: [], total: 0, priority: 0}, 0, new Set(), budget, allBundles);
-    const sortedBundles = allBundles.sort((bundleA, bundleB) => bundleB.priority - bundleA.priority).filter(bundle => bundle.items.length > 0);
-    return {"isValid": false, "partialBundle": sortedBundles};
+    const items = TransformDataToObjects(results);
+    const oneBundle = GetOneBundle2D(items, budget);
+
+    return {"cheapestBundle": cheapestBundle, "bestValueBundle": oneBundle.items};
 }
 
 function GetCheapestBundle(results, budget){
@@ -119,45 +114,6 @@ function GetCheapestBundle(results, budget){
     return total > budget ? null : bundle;
 }
 
-function GetMostRecommendedBundle(results, budget){
-    const allBundles = CreateAllBundles2(results, budget);
-
-    if (Object.keys(allBundles).length == 0){
-        return null;
-    }
-
-    // sort by recommend score
-    allBundles.sort((a, b) => b.recommended - a.recommended);
-
-    return allBundles[0].bundle;
-}
-
-/**
- * Recursively generates all possible bundles
- * @param {Object[]} results
- * @param {Number} budget
- * @returns
- */
-function CreateAllBundles2(results, budget){
-    //Base Case: if results are empty
-    if (Object.keys(results).length == 0){
-        return [{price: 0, recommended: 0, bundle: []}];
-    }
-    const [query, matches] = Object.entries(results)[0];
-    const newResults = {...results};
-    delete newResults[query];
-    const combinations = CreateAllBundles2(newResults, budget);
-    const newCombinations = [];
-    for (const c of combinations){
-        for (const match of matches){
-            if (c.price + match.original.price <= budget){
-                 newCombinations.push({price: c.price + match.original.price, recommended: c.recommended + match.original.recommend_score, bundle: [...c.bundle, match.original]});
-            }
-        }
-    }
-    return newCombinations;
-}
-
 function TransformDataToObjects(results){
     const items = [];
     for (const [query, matches] of Object.entries(results)){
@@ -165,7 +121,8 @@ function TransformDataToObjects(results){
             const newItem = {
                 ...match.original,
                 priority: 1,
-                query: query
+                query: query,
+				price: Math.floor(match.original.price),
             }
             items.push(newItem);
         }
@@ -173,77 +130,69 @@ function TransformDataToObjects(results){
     return items;
 }
 
-/**
- *  Return all bundles, even if partial
- *  All bundles are under budget
- * @param {Object[]} items
- * @param {Object} currentBundle
- * @param {Number} index
- * @param {Set} usedQueries
- * @param {Number} budget
- * @param {Object[]} allBundles
- * @returns
- */
-function GetAnyBundlesRecursion(items, currentBundle, index, usedQueries, budget, allBundles){
-    // Move up index until we find a query that hasn't been used yet
-    while (index < items.length && usedQueries.has(items[index].query)){
-        index++;
+function GetOneBundle2D(items, budget){
+    // Instantiate a 2d Array
+    	// rows represent how many items there are
+    	// columns represent the price
+    	// table[i][j] is an object
+    	    // recommend: the best bundle with i items and j price
+    	    // items: the items in the best bundle
+    const amountItems = items.length;
+    const table = new Array(amountItems + 1);
+    for (let i = 0; i < amountItems + 1; i++){
+		table[i] = [];
+		for (let j = 0; j < budget + 1; j++){
+			table[i][j] = {priority: 0, items: [], usedQueries: new Set()};
+		}
     }
-    // Base Case: if over budget
-    if (currentBundle.total > budget){
-        return;
+    // Fill table
+    for (let i = 1; i < amountItems + 1; i++){
+        for (let j = 1; j < budget + 1; j++){
+            // priority if you include the item i
+            let priorityInclude = 0;
+            let alreadyUsed = false;
+			let willReplace = false;
+			let newUsedQueries = new Set();
+            if (items[i-1].price <= j){
+            	newUsedQueries = new Set(table[i-1][j-items[i-1].price].usedQueries);
+                // if the item query has already been used, replace if the score is better
+                alreadyUsed = table[i-1][j-items[i-1].price].usedQueries.has(items[i-1].query);
+                if (alreadyUsed){
+					const newItems = [...table[i-1][j-items[i-1].price].items];
+					const sameQuery = newItems.find(item => item.query == items[i-1].query);
+					if (sameQuery.recommend_score < items[i-1].recommend_score){
+						priorityInclude = table[i-1][j-items[i-1].price].priority + items[i-1].recommend_score - sameQuery.recommend_score;
+						willReplace = true;
+					}
+                }
+                else {
+                    priorityInclude = items[i-1].recommend_score + table[i-1][j - items[i-1].price].priority;
+                    newUsedQueries.add(items[i-1].query);
+                }
+            }
+            // priority if you exclude the item i
+            const priorityExclude = table[i-1][j].priority;
+            // choose the maximum priority
+			if (priorityInclude > priorityExclude){
+				let newItems = [...table[i-1][j-items[i-1].price].items];
+				if (alreadyUsed && willReplace){
+					newItems = newItems.filter(item => item.query != items[i-1].query);
+					newItems.push(items[i-1]);
+				}
+				else if (alreadyUsed){
+					// do nothing
+				}
+				else {
+					newItems.push(items[i-1]);
+				}
+				table[i][j] = {priority: priorityInclude, items: newItems, usedQueries: newUsedQueries};
+			}
+			else {
+				table[i][j] = {priority: priorityExclude, items: [...table[i-1][j].items], usedQueries: new Set(table[i-1][j].usedQueries)};
+			}
+        }
     }
-    // Base Case: if no more items are left
-    if (index == items.length){
-        allBundles.push(currentBundle)
-        return;
-    }
-    // Recursive Case: explore two cases, one with object and one without
-    // Case 1
-    const newCurrentBundle = {...currentBundle};
-    newCurrentBundle.items = [...currentBundle.items, items[index]];
-    newCurrentBundle.total += items[index].price;
-    newCurrentBundle.priority += items[index].priority;
-    const newQueries = new Set(usedQueries);
-    newQueries.add(items[index].query);
-    GetAnyBundlesRecursion(items, newCurrentBundle, index + 1, newQueries, budget, allBundles);
-    // Case 2
-    GetAnyBundlesRecursion(items, currentBundle, index + 1, usedQueries, budget, allBundles);
-}
-
-function GetOneBundleMemoized(items, currentBundle, index, usedQueries, budget, memoizationMap){
-    // Move up index until we find a query that hasn't been used yet
-    while (index < items.length && usedQueries.has(items[index].query)){
-        index++;
-    }
-    // Base Case: if no more items are left
-    if (index == items.length){
-        return currentBundle;
-    }
-    // Recursive Case: explore two cases, one with object and one without
-    // memoization check:
-    // If we have previously checked this state, return result
-    // state: index, total
-    const key = index.toString() + " " + currentBundle.total.toString();
-    if (memoizationMap.has(key)){
-        return memoizationMap.get(key);
-    }
-    // Case 1: add item to bundle ONLY IF it doesn't exceed budget
-    let option1 = null;
-    if (currentBundle.total + items[index].price <= budget){
-        const newCurrentBundle = {...currentBundle};
-        newCurrentBundle.items = [...currentBundle.items, items[index]];
-        newCurrentBundle.total += items[index].price;
-        newCurrentBundle.priority += items[index].priority;
-        const newQueries = new Set(usedQueries);
-        newQueries.add(items[index].query);
-        option1 = GetOneBundleMemoized(items, newCurrentBundle, index + 1, newQueries, budget, memoizationMap);
-    }
-    // Case 2
-    const option2 = GetOneBundleMemoized(items, currentBundle, index + 1, usedQueries, budget, memoizationMap);
-    const result = option1 != null && option1.priority > option2.priority ? option1 : option2;
-    memoizationMap.set(key, result);
-    return result;
+    return table[amountItems][budget];
 }
 
 /**
