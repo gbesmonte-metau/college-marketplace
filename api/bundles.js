@@ -8,59 +8,57 @@ const tempItems =
       "id": 1,
       "name": "Modern Desk Lamp",
       "recommend_score": 0.4,
-      "price": 49.99
+      "price": 10,
     },
     {
       "id": 2,
       "name": "LED Table Lamp",
       "recommend_score": 0.9,
-      "price": 52.00
+      "price": 10,
     },
     {
       "id": 3,
       "name": "Minimalist Floor Lamp",
       "recommend_score": 0.1,
-      "price": 30.75
+      "price": 10,
     },
     {
       "id": 4,
       "name": "Classic Wood Bedframe",
       "recommend_score": 0.3,
-      "price": 229.00
+      "price": 20,
     },
     {
       "id": 5,
       "name": "Oak Frame Bed",
       "recommend_score": 0.6,
-      "price": 270.25
+      "price": 20,
     },
     {
       "id": 6,
       "name": "Compact Metal Bed Frame",
       "recommend_score": 0.9,
-      "price": 300.80
+      "price": 20,
     },
     {
       "id": 7,
       "name": "Three-Seater Couch",
       "recommend_score": 0.8,
-      "price": 580.50
+      "price": 15,
     },
     {
       "id": 8,
       "name": "Deluxe Fabric Couch",
       "recommend_score": 0.9,
-      "price": 550.00
+      "price": 15,
     },
     {
       "id": 9,
       "name": "Modern Living Room Couch",
       "recommend_score": 0.5,
-      "price": 505.00
+      "price": 15,
     }
 ]
-
-CalculateBundles(tempItems, ["lamp", "bed", "couch"], 1000, 1);
 
 export async function CalculateBundles(posts, itemQueries, budget, user_id){
     let results = {};
@@ -74,8 +72,6 @@ export async function CalculateBundles(posts, itemQueries, budget, user_id){
         results[itemQueries[i]] = similarItems;
     }
 
-    TransformDataToObjects(results);
-
     // get cheapest bundle
     let cheapestBundle = GetCheapestBundle(results, budget);
 
@@ -88,8 +84,14 @@ export async function CalculateBundles(posts, itemQueries, budget, user_id){
         });
     });
     let recommendedBundle = GetMostRecommendedBundle(results, budget);
-
-    return {cheapestBundle, recommendedBundle}
+    if (cheapestBundle != null && recommendedBundle != null){
+        return {"isValid": true, "cheapestBundle": cheapestBundle, "recommendedBundle": recommendedBundle}
+    }
+    const items = TransformDataToObjects(results);
+    const allBundles = [];
+    GetAnyBundlesRecursion(items, {items: [], total: 0, priority: 0}, 0, new Set(), budget, allBundles);
+    const sortedBundles = allBundles.sort((bundleA, bundleB) => bundleB.priority - bundleA.priority).filter(bundle => bundle.items.length > 0);
+    return {"isValid": false, "partialBundle": sortedBundles};
 }
 
 function GetCheapestBundle(results, budget){
@@ -204,19 +206,41 @@ function TransformDataToObjects(results){
 }
 
 /**
- * Partial Bundles
- * @param {*} items
- * @param {*} currentItems
- * @param {*} index
- * @param {*} usedQueries
- * @param {*} budget
+ *  Return all bundles, even if partial
+ *  All bundles are under budget
+ * @param {Object[]} items
+ * @param {Object} currentBundle
+ * @param {Number} index
+ * @param {Set} usedQueries
+ * @param {Number} budget
+ * @param {Object[]} allBundles
  * @returns
  */
-function GetAnyBundles(items, currentItems, index, usedQueries, budget){
+function GetAnyBundlesRecursion(items, currentBundle, index, usedQueries, budget, allBundles){
+    // Move up index until we find a query that hasn't been used yet
+    while (index < items.length && usedQueries.has(items[index].query)){
+        index++;
+    }
+    // Base Case: if over budget
+    if (currentBundle.total > budget){
+        return;
+    }
     // Base Case: if no more items are left
     if (index == items.length){
-        return currentItems;
+        allBundles.push(currentBundle)
+        return;
     }
+    // Recursive Case: explore two cases, one with object and one without
+    // Case 1
+    const newCurrentBundle = {...currentBundle};
+    newCurrentBundle.items = [...currentBundle.items, items[index]];
+    newCurrentBundle.total += items[index].price;
+    newCurrentBundle.priority += items[index].priority;
+    const newQueries = new Set(usedQueries);
+    newQueries.add(items[index].query);
+    GetAnyBundlesRecursion(items, newCurrentBundle, index + 1, newQueries, budget, allBundles);
+    // Case 2
+    GetAnyBundlesRecursion(items, currentBundle, index + 1, usedQueries, budget, allBundles);
 }
 
 /**
