@@ -372,9 +372,13 @@ router.get('/user/recommendations', isAuthenticated, async (req, res, next) => {
     res.status(200).json(recommendedPosts);
 })
 
-//Get bundles for current user
-router.get('/user/bundles', isAuthenticated, async (req, res, next) => {
+//POST - Get bundles for current user
+router.post('/user/bundles', isAuthenticated, async (req, res, next) => {
     const userId = req.session.user.id;
+    const body = req.body;
+    const queries = body.queries;
+    const priorities = body.priorities;
+    const budget = body.budget;
     try{
         const posts = await prisma.post.findMany({
             where: {
@@ -388,13 +392,11 @@ router.get('/user/bundles', isAuthenticated, async (req, res, next) => {
             next({ status: 404, message: 'No posts found' });
             return;
         }
-        if (!Array.isArray(req.query.item) || !req.query.budget) {
-            next({ status: 422, message: 'Invalid query parameters' });
+        if (!queries || !priorities || !budget) {
+            next({ status: 422, message: 'Invalid body' });
             return;
         }
-        const queries = req.query.item.map(String);
-        const budget = parseFloat(req.query.budget);
-        const bundles = await CalculateBundles(posts, queries, budget, userId);
+        const bundles = await CalculateBundles(posts, queries, budget, userId, priorities);
         res.status(200).json(bundles);
     }
     catch (err) {

@@ -1,10 +1,16 @@
 .bundle-page {
-    margin: 2rem;
-    display: grid;
-    grid-template-columns: 1fr 3fr;
+    margin-left: 2rem;
+    margin-right: 2rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
-.bundle-page input {
-    width: 50%;
+.bundle-inputs {
+    display: flex;
+}
+.bundle-page input, .bundle-page select {
+    width: 150px;
     font-family: 'Montserrat', sans-serif;
     padding: 5px;
     border-radius: 5px;
@@ -19,10 +25,13 @@
 .add-items-container {
     display: flex;
     flex-direction: column;
+    justify-content: center;
+    align-items: center;
     gap: 5px;
 }
-.bundle-container {
+.bundles {
     display: flex;
-    width: 100%;
-    max-width: 100%;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
