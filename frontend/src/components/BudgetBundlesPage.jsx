@@ -1,10 +1,11 @@
 import { useState } from 'react'
 import Bundle from './Bundle';
 import '../components-css/BudgetBundlesPage.css'
+import { fetchCreateBundle } from '../api';
 
 export default function BudgetBundlesPage() {
     const [items, setItems] = useState([null, null]);
-    const [priorities, setPriorities] = useState([null, null]);
+    const [priorityMap, setPriorityMap] = useState({});
     const [budget, setBudget] = useState(null);
     const [bundles, setBundles] = useState(null);
 
@@ -15,34 +16,31 @@ export default function BudgetBundlesPage() {
         setItems(newItems);
     }
 
-    function ChangePriority(e, index) {
+    function ChangePriority(e, item) {
         const value = e.target.value;
-        const newPriorities = [...priorities];
-        newPriorities[index] = value;
-        setPriorities(newPriorities);
+        setPriorityMap({...priorityMap, [item]: value});
     }
 
     function AddItem(e) {
         e.preventDefault();
         setItems([...items, null]);
-        setPriorities([...priorities, null]);
     }
 
     function RemoveItem(e) {
         e.preventDefault();
         const newItems = [...items];
-        newItems.pop();
+        const item = newItems.pop();
         setItems(newItems);
-        const newPriorities = [...priorities];
-        newPriorities.pop();
-        setPriorities(newPriorities);
+        const tempMap = {...priorityMap};
+        delete tempMap[item];
+        setPriorityMap(tempMap);
     }
 
     function ClearBundles(e) {
         e.preventDefault();
         setBundles(null);
         setItems([null, null]);
-        setPriorities([null, null]);
+        setPriorityMap({});
         setBudget(null);
     }
 
@@ -53,30 +51,25 @@ export default function BudgetBundlesPage() {
             alert("Please add more items.");
             return;
         }
-        for (let i = 0; i < filteredItems.length; i++) {
-            if (priorities[i] == null) {
+        let priorities = [];
+        for (let i = 0; i < filteredItems.length; i++){
+            const priority = priorityMap[filteredItems[i]];
+            if (priority == null) {
                 alert("Please specify a priority for all items.");
                 return;
             }
+            priorities.push(priority);
         }
         if (budget == null || isNaN(budget)) {
             alert("Invalid budget request.");
             return;
         }
-        const url = new URL(import.meta.env.VITE_URL + '/user/bundles');
         const body = {
             queries: filteredItems,
             budget: parseFloat(budget),
             priorities: priorities,
         }
-        const response = await fetch(url, {
-            method: 'POST',
-            credentials: 'include',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(body),
-        });
+        const response = await fetchCreateBundle(body);
         const result = await response.json();
         if (response.ok) {
             setBundles(result);
@@ -97,8 +90,8 @@ export default function BudgetBundlesPage() {
                             {items.map((item, index) =>
                             <div key={index} className='bundle-inputs'>
                                 <input key={"item" + index} className='bundle-input' type="text" value={item ? item : ""} onChange={(e) => ChangeItem(e,index)} placeholder='Enter Item'/>
-                                <select key={"priority" + index} className='bundle-priority' value={priorities[index] ? priorities[index] : ''} onChange={(e) => ChangePriority(e, index)}>
-                                    {!priorities[index] && <option value=''>Select Priority</option>}
+                                <select key={"priority" + index} className='bundle-priority' value={priorityMap[item] ? priorityMap[item] : ''} onChange={(e) => ChangePriority(e, item)}>
+                                    {!priorityMap[item] && <option value=''>Select Priority</option>}
                                     <option value="High">High</option>
                                     <option value="Medium">Medium</option>
                                     <option value="Low">Low</option>

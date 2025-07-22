@@ -389,7 +389,7 @@ router.post('/user/bundles', isAuthenticated, async (req, res, next) => {
             }
         });
         if (!posts) {
-            next({ status: 404, message: 'No posts found' });
+            next({ status: 200, message: 'No posts found' });
             return;
         }
         if (!queries || !priorities || !budget) {
