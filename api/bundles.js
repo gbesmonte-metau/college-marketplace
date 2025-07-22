@@ -1,249 +1,248 @@
-import fuzzy from 'fuzzy';
-import { GetRecommendations } from './recommended.js';
+import fuzzy from "fuzzy";
+import { GetRecommendations } from "./recommended.js";
 
 //Test Data
-const tempItems =
-[
-    {
-      "id": 1,
-      "name": "Modern Desk Lamp",
-      "recommend_score": 0.4,
-      "price": 10,
-    },
-    {
-      "id": 2,
-      "name": "LED Table Lamp",
-      "recommend_score": 0.9,
-      "price": 10,
-    },
-    {
-      "id": 3,
-      "name": "Minimalist Floor Lamp",
-      "recommend_score": 0.1,
-      "price": 10,
-    },
-    {
-      "id": 4,
-      "name": "Classic Wood Bedframe",
-      "recommend_score": 0.3,
-      "price": 20,
-    },
-    {
-      "id": 5,
-      "name": "Oak Frame Bed",
-      "recommend_score": 0.6,
-      "price": 20,
-    },
-    {
-      "id": 6,
-      "name": "Compact Metal Bed Frame",
-      "recommend_score": 0.9,
-      "price": 20,
-    },
-    {
-      "id": 7,
-      "name": "Three-Seater Couch",
-      "recommend_score": 0.8,
-      "price": 15,
-    },
-    {
-      "id": 8,
-      "name": "Deluxe Fabric Couch",
-      "recommend_score": 0.9,
-      "price": 15,
-    },
-    {
-      "id": 9,
-      "name": "Modern Living Room Couch",
-      "recommend_score": 0.5,
-      "price": 15,
+const tempItems = [
+  {
+    id: 1,
+    name: "Modern Desk Lamp",
+    recommend_score: 0.4,
+    price: 10,
+  },
+  {
+    id: 2,
+    name: "LED Table Lamp",
+    recommend_score: 0.9,
+    price: 10,
+  },
+  {
+    id: 3,
+    name: "Minimalist Floor Lamp",
+    recommend_score: 0.1,
+    price: 10,
+  },
+  {
+    id: 4,
+    name: "Classic Wood Bedframe",
+    recommend_score: 0.3,
+    price: 20,
+  },
+  {
+    id: 5,
+    name: "Oak Frame Bed",
+    recommend_score: 0.6,
+    price: 20,
+  },
+  {
+    id: 6,
+    name: "Compact Metal Bed Frame",
+    recommend_score: 0.9,
+    price: 2,
+  },
+  {
+    id: 7,
+    name: "Three-Seater Couch",
+    recommend_score: 0.8,
+    price: 1,
+  },
+  {
+    id: 8,
+    name: "Deluxe Fabric Couch",
+    recommend_score: 0.9,
+    price: 15,
+  },
+  {
+    id: 9,
+    name: "Modern Living Room Couch",
+    recommend_score: 0.5,
+    price: 15,
+  },
+];
+
+const priorityWeights = {
+  High: 10,
+  Medium: 1,
+  Low: 0.1,
+};
+export async function CalculateBundles(
+  posts,
+  itemQueries,
+  budget,
+  user_id,
+  priorities,
+) {
+  let results = {};
+  // find all items that match each query
+  for (let i = 0; i < itemQueries.length; i++) {
+    const similarItems = FindSimilarItems(itemQueries[i], posts);
+    // if no items found for a query, remove the query
+    if (similarItems.length == 0) {
+      itemQueries.splice(i, 1);
+    } else {
+      results[itemQueries[i]] = similarItems;
     }
-]
+  }
 
-export async function CalculateBundles(posts, itemQueries, budget, user_id){
-    let results = {};
-    // find all items that match each query
-    for (let i = 0; i < itemQueries.length; i++) {
-        const similarItems = FindSimilarItems(itemQueries[i], posts);
-        // if no items found for a query, return null
-        if (similarItems.length == 0){
-            return null;
-        }
-        results[itemQueries[i]] = similarItems;
-    }
+  // get cheapest bundle
+  let cheapestBundle = GetCheapestBundle(results, budget);
 
-    // get cheapest bundle
-    let cheapestBundle = GetCheapestBundle(results, budget);
-
-    //get most recommended bundle
-    const recommendations = await GetRecommendations(user_id, posts.length);
-    posts.forEach(post => {
-        recommendations.forEach(recommendation => {
-            // if post id matches recommendation id and score is not null, set recommend score
-            post.id == recommendation[0] && (recommendation[1] != null ? post.recommend_score = recommendation[1] : post.recommend_score = 0);
-        });
+  // match items to recommendations
+  const recommendations = await GetRecommendations(user_id, posts.length);
+  posts.forEach((post) => {
+    recommendations.forEach((recommendation) => {
+      // if post id matches recommendation id and score is not null, set recommend score
+      post.id == recommendation[0] &&
+        (recommendation[1] != null
+          ? (post.recommend_score = recommendation[1])
+          : (post.recommend_score = 0));
     });
-    let recommendedBundle = GetMostRecommendedBundle(results, budget);
-    if (cheapestBundle != null && recommendedBundle != null){
-        return {"isValid": true, "cheapestBundle": cheapestBundle, "recommendedBundle": recommendedBundle}
+    if (!post.recommend_score) {
+      post.recommend_score = 5;
     }
-    const items = TransformDataToObjects(results);
-	//TODO: add oneBundle to front end
-    const oneBundle = GetOneBundleMemoized(items, {items: [], total: 0, priority: 0}, 0, new Set(), budget, new Map());
+  });
+  const items = TransformDataToObjects(results);
+  // map query to priority
+  const queryToPriority = {};
+  for (let i = 0; i < itemQueries.length; i++) {
+    queryToPriority[itemQueries[i]] = priorities[i];
+  }
+  // weigh recommendations by priorities
+  for (let i = 0; i < items.length; i++) {
+    if (queryToPriority[items[i].query]) {
+      items[i].recommend_score *=
+        priorityWeights[queryToPriority[items[i].query]];
+    }
+  }
+  const oneBundle = GetOneBundle2D(items, budget);
 
-    const allBundles = [];
-    GetAnyBundlesRecursion(items, {items: [], total: 0, priority: 0}, 0, new Set(), budget, allBundles);
-    const sortedBundles = allBundles.sort((bundleA, bundleB) => bundleB.priority - bundleA.priority).filter(bundle => bundle.items.length > 0);
-    return {"isValid": false, "partialBundle": sortedBundles};
+  return { cheapestBundle: cheapestBundle, bestValueBundle: oneBundle.items };
 }
 
-function GetCheapestBundle(results, budget){
-    // get cheapest bundle
-    let bundle = [];
-    let total = 0;
-    const priceCompare = (itemA, itemB) => itemA.price - itemB.price;
-    Object.entries(results).forEach(([query, matches]) => {
-        // create object list
-        let items = [];
-        // matches are guaranteed to be non-empty
-        for (let i = 0; i < matches.length; i++) {
-            items.push(matches[i].original);
+function GetCheapestBundle(results, budget) {
+  // get cheapest bundle
+  let bundle = [];
+  let total = 0;
+  const priceCompare = (itemA, itemB) => itemA.price - itemB.price;
+  Object.entries(results).forEach(([query, matches]) => {
+    // create object list
+    let items = [];
+    // matches are guaranteed to be non-empty
+    for (let i = 0; i < matches.length; i++) {
+      items.push(matches[i].original);
+    }
+    // sort by price
+    items.sort(priceCompare);
+
+    // add to bundle
+    bundle.push(items[0]);
+    total += items[0].price;
+  });
+  return total > budget ? null : bundle;
+}
+
+function TransformDataToObjects(results) {
+  const items = [];
+  for (const [query, matches] of Object.entries(results)) {
+    for (const match of matches) {
+      const newItem = {
+        ...match.original,
+        priority: 1,
+        query: query,
+        price: Math.floor(match.original.price),
+      };
+      items.push(newItem);
+    }
+  }
+  return items;
+}
+
+function GetOneBundle2D(items, budget) {
+  // Instantiate a 2d Array
+  // rows represent how many items there are
+  // columns represent the price
+  // table[i][j] is an object
+  // recommend: the best bundle with i items and j price
+  // items: the items in the best bundle
+  const amountItems = items.length;
+  const table = new Array(amountItems);
+  for (let i = 0; i < amountItems; i++) {
+    table[i] = [];
+    for (let j = 0; j < budget + 1; j++) {
+      table[i][j] = { priority: 0, items: [], usedQueries: new Set() };
+    }
+  }
+  // Fill table
+  for (let i = 0; i < amountItems; i++) {
+    for (let j = 0; j < budget + 1; j++) {
+      // priority if you include the item i
+      let priorityInclude = { priority: 0, items: [], usedQueries: new Set() };
+      if (items[i].price <= j) {
+        let previousBundle;
+        if (i > 0) {
+          previousBundle = table[i - 1][j - items[i].price];
+        } else {
+          previousBundle = {
+            priority: 0,
+            items: [],
+            usedQueries: new Set(),
+          };
         }
-        // sort by price
-        items.sort(priceCompare);
-
-        // add to bundle
-        bundle.push(items[0]);
-        total += items[0].price;
-    });
-    return total > budget ? null : bundle;
-}
-
-function GetMostRecommendedBundle(results, budget){
-    const allBundles = CreateAllBundles2(results, budget);
-
-    if (Object.keys(allBundles).length == 0){
-        return null;
-    }
-
-    // sort by recommend score
-    allBundles.sort((a, b) => b.recommended - a.recommended);
-
-    return allBundles[0].bundle;
-}
-
-/**
- * Recursively generates all possible bundles
- * @param {Object[]} results
- * @param {Number} budget
- * @returns
- */
-function CreateAllBundles2(results, budget){
-    //Base Case: if results are empty
-    if (Object.keys(results).length == 0){
-        return [{price: 0, recommended: 0, bundle: []}];
-    }
-    const [query, matches] = Object.entries(results)[0];
-    const newResults = {...results};
-    delete newResults[query];
-    const combinations = CreateAllBundles2(newResults, budget);
-    const newCombinations = [];
-    for (const c of combinations){
-        for (const match of matches){
-            if (c.price + match.original.price <= budget){
-                 newCombinations.push({price: c.price + match.original.price, recommended: c.recommended + match.original.recommend_score, bundle: [...c.bundle, match.original]});
+        // if the item query has already been used, replace if the score is better
+        const alreadyUsed = previousBundle.usedQueries.has(items[i].query);
+        if (alreadyUsed) {
+          const newItems = [...previousBundle.items];
+          const sameQuery = newItems.find(
+            (item) => item.query == items[i].query,
+          );
+          if (sameQuery.recommend_score < items[i].recommend_score) {
+            priorityInclude = {
+              priority:
+                previousBundle.priority +
+                items[i].recommend_score -
+                sameQuery.recommend_score,
+              items: [
+                ...newItems.filter((item) => item.query != items[i].query),
+                items[i],
+              ],
+              usedQueries: new Set(previousBundle.usedQueries),
+            };
+          } else {
+            priorityInclude = {
+              priority: previousBundle.priority,
+              items: [...previousBundle.items],
+              usedQueries: new Set(previousBundle.usedQueries),
+            };
+          }
+        } else {
+          priorityInclude = {
+            priority: items[i].recommend_score + previousBundle.priority,
+            items: [...previousBundle.items, items[i]],
+          };
+          priorityInclude.usedQueries = new Set(previousBundle.usedQueries);
+          priorityInclude.usedQueries.add(items[i].query);
+        }
+      }
+      // priority if you exclude the item i
+      const priorityExclude =
+        i - 1 >= 0
+          ? {
+              priority: table[i - 1][j].priority,
+              items: [...table[i - 1][j].items],
+              usedQueries: new Set(table[i - 1][j].usedQueries),
             }
-        }
+          : {
+              priority: 0,
+              items: [],
+              usedQueries: new Set(),
+            };
+      if (priorityInclude.priority > priorityExclude.priority) {
+        table[i][j] = priorityInclude;
+      } else {
+        table[i][j] = priorityExclude;
+      }
     }
-    return newCombinations;
-}
-
-function TransformDataToObjects(results){
-    const items = [];
-    for (const [query, matches] of Object.entries(results)){
-        for (const match of matches){
-            const newItem = {
-                ...match.original,
-                priority: 1,
-                query: query
-            }
-            items.push(newItem);
-        }
-    }
-    return items;
-}
-
-/**
- *  Return all bundles, even if partial
- *  All bundles are under budget
- * @param {Object[]} items
- * @param {Object} currentBundle
- * @param {Number} index
- * @param {Set} usedQueries
- * @param {Number} budget
- * @param {Object[]} allBundles
- * @returns
- */
-function GetAnyBundlesRecursion(items, currentBundle, index, usedQueries, budget, allBundles){
-    // Move up index until we find a query that hasn't been used yet
-    while (index < items.length && usedQueries.has(items[index].query)){
-        index++;
-    }
-    // Base Case: if over budget
-    if (currentBundle.total > budget){
-        return;
-    }
-    // Base Case: if no more items are left
-    if (index == items.length){
-        allBundles.push(currentBundle)
-        return;
-    }
-    // Recursive Case: explore two cases, one with object and one without
-    // Case 1
-    const newCurrentBundle = {...currentBundle};
-    newCurrentBundle.items = [...currentBundle.items, items[index]];
-    newCurrentBundle.total += items[index].price;
-    newCurrentBundle.priority += items[index].priority;
-    const newQueries = new Set(usedQueries);
-    newQueries.add(items[index].query);
-    GetAnyBundlesRecursion(items, newCurrentBundle, index + 1, newQueries, budget, allBundles);
-    // Case 2
-    GetAnyBundlesRecursion(items, currentBundle, index + 1, usedQueries, budget, allBundles);
-}
-
-function GetOneBundleMemoized(items, currentBundle, index, usedQueries, budget, memoizationMap){
-    // Move up index until we find a query that hasn't been used yet
-    while (index < items.length && usedQueries.has(items[index].query)){
-        index++;
-    }
-    // Base Case: if no more items are left
-    if (index == items.length){
-        return currentBundle;
-    }
-    // Recursive Case: explore two cases, one with object and one without
-    // memoization check:
-    // If we have previously checked this state, return result
-    // state: index, total
-    const key = index.toString() + " " + currentBundle.total.toString();
-    if (memoizationMap.has(key)){
-        return memoizationMap.get(key);
-    }
-    // Case 1: add item to bundle ONLY IF it doesn't exceed budget
-    let option1 = null;
-    if (currentBundle.total + items[index].price <= budget){
-        const newCurrentBundle = {...currentBundle};
-        newCurrentBundle.items = [...currentBundle.items, items[index]];
-        newCurrentBundle.total += items[index].price;
-        newCurrentBundle.priority += items[index].priority;
-        const newQueries = new Set(usedQueries);
-        newQueries.add(items[index].query);
-        option1 = GetOneBundleMemoized(items, newCurrentBundle, index + 1, newQueries, budget, memoizationMap);
-    }
-    // Case 2
-    const option2 = GetOneBundleMemoized(items, currentBundle, index + 1, usedQueries, budget, memoizationMap);
-    const result = option1 != null && option1.priority > option2.priority ? option1 : option2;
-    memoizationMap.set(key, result);
-    return result;
+  }
+  return table[amountItems - 1][budget];
 }
 
 /**
@@ -257,10 +256,12 @@ function GetOneBundleMemoized(items, currentBundle, index, usedQueries, budget, 
  * @param {Object[]} listItems
  * @returns {Object[]}
  */
-function FindSimilarItems(item, listItems){
-    var options = {
-        extract: function(item) { return item.name; }
-    }
-    var results = fuzzy.filter(item, listItems, options);
-    return results;
+function FindSimilarItems(item, listItems) {
+  var options = {
+    extract: function (item) {
+      return item.name;
+    },
+  };
+  var results = fuzzy.filter(item, listItems, options);
+  return results;
 }
