@@ -59,7 +59,18 @@ const tempItems = [
   },
 ];
 
-export async function CalculateBundles(posts, itemQueries, budget, user_id) {
+const priorityWeights = {
+  High: 10,
+  Medium: 1,
+  Low: 0.1,
+};
+export async function CalculateBundles(
+  posts,
+  itemQueries,
+  budget,
+  user_id,
+  priorities,
+) {
   let results = {};
   // find all items that match each query
   for (let i = 0; i < itemQueries.length; i++) {
@@ -85,9 +96,23 @@ export async function CalculateBundles(posts, itemQueries, budget, user_id) {
           ? (post.recommend_score = recommendation[1])
           : (post.recommend_score = 0));
     });
+    if (!post.recommend_score) {
+      post.recommend_score = 5;
+    }
   });
-
   const items = TransformDataToObjects(results);
+  // map query to priority
+  const queryToPriority = {};
+  for (let i = 0; i < itemQueries.length; i++) {
+    queryToPriority[itemQueries[i]] = priorities[i];
+  }
+  // weigh recommendations by priorities
+  for (let i = 0; i < items.length; i++) {
+    if (queryToPriority[items[i].query]) {
+      items[i].recommend_score *=
+        priorityWeights[queryToPriority[items[i].query]];
+    }
+  }
   const oneBundle = GetOneBundle2D(items, budget);
 
   return { cheapestBundle: cheapestBundle, bestValueBundle: oneBundle.items };
@@ -139,78 +164,85 @@ function GetOneBundle2D(items, budget) {
   // recommend: the best bundle with i items and j price
   // items: the items in the best bundle
   const amountItems = items.length;
-  const table = new Array(amountItems + 1);
-  for (let i = 0; i < amountItems + 1; i++) {
+  const table = new Array(amountItems);
+  for (let i = 0; i < amountItems; i++) {
     table[i] = [];
     for (let j = 0; j < budget + 1; j++) {
       table[i][j] = { priority: 0, items: [], usedQueries: new Set() };
     }
   }
   // Fill table
-  for (let i = 1; i < amountItems + 1; i++) {
-    for (let j = 1; j < budget + 1; j++) {
+  for (let i = 0; i < amountItems; i++) {
+    for (let j = 0; j < budget + 1; j++) {
       // priority if you include the item i
-      let priorityInclude = 0;
-      let alreadyUsed = false;
-      let willReplace = false;
-      let newUsedQueries = new Set();
-      if (items[i - 1].price <= j) {
-        newUsedQueries = new Set(
-          table[i - 1][j - items[i - 1].price].usedQueries,
-        );
+      let priorityInclude = { priority: 0, items: [], usedQueries: new Set() };
+      if (items[i].price <= j) {
+        let previousBundle;
+        if (i > 0) {
+          previousBundle = table[i - 1][j - items[i].price];
+        } else {
+          previousBundle = {
+            priority: 0,
+            items: [],
+            usedQueries: new Set(),
+          };
+        }
         // if the item query has already been used, replace if the score is better
-        alreadyUsed = table[i - 1][j - items[i - 1].price].usedQueries.has(
-          items[i - 1].query,
-        );
+        const alreadyUsed = previousBundle.usedQueries.has(items[i].query);
         if (alreadyUsed) {
-          const newItems = [...table[i - 1][j - items[i - 1].price].items];
+          const newItems = [...previousBundle.items];
           const sameQuery = newItems.find(
-            (item) => item.query == items[i - 1].query,
+            (item) => item.query == items[i].query,
           );
-          if (sameQuery.recommend_score < items[i - 1].recommend_score) {
-            priorityInclude =
-              table[i - 1][j - items[i - 1].price].priority +
-              items[i - 1].recommend_score -
-              sameQuery.recommend_score;
-            willReplace = true;
+          if (sameQuery.recommend_score < items[i].recommend_score) {
+            priorityInclude = {
+              priority:
+                previousBundle.priority +
+                items[i].recommend_score -
+                sameQuery.recommend_score,
+              items: [
+                ...newItems.filter((item) => item.query != items[i].query),
+                items[i],
+              ],
+              usedQueries: new Set(previousBundle.usedQueries),
+            };
+          } else {
+            priorityInclude = {
+              priority: previousBundle.priority,
+              items: [...previousBundle.items],
+              usedQueries: new Set(previousBundle.usedQueries),
+            };
           }
         } else {
-          priorityInclude =
-            items[i - 1].recommend_score +
-            table[i - 1][j - items[i - 1].price].priority;
-          newUsedQueries.add(items[i - 1].query);
+          priorityInclude = {
+            priority: items[i].recommend_score + previousBundle.priority,
+            items: [...previousBundle.items, items[i]],
+          };
+          priorityInclude.usedQueries = new Set(previousBundle.usedQueries);
+          priorityInclude.usedQueries.add(items[i].query);
         }
       }
       // priority if you exclude the item i
-      const priorityExclude = table[i - 1][j].priority;
-      // choose the maximum priority
-      if (priorityInclude > priorityExclude) {
-        let newItems = [...table[i - 1][j - items[i - 1].price].items];
-        if (alreadyUsed && willReplace) {
-          newItems = newItems.filter(
-            (item) => item.query != items[i - 1].query,
-          );
-          newItems.push(items[i - 1]);
-        } else if (alreadyUsed) {
-          // do nothing
-        } else {
-          newItems.push(items[i - 1]);
-        }
-        table[i][j] = {
-          priority: priorityInclude,
-          items: newItems,
-          usedQueries: newUsedQueries,
-        };
+      const priorityExclude =
+        i - 1 >= 0
+          ? {
+              priority: table[i - 1][j].priority,
+              items: [...table[i - 1][j].items],
+              usedQueries: new Set(table[i - 1][j].usedQueries),
+            }
+          : {
+              priority: 0,
+              items: [],
+              usedQueries: new Set(),
+            };
+      if (priorityInclude.priority > priorityExclude.priority) {
+        table[i][j] = priorityInclude;
       } else {
-        table[i][j] = {
-          priority: priorityExclude,
-          items: [...table[i - 1][j].items],
-          usedQueries: new Set(table[i - 1][j].usedQueries),
-        };
+        table[i][j] = priorityExclude;
       }
     }
   }
-  return table[amountItems][budget];
+  return table[amountItems - 1][budget];
 }
 
 /**
