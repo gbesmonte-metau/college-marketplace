@@ -1,4 +1,3 @@
-import React from 'react'
 import { useState } from 'react'
 import Bundle from './Bundle';
 import '../components-css/BudgetBundlesPage.css'
@@ -8,13 +7,6 @@ export default function BudgetBundlesPage() {
     const [priorities, setPriorities] = useState([null, null]);
     const [budget, setBudget] = useState(null);
     const [bundles, setBundles] = useState(null);
-    const [bundlesValid, setBundlesValid] = useState(false);
-
-    const priorityOptions = {
-        High: 1,
-        Medium: 2,
-        Low: 3
-    }
 
     function ChangeItem(e, index) {
         const value = e.target.value;
@@ -67,7 +59,7 @@ export default function BudgetBundlesPage() {
                 return;
             }
         }
-        if (budget == null) {
+        if (budget == null || isNaN(budget)) {
             alert("Invalid budget request.");
             return;
         }
@@ -87,7 +79,6 @@ export default function BudgetBundlesPage() {
         });
         const result = await response.json();
         if (response.ok) {
-            setBundlesValid(result.isValid);
             setBundles(result);
         }
         else{
