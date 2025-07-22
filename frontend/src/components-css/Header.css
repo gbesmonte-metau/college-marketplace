@@ -17,3 +17,13 @@
   align-items: center;
   gap: 10px;
 }
+.nav-bar a {
+  text-decoration: none;
+  color: var(--text);
+}
+.nav-bar a:hover {
+  text-decoration: underline;
+}
+.active {
+  font-weight: 700;
+}

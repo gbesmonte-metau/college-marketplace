@@ -365,6 +365,14 @@ router.get('/user/recommendations', isAuthenticated, async (req, res, next) => {
         const post = await prisma.post.findUnique({
             where: {
                 id: p[0]
+            },
+            include: {
+                _count: {
+                    select: {
+                        usersLiked: true,
+                        usersSaved: true,
+                    }
+                }
             }
         })
         recommendedPosts.push(post);
@@ -385,6 +393,14 @@ router.post('/user/bundles', isAuthenticated, async (req, res, next) => {
                 time_sold: null,
                 NOT: {
                     authorId: userId
+                }
+            },
+            include: {
+                _count: {
+                    select: {
+                        usersLiked: true,
+                        usersSaved: true,
+                    }
                 }
             }
         });

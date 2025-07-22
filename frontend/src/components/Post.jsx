@@ -127,8 +127,14 @@ export default function Post({post}) {
                 <p>{post.name}</p>
                 <p className='price-tag'>${post.price.toFixed(2)}</p>
                 <div className='post-buttons'>
-                    <button onClick={HandleLike}>{isLiked ? <FaHeart/> : <FaRegHeart/> }</button>
-                    <button onClick={HandleSave}>{isSaved ? <FaBookmark/> : <FaRegBookmark/> }</button>
+                    <div className='post-like'>
+                        <button onClick={HandleLike}>{isLiked ? <FaHeart/> : <FaRegHeart/> }</button>
+                        <p>{post._count && post._count.usersLiked}</p>
+                    </div>
+                    <div className='post-save'>
+                        <button onClick={HandleSave}>{isSaved ? <FaBookmark/> : <FaRegBookmark/> }</button>
+                        <p>{post._count && post._count.usersSaved}</p>
+                    </div>
                 </div>
             </div>
         </div>

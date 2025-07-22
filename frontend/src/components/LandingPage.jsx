@@ -3,9 +3,11 @@ import '../components-css/LandingPage.css'
 import { Link } from 'react-router'
 import { useState, useEffect} from 'react'
 import Post from './Post'
+import Loading from './Loading'
 
 export default function LandingPage() {
     const [trendingPosts, setTrendingPosts] = useState([])
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
         GetTrending();
@@ -13,6 +15,7 @@ export default function LandingPage() {
 
     async function GetTrending(){
         try{
+            setIsLoading(true);
             const response = await fetch(import.meta.env.VITE_URL + `/trending`);
             const result = await response.json();
             if (response.ok) {
@@ -25,10 +28,14 @@ export default function LandingPage() {
         catch(error){
             alert(error);
         }
+        finally{
+            setIsLoading(false);
+        }
     }
 
     return (
         <div className='page'>
+            <Loading isLoading={isLoading}></Loading>
             <div className='landing-header'>
                 <div className='landing-header-body'>
                     <h2>All your dorm essentials, from students like you.</h2>

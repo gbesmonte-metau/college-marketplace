@@ -51,7 +51,13 @@ router.get('/posts/:id', async (req, res, next) => {
                 id: parseInt(postId)
             },
             include: {
-                purchase: true
+                purchase: true,
+                _count: {
+                    select: {
+                        usersLiked: true,
+                        usersSaved: true,
+                    }
+                }
             }
         })
         if (post) {
@@ -112,7 +118,13 @@ router.get('/posts', async (req, res, next) => {
         let posts = await prisma.post.findMany({
             where: whereClause,
             include: {
-                purchase: true
+                purchase: true,
+                _count: {
+                    select: {
+                        usersLiked: true,
+                        usersSaved: true,
+                    }
+                }
             }
         })
         //distance
@@ -218,7 +230,15 @@ router.get('/authored', isAuthenticated, async (req, res, next) => {
     try {
         const posts = await prisma.post.findMany({
             where: {
-                authorId: parseInt(userId)
+                authorId: parseInt(userId),
+            },
+            include: {
+                _count: {
+                    select: {
+                        usersLiked: true,
+                        usersSaved: true,
+                    }
+                }
             }
         })
         if (posts.length > 0) {
@@ -312,7 +332,13 @@ router.get('/bought', isAuthenticated, async (req, res, next) => {
                 buyerId: parseInt(userId)
             },
             include: {
-                post: true
+                post: true,
+                _count: {
+                    select: {
+                        usersLiked: true,
+                        usersSaved: true,
+                    }
+                }
             }
         })
         if (posts.length > 0) {
@@ -336,7 +362,13 @@ router.get('/sold', isAuthenticated, async (req, res, next) => {
                 sellerId: parseInt(userId)
             },
             include: {
-                post: true
+                post: true,
+                _count: {
+                    select: {
+                        usersLiked: true,
+                        usersSaved: true,
+                    }
+                }
             }
         })
         if (posts.length > 0) {
@@ -433,6 +465,14 @@ router.get('/trending', async (req, res, next) => {
             const post = await prisma.post.findUnique({
                 where: {
                     id: postId
+                },
+                include: {
+                    _count: {
+                        select: {
+                            usersLiked: true,
+                            usersSaved: true,
+                        }
+                    }
                 }
             })
             if (post){

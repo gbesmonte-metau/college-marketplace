@@ -1,12 +1,12 @@
 import React from 'react'
-import { Link , useNavigate} from 'react-router'
+import { Link , useNavigate, useLocation} from 'react-router'
 import { useContext } from 'react'
 import { UserContext } from '../App';
 import '../components-css/Header.css'
 
 export default function Header() {
   const { user, setUser } = useContext(UserContext);
-
+  const location = useLocation();
   const navigate = useNavigate();
   async function HandleLogout(e) {
         e.preventDefault();
@@ -34,17 +34,21 @@ export default function Header() {
       navigate('/');
   }
 
+  const isLocation = (path) => {
+    return location.pathname == path;
+  }
+
   return (
     <div className="app-header">
        <h1 onClick={HandleTitleClick}>College Marketplace</h1>
        <nav className='nav-bar'>
-        <Link to='/home'>Home</Link>
-        {!user && <Link to='/login'>Login</Link>}
-        {!user && <Link to='/register'>Register</Link>}
-        {user && <Link to='/foryou'>For You</Link>}
-        {user && <Link to='/bundles'>Bundles</Link>}
-        {user && <Link to='/myposts'>My Posts</Link>}
-        {user && <Link to='/profile'>Profile</Link>}
+        <Link to='/home' className={isLocation('/home') ? 'active' : ''}>Home</Link>
+        {!user && <Link to='/login' className={isLocation('/login') ? 'active' : ''}>Login</Link>}
+        {!user && <Link to='/register' className={isLocation('/register') ? 'active' : ''}>Register</Link>}
+        {user && <Link to='/foryou' className={isLocation('/foryou') ? 'active' : ''}>For You</Link>}
+        {user && <Link to='/bundles' className={isLocation('/bundles') ? 'active' : ''}>Bundles</Link>}
+        {user && <Link to='/myposts' className={isLocation('/myposts') ? 'active' : ''}>My Posts</Link>}
+        {user && <Link to='/profile' className={isLocation('/profile') ? 'active' : ''}>Profile</Link>}
         {user && <button onClick={HandleLogout}>Logout</button>}
         {user && <img className="profile-pic" src={user.icon || "../../public/placeholder.png"} alt="profile pic" />}
        </nav>
