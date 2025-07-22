@@ -57,7 +57,7 @@ export default function RegisterPage() {
                     <form className='register-form' onSubmit={HandleRegister}>
                         <div>
                             <p>Email:</p>
-                            <input type="text" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required/>
+                            <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required/>
                         </div>
                         <div>
                             <p>Username:</p>
@@ -65,11 +65,11 @@ export default function RegisterPage() {
                         </div>
                         <div>
                             <p>Password:</p>
-                            <input type="password" placeholder="Password" value={password} onChange={(e)=>setPassword(e.target.value)} required/>
+                            <input type="password" minLength={8} placeholder="Password" value={password} onChange={(e)=>setPassword(e.target.value)} required/>
                         </div>
                         <div>
                             <p>Confirm Password:</p>
-                            <input type="password" placeholder="Confirm Password" value={confirmPassword} onChange={(e)=>setConfirmPassword(e.target.value)}required/>
+                            <input type="password" minLength={8} placeholder="Confirm Password" value={confirmPassword} onChange={(e)=>setConfirmPassword(e.target.value)}required/>
                         </div>
                         <button type="submit">Register</button>
                     </form>

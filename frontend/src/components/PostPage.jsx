@@ -5,18 +5,21 @@ import "../components-css/PostPage.css"
 import Filter from './Filter'
 import CreatePost from './CreatePost'
 import { GetCategoryIdByName } from '../../utils'
+import Loading from './Loading'
 
 export default function PostPage() {
     const [posts, setPosts] = useState([]);
     const [filter, setFilter] = useState({});
     const [search, setSearch] = useState("");
     const [isCreatePostOpen, setIsCreatePostOpen] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         getPosts();
     }, [filter, isCreatePostOpen]);
 
     async function getPosts() {
+        setIsLoading(true);
         const url = new URL(import.meta.env.VITE_URL + '/posts');
         const params = new URLSearchParams();
 
@@ -54,6 +57,7 @@ export default function PostPage() {
             credentials: 'include',
         });
         const result = await response.json();
+        setIsLoading(false);
         if (!response.ok) {
             setPosts([]);
         }
@@ -74,6 +78,7 @@ export default function PostPage() {
 
     return (
         <div className='page'>
+            <Loading isLoading={isLoading} />
             <div className='search-bar'>
                 <form onSubmit={HandleSearch}>
                     <input name="search" type="text" placeholder='Search for a post' value={search} onChange={(e) => setSearch(e.target.value)}/>

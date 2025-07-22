@@ -50,7 +50,7 @@ export default function LoginPage() {
                     <form className='login-form' onSubmit={HandleLogin}>
                         <div>
                             <p>Email:</p>
-                            <input type="text" placeholder="Email" value={email} onChange={(e)=> setEmail(e.target.value)} required/>
+                            <input type="email" placeholder="Email" value={email} onChange={(e)=> setEmail(e.target.value)} required/>
                         </div>
                         <div>
                             <p>Password:</p>
