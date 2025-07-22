@@ -165,7 +165,16 @@ router.get('/user/likes', isAuthenticated, async (req, res, next) => {
                 userId: userId
             },
             include: {
-                post: true
+                post: {
+                    include: {
+                        _count: {
+                            select: {
+                                usersLiked: true,
+                                usersSaved: true
+                            }
+                        }
+                    }
+                }
             }
         })
         if (likedPostsData){
@@ -270,7 +279,16 @@ router.get('/user/saves', isAuthenticated, async (req, res, next) => {
                 userId: userId
             },
             include: {
-                post: true
+                post: {
+                    include: {
+                        _count: {
+                            select: {
+                                usersLiked: true,
+                                usersSaved: true
+                            }
+                        }
+                    }
+                }
             }
         })
         if (savedPostsData){

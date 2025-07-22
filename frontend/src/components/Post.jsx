@@ -13,6 +13,7 @@ import "../components-css/Post.css"
 export default function Post({post}) {
     const [isLiked, setIsLiked] = useState(false);
     const [isSaved, setIsSaved] = useState(false);
+    const [localPost, setLocalPost] = useState(post);
     const { user, setUser } = useContext(UserContext);
 
     useEffect(() => {
@@ -88,6 +89,12 @@ export default function Post({post}) {
                 method: 'POST'
             });
             if (response.ok){
+                if (isLiked){
+                    setLocalPost({...localPost, _count: {...localPost._count, usersLiked: localPost._count.usersLiked - 1}});
+                }
+                else {
+                    setLocalPost({...localPost, _count: {...localPost._count, usersLiked: localPost._count.usersLiked + 1}});
+                }
                 setIsLiked(!isLiked);
             }
             else {
@@ -109,6 +116,12 @@ export default function Post({post}) {
                 method: 'POST'
             });
             if (response.ok){
+                if (isSaved){
+                    setLocalPost({...localPost, _count: {...localPost._count, usersSaved: localPost._count.usersSaved - 1}});
+                }
+                else {
+                    setLocalPost({...localPost, _count: {...localPost._count, usersSaved: localPost._count.usersSaved + 1}});
+                }
                 setIsSaved(!isSaved);
             }
             else {
@@ -129,11 +142,11 @@ export default function Post({post}) {
                 <div className='post-buttons'>
                     <div className='post-like'>
                         <button onClick={HandleLike}>{isLiked ? <FaHeart/> : <FaRegHeart/> }</button>
-                        <p>{post._count && post._count.usersLiked}</p>
+                        <p>{localPost._count && localPost._count.usersLiked}</p>
                     </div>
                     <div className='post-save'>
                         <button onClick={HandleSave}>{isSaved ? <FaBookmark/> : <FaRegBookmark/> }</button>
-                        <p>{post._count && post._count.usersSaved}</p>
+                        <p>{localPost._count && localPost._count.usersSaved}</p>
                     </div>
                 </div>
             </div>

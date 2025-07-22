@@ -332,11 +332,14 @@ router.get('/bought', isAuthenticated, async (req, res, next) => {
                 buyerId: parseInt(userId)
             },
             include: {
-                post: true,
-                _count: {
-                    select: {
-                        usersLiked: true,
-                        usersSaved: true,
+                post: {
+                    include: {
+                        _count: {
+                            select: {
+                                usersLiked: true,
+                                usersSaved: true
+                            }
+                        }
                     }
                 }
             }
@@ -363,12 +366,6 @@ router.get('/sold', isAuthenticated, async (req, res, next) => {
             },
             include: {
                 post: true,
-                _count: {
-                    select: {
-                        usersLiked: true,
-                        usersSaved: true,
-                    }
-                }
             }
         })
         if (posts.length > 0) {
