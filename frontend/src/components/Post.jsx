@@ -1,14 +1,13 @@
-import React from 'react'
-import { useNavigate} from 'react-router'
-import { useState, useEffect } from 'react';
-import { useContext } from 'react'
-import { UserContext } from '../App';
+import { useNavigate } from "react-router";
+import { useState, useEffect } from "react";
+import { useContext } from "react";
+import { UserContext } from "../App";
 
 import { FaHeart } from "react-icons/fa";
 import { FaRegHeart } from "react-icons/fa";
 import { FaRegBookmark } from "react-icons/fa";
 import { FaBookmark } from "react-icons/fa";
-import "../components-css/Post.css"
+import "../components-css/Post.css";
 
 export default function Post({post}) {
     const [isLiked, setIsLiked] = useState(false);
@@ -16,68 +15,71 @@ export default function Post({post}) {
     const [localPost, setLocalPost] = useState(post);
     const { user, setUser } = useContext(UserContext);
 
-    useEffect(() => {
-        Initialize();
-    }, [user]);
+  useEffect(() => {
+    initialize();
+  }, [user]);
 
-    async function Initialize(){
-        if (user){
-            await GetIsLiked();
-            await GetIsSaved();
-        }
-        else {
-            setIsLiked(false);
-            setIsSaved(false);
-        }
+  async function initialize() {
+    if (user) {
+      await getIsLiked();
+      await getIsSaved();
+    } else {
+      setIsLiked(false);
+      setIsSaved(false);
     }
+  }
 
-    const navigate = useNavigate();
-    async function OpenPost(){
-        if (!user){
-            navigate("/login");
+  const navigate = useNavigate();
+  async function openPost() {
+    if (!user) {
+      navigate("/login");
+    } else {
+      try {
+        const response = await fetch(
+          import.meta.env.VITE_URL + `/user/view/${post.id}`,
+          {
+            method: "POST",
+            credentials: "include",
+          },
+        );
+        const result = await response.json();
+        if (response.ok) {
+          navigate(`/posts/${post.id}`);
         }
-        else {
-            try {
-                const response = await fetch(import.meta.env.VITE_URL + `/user/view/${post.id}`, {
-                    method: 'POST',
-                    credentials: 'include',
-                });
-                const result = await response.json();
-                if (response.ok){
-                    navigate(`/posts/${post.id}`);
-                }
-            }
-            catch (e){
-                alert(e);
-            }
-        }
+      } catch (e) {
+        alert(e);
+      }
     }
+  }
 
-    async function GetIsLiked(){
-        try{
-            const response = await fetch(import.meta.env.VITE_URL + `/user/like/${post.id}`, {
-                credentials: 'include',
-            });
-            const result = await response.json();
-            setIsLiked(result.liked);
-        }
-        catch (e){
-            alert(e);
-        }
+  async function getIsLiked() {
+    try {
+      const response = await fetch(
+        import.meta.env.VITE_URL + `/user/like/${post.id}`,
+        {
+          credentials: "include",
+        },
+      );
+      const result = await response.json();
+      setIsLiked(result.liked);
+    } catch (e) {
+      alert(e);
     }
-    async function GetIsSaved(){
-        try{
-            const response = await fetch(import.meta.env.VITE_URL + `/user/save/${post.id}`, {
-                credentials: 'include',
-            });
-            const result = await response.json();
-            setIsSaved(result.saved);
-        }
-        catch (e){
-            alert(e);
-        }
-
+  }
+  async function getIsSaved() {
+    try {
+      const response = await fetch(
+        import.meta.env.VITE_URL + `/user/save/${post.id}`,
+        {
+          credentials: "include",
+        },
+      );
+      const result = await response.json();
+      setIsSaved(result.saved);
+    } catch (e) {
+      alert(e);
     }
+  }
 
     async function HandleLike(e){
         e.preventDefault();
@@ -105,6 +107,7 @@ export default function Post({post}) {
             alert(e);
         }
     }
+  }
 
     async function HandleSave(e){
         e.preventDefault();
@@ -132,6 +135,7 @@ export default function Post({post}) {
             alert(e);
         }
     }
+  }
 
     return (
         <div className="post" onClick={OpenPost}>
@@ -151,5 +155,7 @@ export default function Post({post}) {
                 </div>
             </div>
         </div>
-    )
+      </div>
+    </div>
+  );
 }

@@ -1,53 +1,52 @@
-import React from 'react'
-import { useNavigate, Link } from 'react-router';
-import '../components-css/RegisterPage.css'
+import { useNavigate, Link } from "react-router";
+import "../components-css/RegisterPage.css";
 
 import { MdErrorOutline } from "react-icons/md";
 
-
 export default function RegisterPage() {
-    const navigate = useNavigate();
-    const [email, setEmail] = React.useState('');
-    const [username, setUsername] = React.useState('');
-    const [password, setPassword] = React.useState('');
-    const [confirmPassword, setConfirmPassword] = React.useState('');
-    const [error, setError] = React.useState('');
+  const navigate = useNavigate();
+  const [email, setEmail] = React.useState("");
+  const [username, setUsername] = React.useState("");
+  const [password, setPassword] = React.useState("");
+  const [confirmPassword, setConfirmPassword] = React.useState("");
+  const [error, setError] = React.useState("");
 
-    async function HandleRegister(e){
-        e.preventDefault();
-        if (password !== confirmPassword) {
-            setError('Passwords do not match');
-            return;
-        }
-        const settings = {
-            method: 'POST',
-            credentials: 'include',
-            headers: {
-                Accept: 'application/json',
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                email: email,
-                username: username,
-                password: password,
-            })
-        };
-        try {
-            const response = await fetch(import.meta.env.VITE_URL + '/users/register', settings);
-            const result = await response.json();
-            if (response.ok){
-                alert("You have successfully registered!")
-                setError(null);
-                navigate("/login", result);
-            }
-            else {
-                setError(result.message);
-            }
-        }
-        catch (error) {
-            alert(error.message);
-        }
+  async function handleRegister(e) {
+    e.preventDefault();
+    if (password !== confirmPassword) {
+      setError("Passwords do not match");
+      return;
     }
+    const settings = {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email: email,
+        username: username,
+        password: password,
+      }),
+    };
+    try {
+      const response = await fetch(
+        import.meta.env.VITE_URL + "/users/register",
+        settings,
+      );
+      const result = await response.json();
+      if (response.ok) {
+        alert("You have successfully registered!");
+        setError(null);
+        navigate("/login", result);
+      } else {
+        setError(result.message);
+      }
+    } catch (error) {
+      alert(error.message);
+    }
+  }
 
     return (
         <div className="page">
@@ -81,6 +80,18 @@ export default function RegisterPage() {
                     </div>
                 </div>
             </div>
+            <button type="submit">Register</button>
+          </form>
+          <div className={`error-box ${error ? "visible" : "hidden"}`}>
+            <MdErrorOutline /> <p> Error: {error || "No error"}</p>
+          </div>
+          <div>
+            <p>
+              Already a user? <Link to="/login">Login Here</Link>
+            </p>
+          </div>
         </div>
-  )
+      </div>
+    </div>
+  );
 }

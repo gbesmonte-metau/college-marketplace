@@ -1,30 +1,30 @@
 .register-box {
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-image: linear-gradient(var(--primary), var(--accent));
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-image: linear-gradient(var(--primary), var(--accent));
 }
-.register-body{
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    background-color: white;
-    width: 300px;
-    height: 550px;
-    border-radius: 10px;
+.register-body {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: white;
+  width: 300px;
+  height: 550px;
+  border-radius: 10px;
 }
-.register-form{
-    display:flex;
-    flex-direction: column;
+.register-form {
+  display: flex;
+  flex-direction: column;
 }
 .register-form input {
-    padding: 5px;
-    font-family: 'Montserrat', sans-serif;
+  padding: 5px;
+  font-family: "Montserrat", sans-serif;
 }
 .register-form button {
-    margin-top: 20px;
+  margin-top: 20px;
 }
 .error-box {
     height: 30px;
@@ -37,14 +37,14 @@
 }
 
 .error-box p {
-    text-align: center;
+  text-align: center;
 }
 
 .visible {
-    visibility: visible;
-    opacity: 1;
+  visibility: visible;
+  opacity: 1;
 }
 .hidden {
-    visibility: hidden;
-    opacity: 0;
+  visibility: hidden;
+  opacity: 0;
 }

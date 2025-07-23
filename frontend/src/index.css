@@ -21,14 +21,14 @@
 body {
   margin: 0;
   height: 100vh;
-  font-family: 'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
   width: 100%;
 }
-.pac-container:after{
-  content:none !important;
+.pac-container:after {
+  content: none !important;
 }
 button {
-  font-family: 'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
   background-color: var(--primary);
   color: var(--text);
   border: none;

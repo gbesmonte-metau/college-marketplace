@@ -1,37 +1,38 @@
 .bundle-page {
-    margin-left: 2rem;
-    margin-right: 2rem;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+  margin-left: 2rem;
+  margin-right: 2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 .bundle-inputs {
-    display: flex;
+  display: flex;
 }
-.bundle-page input, .bundle-page select {
-    width: 150px;
-    font-family: 'Montserrat', sans-serif;
-    padding: 5px;
-    border-radius: 5px;
-    border: 1px solid lightgray
+.bundle-page input,
+.bundle-page select {
+  width: 150px;
+  font-family: "Montserrat", sans-serif;
+  padding: 5px;
+  border-radius: 5px;
+  border: 1px solid lightgray;
 }
 .bundles {
-    margin-left: 20px;
-    width: 100%;
-    max-width: 100%;
-    overflow: scroll;
+  margin-left: 20px;
+  width: 100%;
+  max-width: 100%;
+  overflow: scroll;
 }
 .add-items-container {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 5px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
 }
 .bundles {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }

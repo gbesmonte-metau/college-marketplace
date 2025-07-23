@@ -1,5 +1,5 @@
 import fuzzy from "fuzzy";
-import { GetRecommendations } from "./recommended.js";
+import { getRecommendations as getRecommendations } from "./recommended.js";
 
 //Test Data
 const tempItems = [
@@ -64,7 +64,7 @@ const priorityWeights = {
   Medium: 1,
   Low: 0.1,
 };
-export async function CalculateBundles(
+export async function calculateBundles(
   posts,
   itemQueries,
   budget,
@@ -74,7 +74,7 @@ export async function CalculateBundles(
   let results = {};
   // find all items that match each query
   for (let i = 0; i < itemQueries.length; i++) {
-    const similarItems = FindSimilarItems(itemQueries[i], posts);
+    const similarItems = findSimilarItems(itemQueries[i], posts);
     // if no items found for a query, remove the query
     if (similarItems.length == 0) {
       itemQueries.splice(i, 1);
@@ -84,10 +84,10 @@ export async function CalculateBundles(
   }
 
   // get cheapest bundle
-  let cheapestBundle = GetCheapestBundle(results, budget);
+  let cheapestBundle = getCheapestBundle(results, budget);
 
   // match items to recommendations
-  const recommendations = await GetRecommendations(user_id, posts.length);
+  const recommendations = await getRecommendations(user_id, posts.length);
   posts.forEach((post) => {
     recommendations.forEach((recommendation) => {
       // if post id matches recommendation id and score is not null, set recommend score
@@ -100,7 +100,7 @@ export async function CalculateBundles(
       post.recommend_score = 5;
     }
   });
-  const items = TransformDataToObjects(results);
+  const items = transformDataToObjects(results);
   // map query to priority
   const queryToPriority = {};
   for (let i = 0; i < itemQueries.length; i++) {
@@ -113,12 +113,12 @@ export async function CalculateBundles(
         priorityWeights[queryToPriority[items[i].query]];
     }
   }
-  const oneBundle = GetOneBundle2D(items, budget);
+  const oneBundle = getOneBundle2D(items, budget);
 
   return { cheapestBundle: cheapestBundle, bestValueBundle: oneBundle.items };
 }
 
-function GetCheapestBundle(results, budget) {
+function getCheapestBundle(results, budget) {
   // get cheapest bundle
   let bundle = [];
   let total = 0;
@@ -140,7 +140,7 @@ function GetCheapestBundle(results, budget) {
   return total > budget ? null : bundle;
 }
 
-function TransformDataToObjects(results) {
+function transformDataToObjects(results) {
   const items = [];
   for (const [query, matches] of Object.entries(results)) {
     for (const match of matches) {
@@ -156,7 +156,7 @@ function TransformDataToObjects(results) {
   return items;
 }
 
-function GetOneBundle2D(items, budget) {
+function getOneBundle2D(items, budget) {
   // Instantiate a 2d Array
   // rows represent how many items there are
   // columns represent the price
@@ -256,7 +256,7 @@ function GetOneBundle2D(items, budget) {
  * @param {Object[]} listItems
  * @returns {Object[]}
  */
-function FindSimilarItems(item, listItems) {
+function findSimilarItems(item, listItems) {
   var options = {
     extract: function (item) {
       return item.name;

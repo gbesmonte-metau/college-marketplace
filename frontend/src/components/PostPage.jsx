@@ -14,9 +14,9 @@ export default function PostPage() {
     const [isCreatePostOpen, setIsCreatePostOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
 
-    useEffect(() => {
-        getPosts();
-    }, [filter, isCreatePostOpen]);
+  useEffect(() => {
+    getPosts();
+  }, [filter, isCreatePostOpen]);
 
     async function getPosts() {
         setIsLoading(true);
@@ -64,16 +64,20 @@ export default function PostPage() {
         else{
             setPosts(result);
         }
+      }
     }
-
-    function HandleSearch(e){
-        e.preventDefault();
-        setFilter({...filter, search: search});
+    if (filter.color) {
+      for (const colorStr of filter.color) {
+        params.append("color", colorStr);
+      }
     }
-    function HandleClear(e){
-        e.preventDefault();
-        setSearch("");
-        setFilter({...filter, search: ""});
+    if (filter.condition) {
+      for (const conditionStr of filter.condition) {
+        params.append("condition", conditionStr);
+      }
+    }
+    if (filter.distance && filter.distance !== "All") {
+      params.append("distance", filter.distance);
     }
 
     return (
@@ -99,5 +103,10 @@ export default function PostPage() {
             </div>
             {isCreatePostOpen && <CreatePost setIsCreatePostOpen={setIsCreatePostOpen}/>}
         </div>
-    )
+      </div>
+      {isCreatePostOpen && (
+        <CreatePost setIsCreatePostOpen={setIsCreatePostOpen} />
+      )}
+    </div>
+  );
 }

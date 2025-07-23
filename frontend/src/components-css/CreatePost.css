@@ -1,49 +1,50 @@
-.create-modal{
-    position: fixed;
-    z-index: 2;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
-    transition: display .5s;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+.create-modal {
+  position: fixed;
+  z-index: 2;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
+  transition: display 0.5s;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 .create-modal h2 {
-    margin-left: 10px;
+  margin-left: 10px;
 }
 .create-body {
-    background: white;
-    height: 80%;
-    width: 80%;
-    border-radius: 20px;
-    overflow: scroll;
+  background: white;
+  height: 80%;
+  width: 80%;
+  border-radius: 20px;
+  overflow: scroll;
 }
 .create-option {
-    display: grid;
-    grid-template-columns: 1fr 2fr;
-    align-items: center;
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  align-items: center;
 }
-.create-option input, .create-option select {
-    width: 200px;
-    height: 30px;
-    margin: 0;
-    padding: 5px;
-    font-family: 'Montserrat', sans-serif;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-sizing: border-box;
-    font-size: 14px;
+.create-option input,
+.create-option select {
+  width: 200px;
+  height: 30px;
+  margin: 0;
+  padding: 5px;
+  font-family: "Montserrat", sans-serif;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+  font-size: 14px;
 }
 .create-box {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
 }
 .create-post-img {
-    width: 500px;
-    height: 500px;
-    object-fit: cover;
-    justify-self: center;
+  width: 500px;
+  height: 500px;
+  object-fit: cover;
+  justify-self: center;
 }

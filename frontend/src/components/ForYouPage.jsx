@@ -24,6 +24,7 @@ export default function ForYouPage() {
         }
         setIsLoading(false);
     }
+  }
 
     useEffect(() => {
         if (user === null) {
@@ -45,5 +46,7 @@ export default function ForYouPage() {
                 </div>
             </div>
         </div>
-    )
+      </div>
+    </div>
+  );
 }

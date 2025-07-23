@@ -1,33 +1,33 @@
 .post {
-    margin: 5px;
-    width: 250px;
-    height: 400px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    background-color: var(--light-primary);
-    border-radius: 10px;
-    overflow: hidden;
+  margin: 5px;
+  width: 250px;
+  height: 400px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background-color: var(--light-primary);
+  border-radius: 10px;
+  overflow: hidden;
 }
 .post:hover {
     transform: scale(1.05);
     box-shadow: 3px 3px 5px rgb(207, 207, 207);
 }
 .post-image {
-    width: 100%;
-    height: 300px;
-    object-fit: cover;
-    overflow: hidden;
+  width: 100%;
+  height: 300px;
+  object-fit: cover;
+  overflow: hidden;
 }
-.post-content{
-    padding: 10px;
+.post-content {
+  padding: 10px;
 }
 .price-tag {
-    font-weight: bold;
+  font-weight: bold;
 }
 .post-buttons {
-    display: flex;
-    justify-content: right;
+  display: flex;
+  justify-content: right;
 }
 .post-buttons button {
     background-color: transparent;
