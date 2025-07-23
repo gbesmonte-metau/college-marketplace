@@ -9,11 +9,11 @@ import { FaRegBookmark } from "react-icons/fa";
 import { FaBookmark } from "react-icons/fa";
 import "../components-css/Post.css";
 
-export default function Post({post}) {
-    const [isLiked, setIsLiked] = useState(false);
-    const [isSaved, setIsSaved] = useState(false);
-    const [localPost, setLocalPost] = useState(post);
-    const { user, setUser } = useContext(UserContext);
+export default function Post({ post }) {
+  const [isLiked, setIsLiked] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
+  const [localPost, setLocalPost] = useState(post);
+  const { user, setUser } = useContext(UserContext);
 
   useEffect(() => {
     initialize();
@@ -40,7 +40,7 @@ export default function Post({post}) {
           {
             method: "POST",
             credentials: "include",
-          },
+          }
         );
         const result = await response.json();
         if (response.ok) {
@@ -58,7 +58,7 @@ export default function Post({post}) {
         import.meta.env.VITE_URL + `/user/like/${post.id}`,
         {
           credentials: "include",
-        },
+        }
       );
       const result = await response.json();
       setIsLiked(result.liked);
@@ -72,7 +72,7 @@ export default function Post({post}) {
         import.meta.env.VITE_URL + `/user/save/${post.id}`,
         {
           credentials: "include",
-        },
+        }
       );
       const result = await response.json();
       setIsSaved(result.saved);
@@ -81,79 +81,104 @@ export default function Post({post}) {
     }
   }
 
-    async function HandleLike(e){
-        e.preventDefault();
-        e.stopPropagation();
-        const URL = import.meta.env.VITE_URL + (isLiked ? `/user/unlike/${post.id}` : `/user/like/${post.id}`);
-        try{
-            const response = await fetch(URL, {
-                credentials: 'include',
-                method: 'POST'
-            });
-            if (response.ok){
-                if (isLiked){
-                    setLocalPost({...localPost, _count: {...localPost._count, usersLiked: localPost._count.usersLiked - 1}});
-                }
-                else {
-                    setLocalPost({...localPost, _count: {...localPost._count, usersLiked: localPost._count.usersLiked + 1}});
-                }
-                setIsLiked(!isLiked);
-            }
-            else {
-                alert("You must be logged in to like a post");
-            }
+  async function handleLike(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    const URL =
+      import.meta.env.VITE_URL +
+      (isLiked ? `/user/unlike/${post.id}` : `/user/like/${post.id}`);
+    try {
+      const response = await fetch(URL, {
+        credentials: "include",
+        method: "POST",
+      });
+      if (response.ok) {
+        if (isLiked) {
+          setLocalPost({
+            ...localPost,
+            _count: {
+              ...localPost._count,
+              usersLiked: localPost._count.usersLiked - 1,
+            },
+          });
+        } else {
+          setLocalPost({
+            ...localPost,
+            _count: {
+              ...localPost._count,
+              usersLiked: localPost._count.usersLiked + 1,
+            },
+          });
         }
-        catch (e){
-            alert(e);
-        }
+        setIsLiked(!isLiked);
+      } else {
+        alert("You must be logged in to like a post");
+      }
+    } catch (e) {
+      alert(e);
     }
   }
 
-    async function HandleSave(e){
-        e.preventDefault();
-        e.stopPropagation();
-        const URL = import.meta.env.VITE_URL + (isSaved ? `/user/unsave/${post.id}` : `/user/save/${post.id}`);
-        try{
-            const response = await fetch(URL, {
-                credentials: 'include',
-                method: 'POST'
-            });
-            if (response.ok){
-                if (isSaved){
-                    setLocalPost({...localPost, _count: {...localPost._count, usersSaved: localPost._count.usersSaved - 1}});
-                }
-                else {
-                    setLocalPost({...localPost, _count: {...localPost._count, usersSaved: localPost._count.usersSaved + 1}});
-                }
-                setIsSaved(!isSaved);
-            }
-            else {
-                alert("You must be logged in to save a post");
-            }
+  async function handleSave(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    const URL =
+      import.meta.env.VITE_URL +
+      (isSaved ? `/user/unsave/${post.id}` : `/user/save/${post.id}`);
+    try {
+      const response = await fetch(URL, {
+        credentials: "include",
+        method: "POST",
+      });
+      if (response.ok) {
+        if (isSaved) {
+          setLocalPost({
+            ...localPost,
+            _count: {
+              ...localPost._count,
+              usersSaved: localPost._count.usersSaved - 1,
+            },
+          });
+        } else {
+          setLocalPost({
+            ...localPost,
+            _count: {
+              ...localPost._count,
+              usersSaved: localPost._count.usersSaved + 1,
+            },
+          });
         }
-        catch (e){
-            alert(e);
-        }
+        setIsSaved(!isSaved);
+      } else {
+        alert("You must be logged in to save a post");
+      }
+    } catch (e) {
+      alert(e);
     }
   }
-
-    return (
-        <div className="post" onClick={OpenPost}>
-            <img className='post-image' src={post.image_url ? post.image_url : "../../public/placeholder.png"} alt={post.name}/>
-            <div className='post-content'>
-                <p>{post.name}</p>
-                <p className='price-tag'>${post.price.toFixed(2)}</p>
-                <div className='post-buttons'>
-                    <div className='post-like'>
-                        <button onClick={HandleLike}>{isLiked ? <FaHeart/> : <FaRegHeart/> }</button>
-                        <p>{localPost._count && localPost._count.usersLiked}</p>
-                    </div>
-                    <div className='post-save'>
-                        <button onClick={HandleSave}>{isSaved ? <FaBookmark/> : <FaRegBookmark/> }</button>
-                        <p>{localPost._count && localPost._count.usersSaved}</p>
-                    </div>
-                </div>
-            </div>
+  return (
+    <div className="post" onClick={openPost}>
+      <img
+        className="post-image"
+        src={post.image_url ? post.image_url : "../../public/placeholder.png"}
+        alt={post.name}
+      />
+      <div className="post-content">
+        <p>{post.name}</p>
+        <p className="price-tag">${post.price.toFixed(2)}</p>
+        <div className="post-buttons">
+          <div className="post-like">
+            <button onClick={handleLike}>
+              {isLiked ? <FaHeart /> : <FaRegHeart />}
+            </button>
+            <p>{localPost._count && localPost._count.usersLiked}</p>
+          </div>
+          <div className="post-save">
+            <button onClick={handleSave}>
+              {isSaved ? <FaBookmark /> : <FaRegBookmark />}
+            </button>
+            <p>{localPost._count && localPost._count.usersSaved}</p>
+          </div>
         </div>
       </div>
     </div>

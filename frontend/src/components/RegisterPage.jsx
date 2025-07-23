@@ -1,15 +1,16 @@
 import { useNavigate, Link } from "react-router";
+import { useState } from "react";
 import "../components-css/RegisterPage.css";
 
 import { MdErrorOutline } from "react-icons/md";
 
 export default function RegisterPage() {
   const navigate = useNavigate();
-  const [email, setEmail] = React.useState("");
-  const [username, setUsername] = React.useState("");
-  const [password, setPassword] = React.useState("");
-  const [confirmPassword, setConfirmPassword] = React.useState("");
-  const [error, setError] = React.useState("");
+  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [error, setError] = useState("");
 
   async function handleRegister(e) {
     e.preventDefault();
@@ -33,7 +34,7 @@ export default function RegisterPage() {
     try {
       const response = await fetch(
         import.meta.env.VITE_URL + "/users/register",
-        settings,
+        settings
       );
       const result = await response.json();
       if (response.ok) {
@@ -48,37 +49,53 @@ export default function RegisterPage() {
     }
   }
 
-    return (
-        <div className="page">
-            <div className='register-box'>
-                <div className='register-body'>
-                    <h2>Welcome!</h2>
-                    <form className='register-form' onSubmit={HandleRegister}>
-                        <div>
-                            <p>Email:</p>
-                            <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required/>
-                        </div>
-                        <div>
-                            <p>Username:</p>
-                            <input type="text" placeholder="Username" value={username} onChange={(e)=> setUsername(e.target.value)} required/>
-                        </div>
-                        <div>
-                            <p>Password:</p>
-                            <input type="password" minLength={8} placeholder="Password" value={password} onChange={(e)=>setPassword(e.target.value)} required/>
-                        </div>
-                        <div>
-                            <p>Confirm Password:</p>
-                            <input type="password" minLength={8} placeholder="Confirm Password" value={confirmPassword} onChange={(e)=>setConfirmPassword(e.target.value)}required/>
-                        </div>
-                        <button type="submit">Register</button>
-                    </form>
-                    <div className={`error-box ${error ? 'visible' : 'hidden'}`}>
-                        <MdErrorOutline/> <p> Error: {error || 'No error'}</p>
-                    </div>
-                    <div>
-                        <p>Already a user? <Link to="/login">Login Here</Link></p>
-                    </div>
-                </div>
+  return (
+    <div className="page">
+      <div className="register-box">
+        <div className="register-body">
+          <h2>Welcome!</h2>
+          <form className="register-form" onSubmit={handleRegister}>
+            <div>
+              <p>Email:</p>
+              <input
+                type="email"
+                placeholder="Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
+            <div>
+              <p>Username:</p>
+              <input
+                type="text"
+                placeholder="Username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                required
+              />
+            </div>
+            <div>
+              <p>Password:</p>
+              <input
+                type="password"
+                minLength={8}
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </div>
+            <div>
+              <p>Confirm Password:</p>
+              <input
+                type="password"
+                minLength={8}
+                placeholder="Confirm Password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                required
+              />
             </div>
             <button type="submit">Register</button>
           </form>

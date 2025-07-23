@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router";
+import { Link, useNavigate, useLocation } from "react-router";
 import { useContext } from "react";
 import { UserContext } from "../App";
 import "../components-css/Header.css";
@@ -41,7 +41,7 @@ export default function Header() {
 
   return (
     <div className="app-header">
-       <h1 onClick={HandleTitleClick}>College Marketplace</h1>
+       <h1 onClick={handleTitleClick}>College Marketplace</h1>
        <nav className='nav-bar'>
         <Link to='/home' className={isLocation('/home') ? 'active' : ''}>Home</Link>
         {!user && <Link to='/login' className={isLocation('/login') ? 'active' : ''}>Login</Link>}
@@ -50,7 +50,7 @@ export default function Header() {
         {user && <Link to='/bundles' className={isLocation('/bundles') ? 'active' : ''}>Bundles</Link>}
         {user && <Link to='/myposts' className={isLocation('/myposts') ? 'active' : ''}>My Posts</Link>}
         {user && <Link to='/profile' className={isLocation('/profile') ? 'active' : ''}>Profile</Link>}
-        {user && <button onClick={HandleLogout}>Logout</button>}
+        {user && <button onClick={handleLogout}>Logout</button>}
         {user && <img className="profile-pic" src={user.icon || "../../public/placeholder.png"} alt="profile pic" />}
        </nav>
     </div>

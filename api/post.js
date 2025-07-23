@@ -57,11 +57,11 @@ router.get("/posts/:id", async (req, res, next) => {
       include: {
         purchase: true,
         _count: {
-            select: {
-                usersLiked: true,
-                usersSaved: true,
-            }
-        }
+          select: {
+            usersLiked: true,
+            usersSaved: true,
+          },
+        },
       },
     });
     if (post) {
@@ -125,6 +125,12 @@ router.get("/posts", async (req, res, next) => {
       where: whereClause,
       include: {
         purchase: true,
+        _count: {
+          select: {
+            usersLiked: true,
+            usersSaved: true,
+          },
+        },
       },
     });
     //distance
@@ -233,13 +239,13 @@ router.get("/authored", isAuthenticated, async (req, res, next) => {
         authorId: parseInt(userId),
       },
       include: {
-                _count: {
-                    select: {
-                        usersLiked: true,
-                        usersSaved: true,
-                    }
-                }
-            }
+        _count: {
+          select: {
+            usersLiked: true,
+            usersSaved: true,
+          },
+        },
+      },
     });
     if (posts.length > 0) {
       res.status(200).json(posts);
@@ -329,15 +335,15 @@ router.get("/bought", isAuthenticated, async (req, res, next) => {
       },
       include: {
         post: {
-                    include: {
-                        _count: {
-                            select: {
-                                usersLiked: true,
-                                usersSaved: true
-                            }
-                        }
-                    }
-                }
+          include: {
+            _count: {
+              select: {
+                usersLiked: true,
+                usersSaved: true,
+              },
+            },
+          },
+        },
       },
     });
     if (posts.length > 0) {
@@ -444,7 +450,7 @@ router.patch(
     } catch (err) {
       next(err);
     }
-  },
+  }
 );
 
 //get trending posts
@@ -453,7 +459,7 @@ router.get("/trending", async (req, res, next) => {
     const posts = await prisma.post.findMany();
     const trendingScores = await getTrendingScores(posts);
     let sorted = Object.entries(trendingScores).sort(
-      ([, valA], [, valB]) => valB - valA,
+      ([, valA], [, valB]) => valB - valA
     );
     const postIdArr = sorted.map(([key]) => parseInt(key));
     let trendingPosts = [];
@@ -463,13 +469,13 @@ router.get("/trending", async (req, res, next) => {
           id: postId,
         },
         include: {
-                    _count: {
-                        select: {
-                            usersLiked: true,
-                            usersSaved: true,
-                        }
-                    }
-                }
+          _count: {
+            select: {
+              usersLiked: true,
+              usersSaved: true,
+            },
+          },
+        },
       });
       if (post) {
         trendingPosts.push(post);

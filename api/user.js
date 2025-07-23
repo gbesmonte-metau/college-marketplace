@@ -147,36 +147,31 @@ router.patch("/user", isAuthenticated, async (req, res, next) => {
 });
 
 //Get all posts that user liked
-router.get('/user/likes', isAuthenticated, async (req, res, next) => {
-    const userId = req.session.user.id;
-    try {
-        const likedPostsData = await prisma.userLikedPosts.findMany({
-            where: {
-                userId: userId
+router.get("/user/likes", isAuthenticated, async (req, res, next) => {
+  const userId = req.session.user.id;
+  try {
+    const likedPostsData = await prisma.userLikedPosts.findMany({
+      where: {
+        userId: userId,
+      },
+      include: {
+        post: {
+          include: {
+            _count: {
+              select: {
+                usersLiked: true,
+                usersSaved: true,
+              },
             },
-            include: {
-                post: {
-                    include: {
-                        _count: {
-                            select: {
-                                usersLiked: true,
-                                usersSaved: true
-                            }
-                        }
-                    }
-                }
-            }
-        })
-        if (likedPostsData){
-            const likedPosts = likedPostsData.map(data => data.post);
-            res.status(200).json(likedPosts);
-        }
-        else{
-            next({ status: 404, message: `No liked posts` })
-        }
-    }
-    catch (err) {
-        next(err)
+          },
+        },
+      },
+    });
+    if (likedPostsData) {
+      const likedPosts = likedPostsData.map((data) => data.post);
+      res.status(200).json(likedPosts);
+    } else {
+      next({ status: 404, message: `No liked posts` });
     }
   } catch (err) {
     next(err);
@@ -258,36 +253,31 @@ router.get("/user/save/:id", isAuthenticated, async (req, res, next) => {
 });
 
 //Get all posts that user saved
-router.get('/user/saves', isAuthenticated, async (req, res, next) => {
-    const userId = req.session.user.id;
-    try {
-        const savedPostsData = await prisma.userSavedPosts.findMany({
-            where: {
-                userId: userId
+router.get("/user/saves", isAuthenticated, async (req, res, next) => {
+  const userId = req.session.user.id;
+  try {
+    const savedPostsData = await prisma.userSavedPosts.findMany({
+      where: {
+        userId: userId,
+      },
+      include: {
+        post: {
+          include: {
+            _count: {
+              select: {
+                usersLiked: true,
+                usersSaved: true,
+              },
             },
-            include: {
-                post: {
-                    include: {
-                        _count: {
-                            select: {
-                                usersLiked: true,
-                                usersSaved: true
-                            }
-                        }
-                    }
-                }
-            }
-        })
-        if (savedPostsData){
-            const savedPosts = savedPostsData.map(data => data.post);
-            res.status(200).json(savedPosts);
-        }
-        else{
-            next({ status: 404, message: `No saved posts` })
-        }
-    }
-    catch (err) {
-        next(err)
+          },
+        },
+      },
+    });
+    if (savedPostsData) {
+      const savedPosts = savedPostsData.map((data) => data.post);
+      res.status(200).json(savedPosts);
+    } else {
+      next({ status: 404, message: `No saved posts` });
     }
   } catch (err) {
     next(err);
@@ -361,63 +351,56 @@ router.post("/user/view/:id", isAuthenticated, async (req, res, next) => {
 });
 
 //Get recommendations for current user
-router.get('/user/recommendations', isAuthenticated, async (req, res, next) => {
-    const userId = req.session.user.id;
-    const recommendedPosts = [];
-    const postArr = await GetRecommendations(userId);
-    for (const p of postArr) {
-        const post = await prisma.post.findUnique({
-            where: {
-                id: p[0]
-            },
-            include: {
-                _count: {
-                    select: {
-                        usersLiked: true,
-                        usersSaved: true,
-                    }
-                }
-            }
-        })
-        recommendedPosts.push(post);
-    }
-    res.status(200).json(recommendedPosts);
-})
+router.get("/user/recommendations", isAuthenticated, async (req, res, next) => {
+  const userId = req.session.user.id;
+  const recommendedPosts = [];
+  const postArr = await getRecommendations(userId);
+  for (const p of postArr) {
+    const post = await prisma.post.findUnique({
+      where: {
+        id: p[0],
+      },
+      include: {
+        _count: {
+          select: {
+            usersLiked: true,
+            usersSaved: true,
+          },
+        },
+      },
+    });
+    recommendedPosts.push(post);
+  }
+  res.status(200).json(recommendedPosts);
+});
 
 //POST - Get bundles for current user
-router.post('/user/bundles', isAuthenticated, async (req, res, next) => {
-    const userId = req.session.user.id;
-    const body = req.body;
-    const queries = body.queries;
-    const priorities = body.priorities;
-    const budget = body.budget;
-    try{
-        const posts = await prisma.post.findMany({
-            where: {
-                time_sold: null,
-                NOT: {
-                    authorId: userId
-                }
-            },
-            include: {
-                _count: {
-                    select: {
-                        usersLiked: true,
-                        usersSaved: true,
-                    }
-                }
-            }
-        });
-        if (!posts) {
-            next({ status: 404, message: 'No posts found' });
-            return;
-        }
-        if (!queries || !priorities || !budget) {
-            next({ status: 422, message: 'Invalid body' });
-            return;
-        }
-        const bundles = await CalculateBundles(posts, queries, budget, userId, priorities);
-        res.status(200).json(bundles);
+router.post("/user/bundles", isAuthenticated, async (req, res, next) => {
+  const userId = req.session.user.id;
+  const body = req.body;
+  const queries = body.queries;
+  const priorities = body.priorities;
+  const budget = body.budget;
+  try {
+    const posts = await prisma.post.findMany({
+      where: {
+        time_sold: null,
+        NOT: {
+          authorId: userId,
+        },
+      },
+      include: {
+        _count: {
+          select: {
+            usersLiked: true,
+            usersSaved: true,
+          },
+        },
+      },
+    });
+    if (!posts) {
+      next({ status: 404, message: "No posts found" });
+      return;
     }
     if (!queries || !priorities || !budget) {
       next({ status: 422, message: "Invalid body" });
