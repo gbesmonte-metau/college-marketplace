@@ -3,6 +3,7 @@ import { useState, useContext } from "react";
 import { UserContext } from "../App";
 import "../components-css/LoginPage.css";
 import { MdErrorOutline } from "react-icons/md";
+import { postRequest } from "../api";
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -13,23 +14,13 @@ export default function LoginPage() {
 
   async function handleLogin(e) {
     e.preventDefault();
-    const settings = {
-      method: "POST",
-      credentials: "include",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email: e.target[0].value,
-        password: e.target[1].value,
-      }),
+    const url = new URL(import.meta.env.VITE_URL + `/users/login`);
+    const body = {
+      email: e.target[0].value,
+      password: e.target[1].value,
     };
     try {
-      const response = await fetch(
-        import.meta.env.VITE_URL + "/users/login",
-        settings,
-      );
+      const response = await postRequest(url, body);
       const result = await response.json();
       if (response.ok) {
         setUser(result);

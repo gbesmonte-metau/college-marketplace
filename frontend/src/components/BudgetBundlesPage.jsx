@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Bundle from "./Bundle";
 import "../components-css/BudgetBundlesPage.css";
-import { fetchCreateBundle } from "../api";
+import { postRequest } from "../api";
 
 export default function BudgetBundlesPage() {
   const [items, setItems] = useState([null, null]);
@@ -69,7 +69,8 @@ export default function BudgetBundlesPage() {
       budget: parseFloat(budget),
       priorities: priorities,
     };
-    const response = await fetchCreateBundle(body);
+    const url = new URL(import.meta.env.VITE_URL + "/user/bundles");
+    const response = await postRequest(url, body);
     const result = await response.json();
     if (response.ok) {
       setBundles(result);

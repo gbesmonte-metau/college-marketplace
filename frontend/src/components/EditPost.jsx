@@ -8,6 +8,7 @@ import {
 import { useState } from "react";
 import AddressForm from "./AddressForm";
 import UploadImage from "./UploadImage";
+import { patchRequest } from "../api";
 
 export default function EditPost({ postDetails, setIsEditOpen }) {
   const [price, setPrice] = useState(postDetails.price);
@@ -19,20 +20,14 @@ export default function EditPost({ postDetails, setIsEditOpen }) {
   const [color, setColor] = useState(postDetails.color);
   const [location, setLocation] = useState(postDetails.location);
   const [formattedAddr, setFormattedAddr] = useState(
-    postDetails.formatted_address,
+    postDetails.formatted_address
   );
-  const [url, setUrl] = useState(postDetails.image_url);
+  const [imageUrl, setImageUrl] = useState(postDetails.image_url);
 
   async function handleEdit(e) {
     e.preventDefault();
-    const settings = {
-      method: "PATCH",
-      credentials: "include",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
+    try {
+      const body = {
         price: parseFloat(price),
         category: parseInt(category),
         name: name,
@@ -42,14 +37,12 @@ export default function EditPost({ postDetails, setIsEditOpen }) {
         color: color,
         location: location,
         formatted_address: formattedAddr,
-        image_url: url,
-      }),
-    };
-    try {
-      const response = await fetch(
-        import.meta.env.VITE_URL + `/posts/${postDetails.id}`,
-        settings,
+        image_url: imageUrl,
+      };
+      const url = new URL(
+        import.meta.env.VITE_URL + `/posts/${postDetails.id}`
       );
+      const response = await patchRequest(url, body);
       const result = await response.json();
       if (response.ok) {
         alert("Post edited successfully");
@@ -67,8 +60,12 @@ export default function EditPost({ postDetails, setIsEditOpen }) {
       <div className="edit-body">
         <h2>Edit Post</h2>
         <div className="edit-box">
-          {url ? (
-            <img className="edit-post-img" src={url} alt="uploaded image" />
+          {imageUrl ? (
+            <img
+              className="edit-post-img"
+              src={imageUrl}
+              alt="uploaded image"
+            />
           ) : (
             <img
               className="edit-post-img"
@@ -173,7 +170,7 @@ export default function EditPost({ postDetails, setIsEditOpen }) {
             </div>
             <div className="edit-option">
               <p>Image</p>
-              <UploadImage url={url} setUrl={setUrl} />
+              <UploadImage url={imageUrl} setUrl={setImageUrl} />
             </div>
             <button type="submit">Save</button>
             <button onClick={() => setIsEditOpen(false)}>Close</button>

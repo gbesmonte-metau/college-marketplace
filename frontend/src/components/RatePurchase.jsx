@@ -2,6 +2,7 @@ import { useState } from "react";
 import { FaRegStar } from "react-icons/fa";
 import { FaStar } from "react-icons/fa";
 import "../components-css/RatePurchase.css";
+import { patchRequest } from "../api";
 
 export default function RatePurchase({ postDetails }) {
   const ratingOptions = [1, 2, 3, 4, 5];
@@ -9,16 +10,10 @@ export default function RatePurchase({ postDetails }) {
 
   async function updateRating(e) {
     e.preventDefault();
-    const response = await fetch(
+    const body = {rating};
+    const response = await patchRequest(
       import.meta.env.VITE_URL + "/purchases/" + postDetails.id + "/rating",
-      {
-        method: "PATCH",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ rating }),
-      },
+      body
     );
     const data = await response.json();
     alert("Submitted rating!");

@@ -6,6 +6,7 @@ import { UserContext } from "../App";
 import EditPost from "./EditPost";
 import "../components-css/PostDetails.css";
 import RatePurchase from "./RatePurchase";
+import { getRequest, postRequest } from "../api";
 
 export default function PostDetails() {
   const id = useParams().id;
@@ -20,7 +21,7 @@ export default function PostDetails() {
 
   async function getPostDetails() {
     try {
-      const response = await fetch(import.meta.env.VITE_URL + `/posts/${id}`);
+      const response = await getRequest(import.meta.env.VITE_URL + `/posts/${id}`, false);
       const result = await response.json();
       if (response.ok) {
         setPostDetails(result);
@@ -41,7 +42,7 @@ export default function PostDetails() {
     if (response.ok) {
       navigate("/myposts");
     } else {
-      alert("you are not the owner of this post");
+      alert(result.message);
     }
   }
   function openEdit(e) {
@@ -55,13 +56,7 @@ export default function PostDetails() {
       alert("You need to login to purchase this item");
       return;
     }
-    const response = await fetch(
-      import.meta.env.VITE_URL + `/posts/${id}/purchase`,
-      {
-        credentials: "include",
-        method: "POST",
-      },
-    );
+    const response = await postRequest(import.meta.env.VITE_URL + `/posts/${id}/purchase`, {});
     const result = await response.json();
     if (!response.ok) {
       alert(result.message);

@@ -1,4 +1,20 @@
-export async function fetchCreatePost(postBody) {
+export async function getRequest(url, isAuthenticated) {
+  try {
+    let response;
+    if (isAuthenticated) {
+      response = await fetch(url, {
+        credentials:  "include"
+      })
+    }
+    else {
+      response = await fetch(url);
+    }
+    return response;
+  } catch (error) {
+    alert(error);
+  }
+}
+export async function postRequest(url, postBody) {
   const settings = {
     method: "POST",
     credentials: "include",
@@ -9,22 +25,27 @@ export async function fetchCreatePost(postBody) {
     body: JSON.stringify(postBody),
   };
   try {
-    const response = await fetch(import.meta.env.VITE_URL + "/posts", settings);
+    const response = await fetch(url, settings);
     return response;
   } catch (error) {
     alert(error);
   }
 }
 
-export async function fetchCreateBundle(postBody) {
-  const url = new URL(import.meta.env.VITE_URL + "/user/bundles");
-  const response = await fetch(url, {
-    method: "POST",
+export async function patchRequest(url, patchBody) {
+  const settings = {
+    method: "PATCH",
     credentials: "include",
     headers: {
+      Accept: "application/json",
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(postBody),
-  });
-  return response;
+    body: JSON.stringify(patchBody),
+  };
+  try {
+    const response = await fetch(url, settings);
+    return response;
+  } catch (error) {
+    alert(error);
+  }
 }
