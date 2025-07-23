@@ -8,22 +8,30 @@
   justify-content: space-between;
   padding-left: 10px;
   padding-right: 10px;
-  background-color: rgb(255, 255, 255, 0.5);
+  background-color: rgba(211, 255, 226, 0.5);
   backdrop-filter: blur(10px);
+  z-index: 2;
 }
 .nav-bar {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 10px;
+  height: 100%;
 }
 .nav-bar a {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   text-decoration: none;
   color: var(--text);
+  padding-left: 5px;
+  padding-right: 5px;
+  height: 100%;
 }
 .nav-bar a:hover {
-  text-decoration: underline;
+  background-color: rgba(150, 255, 185, 0.4);
 }
 .active {
   font-weight: 700;
+  background-color: rgba(150, 255, 185, 0.4);
 }

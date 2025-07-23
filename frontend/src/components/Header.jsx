@@ -10,14 +10,6 @@ export default function Header() {
   const navigate = useNavigate();
   async function handleLogout(e) {
     e.preventDefault();
-    const settings = {
-      method: "POST",
-      credentials: "include",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-    };
     try {
       const url = new URL(import.meta.env.VITE_URL + "/user/logout");
       const response = await postRequest(url, {});

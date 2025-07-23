@@ -53,6 +53,7 @@ export default function Filter({ filter, setFilter }) {
             onChange={(e) => setPrice(parseInt(e.target.value).toFixed(2))}
           />
           <label htmlFor="price">${price}</label>
+          <hr />
         </div>
         {user && user.location && (
           <div>
@@ -70,6 +71,7 @@ export default function Filter({ filter, setFilter }) {
               <option value="100">100</option>
               <option value="All">All</option>
             </select>
+            <hr />
           </div>
         )}
         <p>Category:</p>
@@ -78,18 +80,21 @@ export default function Filter({ filter, setFilter }) {
           setOptions={setCategories}
           triggerClear={triggerClear}
         />
+        <hr />
         <p>Color:</p>
         <MultiselectFilter
           options={colorArr.slice(0, -1)}
           setOptions={setColors}
           triggerClear={triggerClear}
         />
+        <hr />
         <p>Condition:</p>
         <MultiselectFilter
           options={conditionArr.slice(0, -1)}
           setOptions={setConditions}
           triggerClear={triggerClear}
         />
+        <hr />
         <button type="submit">Apply Filter</button>
         <button type="button" onClick={clearFilter}>
           Clear Filter
