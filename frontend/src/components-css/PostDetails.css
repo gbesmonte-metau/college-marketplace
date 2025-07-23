@@ -1,18 +1,18 @@
 .details {
-    margin-top: 20px;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+  margin-top: 20px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
 }
 .details-image {
-    width: 500px;
-    height: 500px;
-    object-fit: cover;
+  width: 500px;
+  height: 500px;
+  object-fit: cover;
 }
 .details-header {
-    border-bottom: 1px solid lightgray;
+  border-bottom: 1px solid lightgray;
 }
 .img-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }

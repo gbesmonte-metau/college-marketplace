@@ -1,37 +1,51 @@
-import {useEffect, useState} from 'react'
+import { useEffect, useState } from "react";
 
-export default function MultiselectFilter({options, setOptions, triggerClear}) {
-    const [optionChecked, setOptionChecked] = useState(CreateDict());
+export default function MultiselectFilter({
+  options,
+  setOptions,
+  triggerClear,
+}) {
+  const [optionChecked, setOptionChecked] = useState(createDict());
 
-    useEffect(() => {
-        setOptionChecked(CreateDict());
-        setOptions([]);
-    }, [triggerClear])
+  useEffect(() => {
+    setOptionChecked(createDict());
+    setOptions([]);
+  }, [triggerClear]);
 
-    function CreateDict(){
-        let dict = {};
-        options.map((item) => {
-            dict[item] = false;
-        })
-        return dict;
-    }
+  function createDict() {
+    let dict = {};
+    options.map((item) => {
+      dict[item] = false;
+    });
+    return dict;
+  }
 
-    function HandleCheckedChange(optionName){
-        const updatedSetOption = {...optionChecked, [optionName]: !optionChecked[optionName]};
-        setOptionChecked(updatedSetOption);
-        setOptions(Object.keys(updatedSetOption).filter((key) => updatedSetOption[key]));
-    }
+  function handleCheckedChange(optionName) {
+    const updatedSetOption = {
+      ...optionChecked,
+      [optionName]: !optionChecked[optionName],
+    };
+    setOptionChecked(updatedSetOption);
+    setOptions(
+      Object.keys(updatedSetOption).filter((key) => updatedSetOption[key]),
+    );
+  }
 
-    return (
-        <div className='filter-category'>
-            {options.map((c, id) => (
-                <div className='filter' key={id}>
-                    <label>
-                        <input id={c} type='checkbox' checked={optionChecked[c]} onChange={() => HandleCheckedChange(c)}/>
-                        {c}
-                    </label>
-                </div>
-            ))}
+  return (
+    <div className="filter-category">
+      {options.map((c, id) => (
+        <div className="filter" key={id}>
+          <label>
+            <input
+              id={c}
+              type="checkbox"
+              checked={optionChecked[c]}
+              onChange={() => handleCheckedChange(c)}
+            />
+            {c}
+          </label>
         </div>
-    )
+      ))}
+    </div>
+  );
 }
