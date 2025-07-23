@@ -16,3 +16,16 @@ export async function fetchCreatePost(postBody){
         alert(error);
     }
 }
+
+export async function fetchCreateBundle(postBody){
+    const url = new URL(import.meta.env.VITE_URL + '/user/bundles');
+    const response = await fetch(url, {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(postBody),
+    });
+    return response;
+}
