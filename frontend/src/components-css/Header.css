@@ -8,10 +8,10 @@
   justify-content: space-between;
   padding-left: 10px;
   padding-right: 10px;
-  background-color: rgb(255, 255, 255, .5);
+  background-color: rgb(255, 255, 255, 0.5);
   backdrop-filter: blur(10px);
 }
-.nav-bar{
+.nav-bar {
   display: flex;
   justify-content: center;
   align-items: center;

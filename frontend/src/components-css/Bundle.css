@@ -1,11 +1,11 @@
 .bundle {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 .bundle-container {
-    display: flex;
-    width: 100%;
-    max-width: 100%;
+  display: flex;
+  width: 100%;
+  max-width: 100%;
 }
