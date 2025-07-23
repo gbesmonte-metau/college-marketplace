@@ -1,8 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, use } from "react";
 import "../components-css/ProfilePage.css";
 import Post from "./Post";
 import EditProfile from "./EditProfile";
 import { getRequest } from "../api";
+import Loading from "./Loading";
 
 const mode = {
   Likes: 0,
@@ -17,8 +18,10 @@ export default function ProfilePage() {
   const [boughtPosts, setBoughtPosts] = useState([]);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [modeState, setModeState] = useState(mode.Likes);
+  const [isLoading, setIsLoading] = useState(false);
 
   async function getProfile() {
+    setIsLoading(true);
     const response = await getRequest(import.meta.env.VITE_URL + "/user", true);
     const result = await response.json();
     if (response.ok) {
@@ -48,6 +51,7 @@ export default function ProfilePage() {
     if (response.ok) {
       setBoughtPosts(result);
     }
+    setIsLoading(false);
   }
 
   function handleEdit() {
@@ -63,6 +67,7 @@ export default function ProfilePage() {
 
   return (
     <div className="page">
+      <Loading isLoading={isLoading}></Loading>
       <div className="profile-body">
         <div className="profile-info">
           <img

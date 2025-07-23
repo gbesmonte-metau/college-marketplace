@@ -14,6 +14,7 @@ export async function getRequest(url, isAuthenticated) {
     alert(error);
   }
 }
+
 export async function postRequest(url, postBody) {
   const settings = {
     method: "POST",

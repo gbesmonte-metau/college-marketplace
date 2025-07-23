@@ -2,12 +2,14 @@ import { useState } from "react";
 import Bundle from "./Bundle";
 import "../components-css/BudgetBundlesPage.css";
 import { postRequest } from "../api";
+import Loading from "./Loading";
 
 export default function BudgetBundlesPage() {
   const [items, setItems] = useState([null, null]);
   const [priorityMap, setPriorityMap] = useState({});
   const [budget, setBudget] = useState(null);
   const [bundles, setBundles] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   function changeItem(e, index) {
     const value = e.target.value;
@@ -46,6 +48,7 @@ export default function BudgetBundlesPage() {
 
   async function findBundles(e) {
     e.preventDefault();
+    setIsLoading(true);
     const filteredItems = items.filter((item) => item != null && item != "");
     if (filteredItems.length < 2) {
       alert("Please add more items.");
@@ -77,10 +80,12 @@ export default function BudgetBundlesPage() {
     } else {
       alert(result.message);
     }
+    setIsLoading(false);
   }
 
   return (
     <div className="page">
+      <Loading isLoading={isLoading}></Loading>
       <div className="bundle-page">
         <h2>Budget Bundles</h2>
         <div>
