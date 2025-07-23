@@ -155,7 +155,16 @@ router.get("/user/likes", isAuthenticated, async (req, res, next) => {
         userId: userId,
       },
       include: {
-        post: true,
+        post: {
+          include: {
+            _count: {
+              select: {
+                usersLiked: true,
+                usersSaved: true,
+              },
+            },
+          },
+        },
       },
     });
     if (likedPostsData) {
@@ -252,7 +261,16 @@ router.get("/user/saves", isAuthenticated, async (req, res, next) => {
         userId: userId,
       },
       include: {
-        post: true,
+        post: {
+          include: {
+            _count: {
+              select: {
+                usersLiked: true,
+                usersSaved: true,
+              },
+            },
+          },
+        },
       },
     });
     if (savedPostsData) {
@@ -342,6 +360,14 @@ router.get("/user/recommendations", isAuthenticated, async (req, res, next) => {
       where: {
         id: p[0],
       },
+      include: {
+        _count: {
+          select: {
+            usersLiked: true,
+            usersSaved: true,
+          },
+        },
+      },
     });
     recommendedPosts.push(post);
   }
@@ -363,6 +389,14 @@ router.post("/user/bundles", isAuthenticated, async (req, res, next) => {
           authorId: userId,
         },
       },
+      include: {
+        _count: {
+          select: {
+            usersLiked: true,
+            usersSaved: true,
+          },
+        },
+      },
     });
     if (!posts) {
       next({ status: 200, message: "No posts found" });
@@ -377,7 +411,7 @@ router.post("/user/bundles", isAuthenticated, async (req, res, next) => {
       queries,
       budget,
       userId,
-      priorities
+      priorities,
     );
     res.status(200).json(bundles);
   } catch (err) {

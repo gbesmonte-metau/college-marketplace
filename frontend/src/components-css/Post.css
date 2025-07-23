@@ -9,6 +9,10 @@
   border-radius: 10px;
   overflow: hidden;
 }
+.post:hover {
+  transform: scale(1.05);
+  box-shadow: 3px 3px 5px rgb(207, 207, 207);
+}
 .post-image {
   width: 100%;
   height: 300px;
@@ -29,4 +33,13 @@
   background-color: transparent;
   color: var(--accent);
   font-size: 1.2rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.post-like,
+.post-save {
+  display: grid;
+  width: 25%;
+  grid-template-columns: 1fr 1fr;
 }

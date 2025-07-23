@@ -12,6 +12,7 @@ import "../components-css/Post.css";
 export default function Post({ post }) {
   const [isLiked, setIsLiked] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
+  const [localPost, setLocalPost] = useState(post);
   const { user, setUser } = useContext(UserContext);
 
   useEffect(() => {
@@ -92,6 +93,23 @@ export default function Post({ post }) {
         method: "POST",
       });
       if (response.ok) {
+        if (isLiked) {
+          setLocalPost({
+            ...localPost,
+            _count: {
+              ...localPost._count,
+              usersLiked: localPost._count.usersLiked - 1,
+            },
+          });
+        } else {
+          setLocalPost({
+            ...localPost,
+            _count: {
+              ...localPost._count,
+              usersLiked: localPost._count.usersLiked + 1,
+            },
+          });
+        }
         setIsLiked(!isLiked);
       } else {
         alert("You must be logged in to like a post");
@@ -113,6 +131,23 @@ export default function Post({ post }) {
         method: "POST",
       });
       if (response.ok) {
+        if (isSaved) {
+          setLocalPost({
+            ...localPost,
+            _count: {
+              ...localPost._count,
+              usersSaved: localPost._count.usersSaved - 1,
+            },
+          });
+        } else {
+          setLocalPost({
+            ...localPost,
+            _count: {
+              ...localPost._count,
+              usersSaved: localPost._count.usersSaved + 1,
+            },
+          });
+        }
         setIsSaved(!isSaved);
       } else {
         alert("You must be logged in to save a post");
@@ -121,7 +156,6 @@ export default function Post({ post }) {
       alert(e);
     }
   }
-
   return (
     <div className="post" onClick={openPost}>
       <img
@@ -133,12 +167,18 @@ export default function Post({ post }) {
         <p>{post.name}</p>
         <p className="price-tag">${post.price.toFixed(2)}</p>
         <div className="post-buttons">
-          <button onClick={handleLike}>
-            {isLiked ? <FaHeart /> : <FaRegHeart />}
-          </button>
-          <button onClick={handleSave}>
-            {isSaved ? <FaBookmark /> : <FaRegBookmark />}
-          </button>
+          <div className="post-like">
+            <button onClick={handleLike}>
+              {isLiked ? <FaHeart /> : <FaRegHeart />}
+            </button>
+            <p>{localPost._count && localPost._count.usersLiked}</p>
+          </div>
+          <div className="post-save">
+            <button onClick={handleSave}>
+              {isSaved ? <FaBookmark /> : <FaRegBookmark />}
+            </button>
+            <p>{localPost._count && localPost._count.usersSaved}</p>
+          </div>
         </div>
       </div>
     </div>

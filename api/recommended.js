@@ -39,7 +39,7 @@ export async function getRecommendations(user_id, k) {
   // keyword based recommendation
   const postInformationScores = getRecommendationsByPostInformation(
     interactions,
-    posts,
+    posts
   );
   const informationVector = new Vector(postInformationScores);
   informationVector.normalize().multiply(WEIGHTS.information);
@@ -53,9 +53,13 @@ export async function getRecommendations(user_id, k) {
       id: user_id,
     },
   });
-  const locationScores = await getLocationScores(user);
-  const locationVector = new Vector(locationScores);
-  locationVector.normalize().multiply(WEIGHTS.location);
+  let locationScores;
+  let locationVector = new Vector();
+  if (user.location) {
+    locationScores = await getLocationScores(user);
+    locationVector = new Vector(locationScores);
+    locationVector.normalize().multiply(WEIGHTS.location);
+  }
   const trendingScores = await getTrendingScores(posts);
   const trendingVector = new Vector(trendingScores);
   trendingVector.normalize().multiply(WEIGHTS.trending);
@@ -84,7 +88,7 @@ export async function getRecommendations(user_id, k) {
     .add(sellerVector)
     .toObject();
   let sortedEntries = Object.entries(totalVectorObj).sort(
-    ([, scoreA], [, scoreB]) => scoreB - scoreA,
+    ([, scoreA], [, scoreB]) => scoreB - scoreA
   );
   // Filter out posts the user has already interacted with
   sortedEntries = sortedEntries.filter(
@@ -92,8 +96,8 @@ export async function getRecommendations(user_id, k) {
       !interactions.liked.some((liked) => liked.postId === parseInt(key)) &&
       !interactions.saved.some((saved) => saved.postId === parseInt(key)) &&
       !interactions.purchased.some(
-        (purchased) => purchased.id === parseInt(key),
-      ),
+        (purchased) => purchased.id === parseInt(key)
+      )
   );
   // Get top k
   return sortedEntries
@@ -183,7 +187,7 @@ function getRecommendationsByPostInformation(userPosts, posts) {
         userPosts.liked.some((liked) => liked.postId === post.id) ||
         userPosts.saved.some((saved) => saved.postId === post.id) ||
         userPosts.purchased.some((purchased) => purchased.id === post.id)
-      ),
+      )
   );
   // Calculate cosine similarity
   const result = getPostsCosineSimilarity(userProfileVector, postVectors);
@@ -195,7 +199,7 @@ function getPostsCosineSimilarity(currVector, allVectors) {
   // Calculate cosine similarity
   for (let i = 0; i < allVectors.length; i++) {
     const cosineSimilarity = currVector.getCosineSimilarity(
-      allVectors[i].vector,
+      allVectors[i].vector
     );
     // heap only needs to be k size
     cosineSimilarityDict[allVectors[i].id] = cosineSimilarity;
@@ -250,7 +254,7 @@ function calculateUserProfileVector(userPosts, postVectors) {
   const allPosts = userPosts.viewed.concat(
     userPosts.liked,
     userPosts.saved,
-    userPosts.purchased,
+    userPosts.purchased
   );
   for (const post of allPosts) {
     for (const postVector of postVectors) {
@@ -286,13 +290,13 @@ function getRecommendationsByCategory(userPosts, posts) {
   // Calculate user profile vector
   const userProfileVector = calculateUserProfileVector(
     userPosts,
-    postCategoryVectors,
+    postCategoryVectors
   );
 
   // Calculate cosine similarity
   const result = getPostsCosineSimilarity(
     userProfileVector,
-    postCategoryVectors,
+    postCategoryVectors
   );
 
   return result;
@@ -317,15 +321,16 @@ async function getLocationScores(currUser) {
   let users = await prisma.user.findMany();
   users = users.filter(
     (user) =>
+      user.location &&
       getDistanceCoords(user.location, currUser.location) < 100 &&
-      user.id !== currUser.id,
+      user.id !== currUser.id
   );
   for (const user of users) {
     const distance = getDistanceCoords(user.location, currUser.location);
     const interactions = await getUserInteractions(user.id);
     const allInteractions = interactions.viewed.concat(
       interactions.liked,
-      interactions.saved,
+      interactions.saved
     );
     for (const interaction of allInteractions) {
       locationScores[interaction.postId] =
@@ -345,19 +350,19 @@ export async function getTrendingScores(posts) {
   for (const viewed of allInteractions.viewed) {
     trendingScores[viewed.postId] += calculateTrendingScore(
       viewed.viewedAt,
-      VIEWED_WEIGHT,
+      VIEWED_WEIGHT
     );
   }
   for (const liked of allInteractions.liked) {
     trendingScores[liked.postId] += calculateTrendingScore(
       liked.likedAt,
-      LIKED_WEIGHT,
+      LIKED_WEIGHT
     );
   }
   for (const saved of allInteractions.saved) {
     trendingScores[saved.postId] += calculateTrendingScore(
       saved.savedAt,
-      SAVED_WEIGHT,
+      SAVED_WEIGHT
     );
   }
   return trendingScores;

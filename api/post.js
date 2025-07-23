@@ -56,6 +56,12 @@ router.get("/posts/:id", async (req, res, next) => {
       },
       include: {
         purchase: true,
+        _count: {
+          select: {
+            usersLiked: true,
+            usersSaved: true,
+          },
+        },
       },
     });
     if (post) {
@@ -119,6 +125,12 @@ router.get("/posts", async (req, res, next) => {
       where: whereClause,
       include: {
         purchase: true,
+        _count: {
+          select: {
+            usersLiked: true,
+            usersSaved: true,
+          },
+        },
       },
     });
     //distance
@@ -226,6 +238,14 @@ router.get("/authored", isAuthenticated, async (req, res, next) => {
       where: {
         authorId: parseInt(userId),
       },
+      include: {
+        _count: {
+          select: {
+            usersLiked: true,
+            usersSaved: true,
+          },
+        },
+      },
     });
     if (posts.length > 0) {
       res.status(200).json(posts);
@@ -314,7 +334,16 @@ router.get("/bought", isAuthenticated, async (req, res, next) => {
         buyerId: parseInt(userId),
       },
       include: {
-        post: true,
+        post: {
+          include: {
+            _count: {
+              select: {
+                usersLiked: true,
+                usersSaved: true,
+              },
+            },
+          },
+        },
       },
     });
     if (posts.length > 0) {
@@ -438,6 +467,14 @@ router.get("/trending", async (req, res, next) => {
       const post = await prisma.post.findUnique({
         where: {
           id: postId,
+        },
+        include: {
+          _count: {
+            select: {
+              usersLiked: true,
+              usersSaved: true,
+            },
+          },
         },
       });
       if (post) {

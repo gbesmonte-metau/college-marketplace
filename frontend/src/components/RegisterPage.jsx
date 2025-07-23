@@ -1,15 +1,16 @@
 import { useNavigate, Link } from "react-router";
+import { useState } from "react";
 import "../components-css/RegisterPage.css";
 
 import { MdErrorOutline } from "react-icons/md";
 
 export default function RegisterPage() {
   const navigate = useNavigate();
-  const [email, setEmail] = React.useState("");
-  const [username, setUsername] = React.useState("");
-  const [password, setPassword] = React.useState("");
-  const [confirmPassword, setConfirmPassword] = React.useState("");
-  const [error, setError] = React.useState("");
+  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [error, setError] = useState("");
 
   async function handleRegister(e) {
     e.preventDefault();
@@ -57,7 +58,7 @@ export default function RegisterPage() {
             <div>
               <p>Email:</p>
               <input
-                type="text"
+                type="email"
                 placeholder="Email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -78,6 +79,7 @@ export default function RegisterPage() {
               <p>Password:</p>
               <input
                 type="password"
+                minLength={8}
                 placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -88,6 +90,7 @@ export default function RegisterPage() {
               <p>Confirm Password:</p>
               <input
                 type="password"
+                minLength={8}
                 placeholder="Confirm Password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}

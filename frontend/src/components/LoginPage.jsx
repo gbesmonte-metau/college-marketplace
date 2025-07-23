@@ -10,7 +10,6 @@ export default function LoginPage() {
   const [error, setError] = useState(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
 
   async function handleLogin(e) {
     e.preventDefault();
@@ -51,7 +50,7 @@ export default function LoginPage() {
             <div>
               <p>Email:</p>
               <input
-                type="text"
+                type="email"
                 placeholder="Email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -79,6 +78,11 @@ export default function LoginPage() {
             </p>
           </div>
         </div>
+      </div>
+      <div>
+        <p>
+          No account? <Link to="/register">Register Here</Link>
+        </p>
       </div>
     </div>
   );
