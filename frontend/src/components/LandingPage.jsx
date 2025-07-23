@@ -24,8 +24,7 @@ export default function LandingPage() {
       }
     } catch (error) {
       alert(error);
-    }
-    finally {
+    } finally {
       setIsLoading(false);
     }
   }

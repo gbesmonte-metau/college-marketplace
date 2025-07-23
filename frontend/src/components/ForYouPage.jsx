@@ -18,7 +18,7 @@ export default function ForYouPage() {
       import.meta.env.VITE_URL + "/user/recommendations",
       {
         credentials: "include",
-      }
+      },
     );
     const result = await response.json();
     if (response.ok) {

@@ -411,7 +411,7 @@ router.post("/user/bundles", isAuthenticated, async (req, res, next) => {
       queries,
       budget,
       userId,
-      priorities
+      priorities,
     );
     res.status(200).json(bundles);
   } catch (err) {

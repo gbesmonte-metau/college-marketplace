@@ -28,7 +28,7 @@ export default function LoginPage() {
     try {
       const response = await fetch(
         import.meta.env.VITE_URL + "/users/login",
-        settings
+        settings,
       );
       const result = await response.json();
       if (response.ok) {

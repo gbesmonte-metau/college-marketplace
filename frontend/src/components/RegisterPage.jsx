@@ -34,7 +34,7 @@ export default function RegisterPage() {
     try {
       const response = await fetch(
         import.meta.env.VITE_URL + "/users/register",
-        settings
+        settings,
       );
       const result = await response.json();
       if (response.ok) {

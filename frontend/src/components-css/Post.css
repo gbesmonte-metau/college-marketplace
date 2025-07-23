@@ -10,8 +10,8 @@
   overflow: hidden;
 }
 .post:hover {
-    transform: scale(1.05);
-    box-shadow: 3px 3px 5px rgb(207, 207, 207);
+  transform: scale(1.05);
+  box-shadow: 3px 3px 5px rgb(207, 207, 207);
 }
 .post-image {
   width: 100%;
@@ -30,15 +30,16 @@
   justify-content: right;
 }
 .post-buttons button {
-    background-color: transparent;
-    color: var(--accent);
-    font-size: 1.2rem;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  background-color: transparent;
+  color: var(--accent);
+  font-size: 1.2rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
-.post-like, .post-save {
-    display: grid;
-    width: 25%;
-    grid-template-columns: 1fr 1fr;
+.post-like,
+.post-save {
+  display: grid;
+  width: 25%;
+  grid-template-columns: 1fr 1fr;
 }

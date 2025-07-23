@@ -450,7 +450,7 @@ router.patch(
     } catch (err) {
       next(err);
     }
-  }
+  },
 );
 
 //get trending posts
@@ -459,7 +459,7 @@ router.get("/trending", async (req, res, next) => {
     const posts = await prisma.post.findMany();
     const trendingScores = await getTrendingScores(posts);
     let sorted = Object.entries(trendingScores).sort(
-      ([, valA], [, valB]) => valB - valA
+      ([, valA], [, valB]) => valB - valA,
     );
     const postIdArr = sorted.map(([key]) => parseInt(key));
     let trendingPosts = [];

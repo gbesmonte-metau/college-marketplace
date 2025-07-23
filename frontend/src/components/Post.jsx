@@ -40,7 +40,7 @@ export default function Post({ post }) {
           {
             method: "POST",
             credentials: "include",
-          }
+          },
         );
         const result = await response.json();
         if (response.ok) {
@@ -58,7 +58,7 @@ export default function Post({ post }) {
         import.meta.env.VITE_URL + `/user/like/${post.id}`,
         {
           credentials: "include",
-        }
+        },
       );
       const result = await response.json();
       setIsLiked(result.liked);
@@ -72,7 +72,7 @@ export default function Post({ post }) {
         import.meta.env.VITE_URL + `/user/save/${post.id}`,
         {
           credentials: "include",
-        }
+        },
       );
       const result = await response.json();
       setIsSaved(result.saved);

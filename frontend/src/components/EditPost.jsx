@@ -19,7 +19,7 @@ export default function EditPost({ postDetails, setIsEditOpen }) {
   const [color, setColor] = useState(postDetails.color);
   const [location, setLocation] = useState(postDetails.location);
   const [formattedAddr, setFormattedAddr] = useState(
-    postDetails.formatted_address
+    postDetails.formatted_address,
   );
   const [url, setUrl] = useState(postDetails.image_url);
 
@@ -48,7 +48,7 @@ export default function EditPost({ postDetails, setIsEditOpen }) {
     try {
       const response = await fetch(
         import.meta.env.VITE_URL + `/posts/${postDetails.id}`,
-        settings
+        settings,
       );
       const result = await response.json();
       if (response.ok) {

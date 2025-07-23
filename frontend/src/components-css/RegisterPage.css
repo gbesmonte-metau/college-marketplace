@@ -27,13 +27,13 @@
   margin-top: 20px;
 }
 .error-box {
-    height: 30px;
-    padding: 5px;
-    color: red;
-    border-radius: 5px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  height: 30px;
+  padding: 5px;
+  color: red;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .error-box p {
