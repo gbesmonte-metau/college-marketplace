@@ -13,11 +13,12 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json({ limit: "25mb" }));
 app.use(express.urlencoded({ limit: "25mb" }));
 app.set('trust proxy', 1);
+const isProduction = process.env.NODE_ENV === 'production';
 app.use(cors({ credentials: true, origin: process.env.FRONTEND_URL}));
 app.use(
   expressSession({
     name: "cookie",
-    cookie: { path: "/", httpOnly: false, secure: false, sameSite: 'none' },
+    cookie: { httpOnly: false, secure: isProduction, sameSite: isProduction ? 'none' : 'lax' },
     secret: "temporary secret",
     resave: false,
     saveUninitialized: false,
