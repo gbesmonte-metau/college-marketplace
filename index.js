@@ -12,17 +12,17 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 app.use(express.json({ limit: "25mb" }));
 app.use(express.urlencoded({ limit: "25mb" }));
-app.use(cors({ credentials: true, origin: process.env.FRONTEND_URL, sameSite: "none" }));
+app.set('trust proxy', 1);
+app.use(cors({ credentials: true, origin: process.env.FRONTEND_URL}));
 app.use(
   expressSession({
     name: "cookie",
-    cookie: { path: "/", httpOnly: false, secure: false },
+    cookie: { path: "/", httpOnly: false, secure: false, sameSite: 'none' },
     secret: "temporary secret",
     resave: false,
     saveUninitialized: false,
   }),
 );
-app.set('trust proxy', true);
 app.use(userRouter);
 app.use(postRouter);
 
