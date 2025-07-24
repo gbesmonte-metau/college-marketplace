@@ -6,11 +6,15 @@ import { UserContext } from "../App";
 import "../components-css/ForYouPage.css";
 import Loading from "./Loading";
 import { getRequest } from "../api";
+import RecommendedPost from "./RecommendedPost";
+import { MdNavigateNext } from "react-icons/md";
+import { MdNavigateBefore } from "react-icons/md";
 
 export default function ForYouPage() {
   const { user, setUser } = useContext(UserContext);
   const navigate = useNavigate();
-  const [posts, setPosts] = useState([]);
+  const [recommendedPosts, setRecommendedPosts] = useState([]);
+  const [recommendedPostIdx, setRecommendedPostIdx] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
 
   async function getRecommendedPosts() {
@@ -19,7 +23,7 @@ export default function ForYouPage() {
     const response = await getRequest(url, true);
     const result = await response.json();
     if (response.ok) {
-      setPosts(result);
+      setRecommendedPosts(result);
     }
     setIsLoading(false);
   }
@@ -34,14 +38,47 @@ export default function ForYouPage() {
     getRecommendedPosts();
   }, [user]);
 
+  function IncrementIndex(e) {
+    e.preventDefault();
+    setRecommendedPostIdx(recommendedPostIdx + 1);
+  }
+  function DecrementIndex(e) {
+    e.preventDefault();
+    setRecommendedPostIdx(recommendedPostIdx - 1);
+  }
+
   return (
     <div className="page">
       <Loading isLoading={isLoading}></Loading>
       <div className="recommended-body">
         <h2>Recommended Posts</h2>
         <div className="recommended-container">
-          {posts &&
-            posts.map((post, idx) => <Post key={idx} post={post}></Post>)}
+          <div className="arrow-container">
+            {recommendedPostIdx != 0 && (
+              <button
+                type="button"
+                className="skip-button"
+                onClick={DecrementIndex}
+              >
+                <MdNavigateBefore />
+              </button>
+            )}
+          </div>
+          {recommendedPosts.length > 0 && (
+            <RecommendedPost post={recommendedPosts[recommendedPostIdx]} />
+          )}
+
+          <div className="arrow-container">
+            {recommendedPostIdx != recommendedPosts.length - 1 && (
+              <button
+                type="button"
+                className="skip-button"
+                onClick={IncrementIndex}
+              >
+                <MdNavigateNext />
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </div>

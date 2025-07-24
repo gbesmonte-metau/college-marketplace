@@ -1,0 +1,11 @@
+.recommended-post-image {
+    height: 500px;
+    width: 500px;
+    object-fit: cover;
+}
+.recommended-post .post-like, .post-save {
+    font-size: 30px;
+}
+.recommended-post .like-button, .save-button {
+    font-size: 30px !important;
+}
