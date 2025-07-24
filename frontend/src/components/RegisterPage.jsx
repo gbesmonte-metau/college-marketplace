@@ -3,6 +3,7 @@ import { useState } from "react";
 import "../components-css/RegisterPage.css";
 
 import { MdErrorOutline } from "react-icons/md";
+import { postRequest } from "../api";
 
 export default function RegisterPage() {
   const navigate = useNavigate();
@@ -18,23 +19,15 @@ export default function RegisterPage() {
       setError("Passwords do not match");
       return;
     }
-    const settings = {
-      method: "POST",
-      credentials: "include",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email: email,
-        username: username,
-        password: password,
-      }),
+    const body = {
+      email: email,
+      username: username,
+      password: password,
     };
     try {
-      const response = await fetch(
+      const response = await postRequest(
         import.meta.env.VITE_URL + "/users/register",
-        settings,
+        body
       );
       const result = await response.json();
       if (response.ok) {

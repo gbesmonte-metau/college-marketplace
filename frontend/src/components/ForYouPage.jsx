@@ -5,6 +5,7 @@ import { useContext } from "react";
 import { UserContext } from "../App";
 import "../components-css/ForYouPage.css";
 import Loading from "./Loading";
+import { getRequest } from "../api";
 
 export default function ForYouPage() {
   const { user, setUser } = useContext(UserContext);
@@ -14,12 +15,8 @@ export default function ForYouPage() {
 
   async function getRecommendedPosts() {
     setIsLoading(true);
-    const response = await fetch(
-      import.meta.env.VITE_URL + "/user/recommendations",
-      {
-        credentials: "include",
-      },
-    );
+    const url = new URL(import.meta.env.VITE_URL + "/user/recommendations");
+    const response = await getRequest(url, true);
     const result = await response.json();
     if (response.ok) {
       setPosts(result);

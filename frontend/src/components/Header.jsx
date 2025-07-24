@@ -2,6 +2,7 @@ import { Link, useNavigate, useLocation } from "react-router";
 import { useContext } from "react";
 import { UserContext } from "../App";
 import "../components-css/Header.css";
+import { postRequest } from "../api";
 
 export default function Header() {
   const { user, setUser } = useContext(UserContext);
@@ -9,19 +10,9 @@ export default function Header() {
   const navigate = useNavigate();
   async function handleLogout(e) {
     e.preventDefault();
-    const settings = {
-      method: "POST",
-      credentials: "include",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-    };
     try {
-      const response = await fetch(
-        import.meta.env.VITE_URL + "/user/logout",
-        settings,
-      );
+      const url = new URL(import.meta.env.VITE_URL + "/user/logout");
+      const response = await postRequest(url, {});
       const result = await response.json();
       setUser(null);
       navigate("/");

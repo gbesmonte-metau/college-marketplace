@@ -4,6 +4,7 @@ import AddressForm from "./AddressForm";
 import "../components-css/EditProfile.css";
 import { useContext } from "react";
 import { UserContext } from "../App";
+import { patchRequest } from "../api";
 
 export default function EditProfile({ userInfo, setIsEditOpen }) {
   const [icon, setIcon] = useState(userInfo.icon);
@@ -14,25 +15,15 @@ export default function EditProfile({ userInfo, setIsEditOpen }) {
 
   async function handleEdit(e) {
     e.preventDefault();
-    const settings = {
-      method: "PATCH",
-      credentials: "include",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
+    try {
+      const body = {
         icon: icon,
         bio: bio,
         location: location,
         formatted_address: address,
-      }),
-    };
-    try {
-      const response = await fetch(
-        import.meta.env.VITE_URL + `/user`,
-        settings,
-      );
+      };
+      const url = new URL(import.meta.env.VITE_URL + `/user`);
+      const response = await patchRequest(url, body);
       const result = await response.json();
       if (response.ok) {
         alert("User edit");

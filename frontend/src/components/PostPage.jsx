@@ -6,6 +6,7 @@ import Filter from "./Filter";
 import CreatePost from "./CreatePost";
 import { getCategoryIdByName } from "../../utils";
 import Loading from "./Loading";
+import { getRequest } from "../api";
 
 export default function PostPage() {
   const [posts, setPosts] = useState([]);
@@ -52,10 +53,7 @@ export default function PostPage() {
 
     const queryString = params.toString();
     const fetchUrl = queryString ? `${url}?${queryString}` : url.toString();
-    const response = await fetch(fetchUrl, {
-      method: "GET",
-      credentials: "include",
-    });
+    const response = await getRequest(fetchUrl, true);
     const result = await response.json();
     setIsLoading(false);
     if (!response.ok) {

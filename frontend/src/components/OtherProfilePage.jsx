@@ -1,12 +1,14 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router";
+import { getRequest } from "../api";
 
 export default function OtherProfilePage() {
   const [userInfo, setUserInfo] = useState({});
   const id = useParams().id;
 
   async function getProfile() {
-    const response = await fetch(import.meta.env.VITE_URL + `/users/${id}`);
+    const url = new URL(import.meta.env.VITE_URL + `/users/${id}`);
+    const response = await getRequest(url, false);
     const result = await response.json();
     if (response.ok) {
       setUserInfo(result);

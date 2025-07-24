@@ -8,6 +8,7 @@ import { FaRegHeart } from "react-icons/fa";
 import { FaRegBookmark } from "react-icons/fa";
 import { FaBookmark } from "react-icons/fa";
 import "../components-css/Post.css";
+import { getRequest, postRequest } from "../api";
 
 export default function Post({ post }) {
   const [isLiked, setIsLiked] = useState(false);
@@ -35,13 +36,8 @@ export default function Post({ post }) {
       navigate("/login");
     } else {
       try {
-        const response = await fetch(
-          import.meta.env.VITE_URL + `/user/view/${post.id}`,
-          {
-            method: "POST",
-            credentials: "include",
-          },
-        );
+        const url = new URL(import.meta.env.VITE_URL + `/user/view/${post.id}`);
+        const response = await postRequest(url, {});
         const result = await response.json();
         if (response.ok) {
           navigate(`/posts/${post.id}`);
@@ -54,12 +50,8 @@ export default function Post({ post }) {
 
   async function getIsLiked() {
     try {
-      const response = await fetch(
-        import.meta.env.VITE_URL + `/user/like/${post.id}`,
-        {
-          credentials: "include",
-        },
-      );
+      const url = new URL(import.meta.env.VITE_URL + `/user/like/${post.id}`);
+      const response = await getRequest(url, true);
       const result = await response.json();
       setIsLiked(result.liked);
     } catch (e) {
@@ -68,12 +60,8 @@ export default function Post({ post }) {
   }
   async function getIsSaved() {
     try {
-      const response = await fetch(
-        import.meta.env.VITE_URL + `/user/save/${post.id}`,
-        {
-          credentials: "include",
-        },
-      );
+      const url = new URL(import.meta.env.VITE_URL + `/user/save/${post.id}`);
+      const response = await getRequest(url, true);
       const result = await response.json();
       setIsSaved(result.saved);
     } catch (e) {
@@ -88,10 +76,7 @@ export default function Post({ post }) {
       import.meta.env.VITE_URL +
       (isLiked ? `/user/unlike/${post.id}` : `/user/like/${post.id}`);
     try {
-      const response = await fetch(URL, {
-        credentials: "include",
-        method: "POST",
-      });
+      const response = await postRequest(URL, {});
       if (response.ok) {
         if (isLiked) {
           setLocalPost({
@@ -126,10 +111,7 @@ export default function Post({ post }) {
       import.meta.env.VITE_URL +
       (isSaved ? `/user/unsave/${post.id}` : `/user/save/${post.id}`);
     try {
-      const response = await fetch(URL, {
-        credentials: "include",
-        method: "POST",
-      });
+      const response = await postRequest(URL, {});
       if (response.ok) {
         if (isSaved) {
           setLocalPost({

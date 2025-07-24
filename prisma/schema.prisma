@@ -56,7 +56,7 @@ model Post {
 model UserViewedPosts {
   user User @relation("UserViewedPosts", fields: [userId], references: [id])
   userId Int
-  post Post @relation("UserViewedPosts", fields: [postId], references: [id])
+  post Post @relation("UserViewedPosts", fields: [postId], references: [id], onDelete: Cascade)
   postId Int
   viewedAt DateTime @default(now())
   @@id([userId, postId])
@@ -65,7 +65,7 @@ model UserViewedPosts {
 model UserLikedPosts {
   user User @relation("UserLikedPosts", fields: [userId], references: [id])
   userId Int
-  post Post @relation("UserLikedPosts", fields: [postId], references: [id])
+  post Post @relation("UserLikedPosts", fields: [postId], references: [id], onDelete: Cascade)
   postId Int
   likedAt DateTime @default(now())
   @@id([userId, postId])
@@ -74,7 +74,7 @@ model UserLikedPosts {
 model UserSavedPosts {
   user User @relation("UserSavedPosts", fields: [userId], references: [id])
   userId Int
-  post Post @relation("UserSavedPosts", fields: [postId], references: [id])
+  post Post @relation("UserSavedPosts", fields: [postId], references: [id], onDelete: Cascade)
   postId Int
   savedAt DateTime @default(now())
   @@id([userId, postId])
@@ -86,7 +86,7 @@ model Purchase {
   buyerId Int
   seller User @relation("PurchaseSeller", fields: [sellerId], references: [id])
   sellerId Int
-  post Post @relation("PurchasePost", fields: [postId], references: [id])
+  post Post @relation("PurchasePost", fields: [postId], references: [id], onDelete: Cascade)
   postId Int @unique
   purchasedAt DateTime @default(now())
   rating Int?

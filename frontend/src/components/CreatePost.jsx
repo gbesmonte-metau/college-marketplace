@@ -9,7 +9,7 @@ import {
 import { useState, useContext } from "react";
 import { UserContext } from "../App";
 import { useNavigate } from "react-router";
-import { fetchCreatePost } from "../api";
+import { postRequest } from "../api";
 import AddressForm from "./AddressForm";
 import UploadImage from "./UploadImage";
 import { MdErrorOutline } from "react-icons/md";
@@ -28,7 +28,7 @@ export default function CreatePost({ setIsCreatePostOpen }) {
   const [color, setColor] = useState("Other");
   const [location, setLocation] = useState(null);
   const [formattedAddr, setFormattedAddr] = useState("");
-  const [url, setUrl] = useState("");
+  const [imageUrl, setImageUrl] = useState("");
 
   const [error, setError] = useState(null);
 
@@ -60,10 +60,11 @@ export default function CreatePost({ setIsCreatePostOpen }) {
       time_created: Date.now().toString(),
       location: location,
       formatted_address: formattedAddr,
-      image_url: url,
+      image_url: imageUrl,
       authorId: user.id,
     };
-    const response = await fetchCreatePost(body);
+    const url = new URL(import.meta.env.VITE_URL + "/posts");
+    const response = await postRequest(url, body);
     const result = await response.json();
     if (response.ok) {
       setIsCreatePostOpen(false);
@@ -77,8 +78,8 @@ export default function CreatePost({ setIsCreatePostOpen }) {
       <div className="create-body">
         <h2>Create Post</h2>
         <div className="create-box">
-          {url ? (
-            <img className="create-post-img" src={url} alt="uploaded image" />
+          {imageUrl ? (
+            <img className="create-post-img" src={imageUrl} alt="uploaded image" />
           ) : (
             <img
               className="create-post-img"
@@ -184,7 +185,7 @@ export default function CreatePost({ setIsCreatePostOpen }) {
             </div>
             <div className="create-option">
               <p>Image</p>
-              <UploadImage url={url} setUrl={setUrl} />
+              <UploadImage url={imageUrl} setUrl={setImageUrl} />
             </div>
             <button type="submit">Create</button>
             <button onClick={() => setIsCreatePostOpen(false)}>Close</button>

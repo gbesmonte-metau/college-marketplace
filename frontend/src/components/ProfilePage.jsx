@@ -1,7 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, use } from "react";
 import "../components-css/ProfilePage.css";
 import Post from "./Post";
 import EditProfile from "./EditProfile";
+import { getRequest } from "../api";
+import Loading from "./Loading";
 
 const mode = {
   Likes: 0,
@@ -16,11 +18,11 @@ export default function ProfilePage() {
   const [boughtPosts, setBoughtPosts] = useState([]);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [modeState, setModeState] = useState(mode.Likes);
+  const [isLoading, setIsLoading] = useState(false);
 
   async function getProfile() {
-    const response = await fetch(import.meta.env.VITE_URL + "/user", {
-      credentials: "include",
-    });
+    setIsLoading(true);
+    const response = await getRequest(import.meta.env.VITE_URL + "/user", true);
     const result = await response.json();
     if (response.ok) {
       setUserInfo(result);
@@ -28,9 +30,7 @@ export default function ProfilePage() {
   }
 
   async function getLikedPosts() {
-    const response = await fetch(import.meta.env.VITE_URL + "/user/likes", {
-      credentials: "include",
-    });
+    const response = await getRequest(import.meta.env.VITE_URL + "/user/likes", true);
     const result = await response.json();
     if (response.ok) {
       setLikedPosts(result);
@@ -38,9 +38,7 @@ export default function ProfilePage() {
   }
 
   async function getSavedPosts() {
-    const response = await fetch(import.meta.env.VITE_URL + "/user/saves", {
-      credentials: "include",
-    });
+    const response = await getRequest(import.meta.env.VITE_URL + "/user/saves", true);
     const result = await response.json();
     if (response.ok) {
       setSavedPosts(result);
@@ -48,13 +46,12 @@ export default function ProfilePage() {
   }
 
   async function getBoughtPosts() {
-    const response = await fetch(import.meta.env.VITE_URL + "/bought", {
-      credentials: "include",
-    });
+    const response = await getRequest(import.meta.env.VITE_URL + "/bought", true);
     const result = await response.json();
     if (response.ok) {
       setBoughtPosts(result);
     }
+    setIsLoading(false);
   }
 
   function handleEdit() {
@@ -70,6 +67,7 @@ export default function ProfilePage() {
 
   return (
     <div className="page">
+      <Loading isLoading={isLoading}></Loading>
       <div className="profile-body">
         <div className="profile-info">
           <img
@@ -106,7 +104,7 @@ export default function ProfilePage() {
                 <li key={idx} onClick={() => setModeState(mode[key])}>
                   {key}
                 </li>
-              ),
+              )
             )}
           </ul>
         </nav>

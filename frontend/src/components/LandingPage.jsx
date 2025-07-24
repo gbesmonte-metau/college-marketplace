@@ -3,6 +3,7 @@ import { Link } from "react-router";
 import { useState, useEffect } from "react";
 import Loading from "./Loading";
 import Post from "./Post";
+import { getRequest } from "../api";
 
 export default function LandingPage() {
   const [trendingPosts, setTrendingPosts] = useState([]);
@@ -15,7 +16,8 @@ export default function LandingPage() {
   async function getTrending() {
     try {
       setIsLoading(true);
-      const response = await fetch(import.meta.env.VITE_URL + `/trending`);
+      const url = new URL(import.meta.env.VITE_URL + `/trending`);
+      const response = await getRequest(url, false);
       const result = await response.json();
       if (response.ok) {
         setTrendingPosts(result);
