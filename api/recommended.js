@@ -109,7 +109,7 @@ export async function getRecommendations(user_id, k) {
     3: sellerVector.toObject(),
   };
   const postIds = sortedEntries.map(([postId, _]) => postId.toString());
-  const postsToHighest = GetMaxCategoryPerPost(postIds, allVectors);
+  const postsToHighest = getMaxCategoryPerPost(postIds, allVectors);
 
   // Get top k
   sortedEntries = sortedEntries
@@ -119,7 +119,7 @@ export async function getRecommendations(user_id, k) {
 }
 
 // HELPER FUNCTIONS
-function GetMaxCategoryPerPost(postIds, allVectors) {
+function getMaxCategoryPerPost(postIds, allVectors) {
   const postsToHighest = {};
   for (const postId of postIds) {
     postsToHighest[postId] = [-1, -Infinity];

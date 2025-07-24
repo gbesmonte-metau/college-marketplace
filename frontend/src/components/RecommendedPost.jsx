@@ -62,12 +62,12 @@ export default function RecommendedPost({
     }
   }
 
-  async function IncrementIndex(e) {
+  async function incrementIndex(e) {
     e.preventDefault();
     await createRecommendation();
     setRecommendedPostIdx(recommendedPostIdx + 1);
   }
-  async function DecrementIndex(e) {
+  async function decrementIndex(e) {
     e.preventDefault();
     await createRecommendation();
     setRecommendedPostIdx(recommendedPostIdx - 1);
@@ -111,6 +111,7 @@ export default function RecommendedPost({
       alert(e);
     }
   }
+  
   async function getIsSaved() {
     try {
       const url = new URL(import.meta.env.VITE_URL + `/user/save/${post.id}`);
@@ -198,7 +199,7 @@ export default function RecommendedPost({
           <button
             type="button"
             className="skip-button"
-            onClick={DecrementIndex}
+            onClick={decrementIndex}
           >
             <MdNavigateBefore />
           </button>
@@ -234,7 +235,7 @@ export default function RecommendedPost({
           <button
             type="button"
             className="skip-button"
-            onClick={IncrementIndex}
+            onClick={incrementIndex}
           >
             <MdNavigateNext />
           </button>
