@@ -369,6 +369,7 @@ router.get("/user/recommendations", isAuthenticated, async (req, res, next) => {
         },
       },
     });
+    post["best_category"] = p[2];
     recommendedPosts.push(post);
   }
   res.status(200).json(recommendedPosts);

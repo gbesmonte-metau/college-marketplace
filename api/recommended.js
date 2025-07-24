@@ -25,10 +25,9 @@ const RATING_WEIGHTS = {
 };
 const USER_SOLD_WEIGHT = 3;
 const WEIGHTS = {
-  information: 30,
-  category: 10,
-  location: 10,
-  trending: 25,
+  information: 25,
+  category: 25,
+  otherUsers: 25,
   seller: 25,
 };
 
@@ -58,11 +57,14 @@ export async function getRecommendations(user_id, k) {
   if (user.location) {
     locationScores = await getLocationScores(user);
     locationVector = new Vector(locationScores);
-    locationVector.normalize().multiply(WEIGHTS.location);
+    locationVector.normalize();
   }
   const trendingScores = await getTrendingScores(posts);
   const trendingVector = new Vector(trendingScores);
-  trendingVector.normalize().multiply(WEIGHTS.trending);
+  trendingVector.normalize();
+  const otherUserScores = trendingVector
+    .add(locationVector)
+    .multiply(WEIGHTS.otherUsers);
   // seller score
   const sellerToScore = {};
   const sellerArr = {};
@@ -82,9 +84,9 @@ export async function getRecommendations(user_id, k) {
   sellerVector.normalize().multiply(WEIGHTS.seller);
   // calculate final score
   const totalVectorObj = informationVector
+    .clone()
     .add(categoryVector)
-    .add(trendingVector)
-    .add(locationVector)
+    .add(otherUserScores)
     .add(sellerVector)
     .toObject();
   let sortedEntries = Object.entries(totalVectorObj).sort(
@@ -99,18 +101,39 @@ export async function getRecommendations(user_id, k) {
         (purchased) => purchased.id === parseInt(key)
       )
   );
+  // get the highest score for each post
+  const allVectors = {
+    0: informationVector.toObject(),
+    1: categoryVector.toObject(),
+    2: otherUserScores.toObject(),
+    3: sellerVector.toObject(),
+  };
+  const postIds = sortedEntries.map(([postId, _]) => postId.toString());
+  const postsToHighest = GetMaxCategoryPerPost(postIds, allVectors);
+
   // Get top k
-  return sortedEntries
+  sortedEntries = sortedEntries
     .slice(0, k)
-    .map(([key, value]) => [parseInt(key), value]);
+    .map(([key, value]) => [parseInt(key), value, postsToHighest[key][0]]);
+  return sortedEntries;
 }
 
 // HELPER FUNCTIONS
-/**
- * Get user interactions
- * Input: userId
- * Output: {viewed: [{userId, postId, viewedAt}], liked: [], saved: [], purchased: []}
- */
+function GetMaxCategoryPerPost(postIds, allVectors) {
+  const postsToHighest = {};
+  for (const postId of postIds) {
+    postsToHighest[postId] = [-1, -Infinity];
+    for (const [type, vectorValues] of Object.entries(allVectors)) {
+      const score =
+        vectorValues[postId] != undefined ? vectorValues[postId] : -Infinity;
+      if (score > postsToHighest[postId][1]) {
+        postsToHighest[postId][0] = type;
+        postsToHighest[postId][1] = score;
+      }
+    }
+  }
+  return postsToHighest;
+}
 
 /**
  * Get user interactions
