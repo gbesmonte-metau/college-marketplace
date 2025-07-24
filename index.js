@@ -12,7 +12,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 app.use(express.json({ limit: "25mb" }));
 app.use(express.urlencoded({ limit: "25mb" }));
-app.use(cors({ credentials: true, origin: "http://localhost:5173" }));
+app.use(cors({ credentials: true, origin: process.env.FRONTEND_URL }));
 app.use(
   expressSession({
     name: "cookie",
@@ -35,7 +35,7 @@ app.get("/", (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+  console.log(`Server is running on ${process.env.FRONTEND_URL}`);
 });
 
 app.post("/uploadImage", (req, res) => {
