@@ -25,10 +25,10 @@ const RATING_WEIGHTS = {
 };
 const USER_SOLD_WEIGHT = 3;
 const WEIGHTS = {
-  information: 25,
-  category: 25,
-  otherUsers: 25,
-  seller: 25,
+  information: 0,
+  category: 1,
+  otherUsers: 2,
+  seller: 3,
 };
 
 // MAIN FUNCTION
@@ -41,11 +41,9 @@ export async function getRecommendations(user_id, k) {
     posts
   );
   const informationVector = new Vector(postInformationScores);
-  informationVector.normalize().multiply(WEIGHTS.information);
   // category based recommendation
   const categoryScores = getRecommendationsByCategory(interactions, posts);
   const categoryVector = new Vector(categoryScores);
-  categoryVector.normalize().multiply(WEIGHTS.category);
   // other users based recommendation
   const user = await prisma.user.findUnique({
     where: {
@@ -62,9 +60,6 @@ export async function getRecommendations(user_id, k) {
   const trendingScores = await getTrendingScores(posts);
   const trendingVector = new Vector(trendingScores);
   trendingVector.normalize();
-  const otherUserScores = trendingVector
-    .add(locationVector)
-    .multiply(WEIGHTS.otherUsers);
   // seller score
   const sellerToScore = {};
   const sellerArr = {};
@@ -81,7 +76,30 @@ export async function getRecommendations(user_id, k) {
     }
   }
   const sellerVector = new Vector(sellerArr);
-  sellerVector.normalize().multiply(WEIGHTS.seller);
+  
+  // recalculate weights based on feedback
+  const currentWeights = await recalculateWeights(user);
+  // make weights add up to 100
+  const normalizedWeights = normalizeWeights(currentWeights);
+
+  // change weight of user
+  await prisma.user.update({
+    where: {
+      id: user_id,
+    },
+    data: {
+      weights: normalizedWeights
+    }
+  })
+
+  // get and use weights from user
+  informationVector.normalize().multiply(user.weights[WEIGHTS["information"]]);
+  categoryVector.normalize().multiply(user.weights[WEIGHTS["category"]]);
+  const otherUserScores = trendingVector
+    .add(locationVector)
+    .multiply(user.weights[WEIGHTS["otherUsers"]]);
+  sellerVector.normalize().multiply(user.weights[WEIGHTS["seller"]]);
+
   // calculate final score
   const totalVectorObj = informationVector
     .clone()
@@ -101,6 +119,7 @@ export async function getRecommendations(user_id, k) {
         (purchased) => purchased.id === parseInt(key)
       )
   );
+
   // get the highest score for each post
   const allVectors = {
     0: informationVector.toObject(),
@@ -119,6 +138,47 @@ export async function getRecommendations(user_id, k) {
 }
 
 // HELPER FUNCTIONS
+function normalizeWeights(weights){
+  const sumWeights = weights.reduce((sum, current) => sum + current, 0);
+  const scale = 100 / sumWeights;
+  const normalizedWeights = weights.map(weight => weight * scale);
+  return normalizedWeights;
+}
+
+async function recalculateWeights(user){
+  // recalculate weights based on previous feedback
+  const previousFeedback = await prisma.recommendedPosts.findMany({
+    where: {
+      userId: user.id,
+      NOT: {
+         isWeighed: true
+      }
+    }
+  });
+  const currentWeights = user.weights;
+  for (const feedback of previousFeedback){
+    if (feedback.isFeedbackPositive){
+      currentWeights[feedback.bestCategory] += .5;
+    }
+    else {
+      currentWeights[feedback.bestCategory] -= .5;
+    }
+  }
+  // mark previous feedback as used
+  await prisma.recommendedPosts.updateMany({
+    where: {
+      userId: user.id,
+      NOT: {
+        isWeighed: true
+      }
+    },
+    data: { 
+      isWeighed: true
+    }
+  })
+  return currentWeights;
+}
+
 function getMaxCategoryPerPost(postIds, allVectors) {
   const postsToHighest = {};
   for (const postId of postIds) {

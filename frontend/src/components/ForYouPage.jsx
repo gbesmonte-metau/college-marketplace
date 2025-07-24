@@ -35,15 +35,6 @@ export default function ForYouPage() {
     getRecommendedPosts();
   }, [user]);
 
-  function IncrementIndex(e) {
-    e.preventDefault();
-    setRecommendedPostIdx(recommendedPostIdx + 1);
-  }
-  function DecrementIndex(e) {
-    e.preventDefault();
-    setRecommendedPostIdx(recommendedPostIdx - 1);
-  }
-
   return (
     <div className="page">
       <Loading isLoading={isLoading}></Loading>
