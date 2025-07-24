@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import Post from "./Post";
 import { useNavigate } from "react-router";
 import { useContext } from "react";
 import { UserContext } from "../App";
@@ -7,8 +6,6 @@ import "../components-css/ForYouPage.css";
 import Loading from "./Loading";
 import { getRequest } from "../api";
 import RecommendedPost from "./RecommendedPost";
-import { MdNavigateNext } from "react-icons/md";
-import { MdNavigateBefore } from "react-icons/md";
 
 export default function ForYouPage() {
   const { user, setUser } = useContext(UserContext);
@@ -53,32 +50,14 @@ export default function ForYouPage() {
       <div className="recommended-body">
         <h2>Recommended Posts</h2>
         <div className="recommended-container">
-          <div className="arrow-container">
-            {recommendedPostIdx != 0 && (
-              <button
-                type="button"
-                className="skip-button"
-                onClick={DecrementIndex}
-              >
-                <MdNavigateBefore />
-              </button>
-            )}
-          </div>
           {recommendedPosts.length > 0 && (
-            <RecommendedPost post={recommendedPosts[recommendedPostIdx]} />
+            <RecommendedPost
+              post={recommendedPosts[recommendedPostIdx]}
+              recommendedPosts={recommendedPosts}
+              recommendedPostIdx={recommendedPostIdx}
+              setRecommendedPostIdx={setRecommendedPostIdx}
+            />
           )}
-
-          <div className="arrow-container">
-            {recommendedPostIdx != recommendedPosts.length - 1 && (
-              <button
-                type="button"
-                className="skip-button"
-                onClick={IncrementIndex}
-              >
-                <MdNavigateNext />
-              </button>
-            )}
-          </div>
         </div>
       </div>
     </div>

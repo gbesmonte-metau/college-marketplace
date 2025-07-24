@@ -412,10 +412,56 @@ router.post("/user/bundles", isAuthenticated, async (req, res, next) => {
       queries,
       budget,
       userId,
-      priorities,
+      priorities
     );
     res.status(200).json(bundles);
   } catch (err) {
     next(err);
   }
 });
+
+// Create recommendation log
+router.post(
+  "/user/recommended/:id",
+  isAuthenticated,
+  async (req, res, next) => {
+    const userId = req.session.user.id;
+    const postId = parseInt(req.params.id);
+    const body = req.body;
+    try {
+      // overwrite previous record if exists
+      const post = await prisma.recommendedPosts.findUnique({
+        where: {
+          userId_postId: {
+            userId: userId,
+            postId: postId,
+          },
+        },
+      });
+      if (post) {
+        await prisma.recommendedPosts.delete({
+          where: {
+            userId_postId: {
+              userId: userId,
+              postId: postId,
+            },
+          },
+        });
+      }
+      // create new record
+      await prisma.recommendedPosts.create({
+        data: {
+          userId: userId,
+          postId: parseInt(postId),
+          isRecommended: true,
+          isWeighed: false,
+          bestCategory: parseInt(body.bestCategory),
+          isFeedbackPositive: body.isFeedbackPositive,
+        },
+      });
+      res.status(200).json({ message: "Post saved" });
+    } catch (err) {
+      next(err);
+    }
+  }
+);
