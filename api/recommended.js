@@ -57,9 +57,12 @@ export async function getRecommendations(user_id, k) {
     locationVector = new Vector(locationScores);
     locationVector.normalize();
   }
-  const trendingScores = await getTrendingScores(posts);
+  const trendingScores = await getTrendingScores(posts, user_id);
+  const allZero = Object.values(trendingScores).every((score) => score == 0);
   const trendingVector = new Vector(trendingScores);
-  trendingVector.normalize();
+  if (!allZero) {
+    trendingVector.normalize();
+  }
   // seller score
   const sellerToScore = {};
   const sellerArr = {};
@@ -76,7 +79,7 @@ export async function getRecommendations(user_id, k) {
     }
   }
   const sellerVector = new Vector(sellerArr);
-  
+
   // recalculate weights based on feedback
   const currentWeights = await recalculateWeights(user);
   // make weights add up to 100
@@ -88,9 +91,9 @@ export async function getRecommendations(user_id, k) {
       id: user_id,
     },
     data: {
-      weights: normalizedWeights
-    }
-  })
+      weights: normalizedWeights,
+    },
+  });
 
   // get and use weights from user
   informationVector.normalize().multiply(user.weights[WEIGHTS["information"]]);
@@ -133,35 +136,34 @@ export async function getRecommendations(user_id, k) {
   // Get top k
   sortedEntries = sortedEntries
     .slice(0, k)
-    .map(([key, value]) => [parseInt(key), value, postsToHighest[key][0]]);
+    .map(([key, value]) => [parseInt(key), value, postsToHighest[key].type]);
   return sortedEntries;
 }
 
 // HELPER FUNCTIONS
-function normalizeWeights(weights){
+function normalizeWeights(weights) {
   const sumWeights = weights.reduce((sum, current) => sum + current, 0);
   const scale = 100 / sumWeights;
-  const normalizedWeights = weights.map(weight => weight * scale);
+  const normalizedWeights = weights.map((weight) => weight * scale);
   return normalizedWeights;
 }
 
-async function recalculateWeights(user){
+async function recalculateWeights(user) {
   // recalculate weights based on previous feedback
   const previousFeedback = await prisma.recommendedPosts.findMany({
     where: {
       userId: user.id,
       NOT: {
-         isWeighed: true
-      }
-    }
+        isWeighed: true,
+      },
+    },
   });
   const currentWeights = user.weights;
-  for (const feedback of previousFeedback){
-    if (feedback.isFeedbackPositive){
-      currentWeights[feedback.bestCategory] += .5;
-    }
-    else {
-      currentWeights[feedback.bestCategory] -= .5;
+  for (const feedback of previousFeedback) {
+    if (feedback.isFeedbackPositive) {
+      currentWeights[feedback.bestCategory] += 0.5;
+    } else {
+      currentWeights[feedback.bestCategory] -= 0.5;
     }
   }
   // mark previous feedback as used
@@ -169,28 +171,31 @@ async function recalculateWeights(user){
     where: {
       userId: user.id,
       NOT: {
-        isWeighed: true
-      }
+        isWeighed: true,
+      },
     },
-    data: { 
-      isWeighed: true
-    }
-  })
+    data: {
+      isWeighed: true,
+    },
+  });
   return currentWeights;
 }
 
 function getMaxCategoryPerPost(postIds, allVectors) {
   const postsToHighest = {};
   for (const postId of postIds) {
-    postsToHighest[postId] = [-1, -Infinity];
-    for (const [type, vectorValues] of Object.entries(allVectors)) {
-      const score =
-        vectorValues[postId] != undefined ? vectorValues[postId] : -Infinity;
-      if (score > postsToHighest[postId][1]) {
-        postsToHighest[postId][0] = type;
-        postsToHighest[postId][1] = score;
-      }
-    }
+    const { type, score } = Object.entries(allVectors).reduce(
+      (max, [type, vectorValues]) => {
+        const score =
+          vectorValues[postId] != undefined ? vectorValues[postId] : -Infinity;
+        if (score > max.score) {
+          return { type, score };
+        }
+        return max;
+      },
+      { type: -1, score: -Infinity }
+    );
+    postsToHighest[postId] = { type, score };
   }
   return postsToHighest;
 }
@@ -424,25 +429,34 @@ async function getLocationScores(currUser) {
   return locationScores;
 }
 
-export async function getTrendingScores(posts) {
+export async function getTrendingScores(posts, userId) {
   let trendingScores = {};
   for (const post of posts) {
     trendingScores[post.id] = 0;
   }
   const allInteractions = await getAllInteractions();
   for (const viewed of allInteractions.viewed) {
+    if (userId && viewed.userId == userId) {
+      continue;
+    }
     trendingScores[viewed.postId] += calculateTrendingScore(
       viewed.viewedAt,
       VIEWED_WEIGHT
     );
   }
   for (const liked of allInteractions.liked) {
+    if (userId && liked.userId == userId) {
+      continue;
+    }
     trendingScores[liked.postId] += calculateTrendingScore(
       liked.likedAt,
       LIKED_WEIGHT
     );
   }
   for (const saved of allInteractions.saved) {
+    if (userId && saved.userId == userId) {
+      continue;
+    }
     trendingScores[saved.postId] += calculateTrendingScore(
       saved.savedAt,
       SAVED_WEIGHT
