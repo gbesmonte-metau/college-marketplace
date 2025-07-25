@@ -26,7 +26,7 @@ export default function EditProfile({ userInfo, setIsEditOpen }) {
       const response = await patchRequest(url, body);
       const result = await response.json();
       if (response.ok) {
-        alert("User edit");
+        alert("Edited post successfully!");
         setIsEditOpen(false);
         setUser(result);
       } else {

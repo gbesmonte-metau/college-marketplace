@@ -1,64 +1,6 @@
 import fuzzy from "fuzzy";
 import { getRecommendations as getRecommendations } from "./recommended.js";
 
-//Test Data
-const tempItems = [
-  {
-    id: 1,
-    name: "Modern Desk Lamp",
-    recommend_score: 0.4,
-    price: 10,
-  },
-  {
-    id: 2,
-    name: "LED Table Lamp",
-    recommend_score: 0.9,
-    price: 10,
-  },
-  {
-    id: 3,
-    name: "Minimalist Floor Lamp",
-    recommend_score: 0.1,
-    price: 10,
-  },
-  {
-    id: 4,
-    name: "Classic Wood Bedframe",
-    recommend_score: 0.3,
-    price: 20,
-  },
-  {
-    id: 5,
-    name: "Oak Frame Bed",
-    recommend_score: 0.6,
-    price: 20,
-  },
-  {
-    id: 6,
-    name: "Compact Metal Bed Frame",
-    recommend_score: 0.9,
-    price: 2,
-  },
-  {
-    id: 7,
-    name: "Three-Seater Couch",
-    recommend_score: 0.8,
-    price: 1,
-  },
-  {
-    id: 8,
-    name: "Deluxe Fabric Couch",
-    recommend_score: 0.9,
-    price: 15,
-  },
-  {
-    id: 9,
-    name: "Modern Living Room Couch",
-    recommend_score: 0.5,
-    price: 15,
-  },
-];
-
 const priorityWeights = {
   High: 10,
   Medium: 1,

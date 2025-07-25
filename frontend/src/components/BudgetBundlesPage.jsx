@@ -121,9 +121,11 @@ export default function BudgetBundlesPage() {
                 <button type="button" onClick={addItem}>
                   Add Item
                 </button>
-                <button type="button" onClick={removeItem}>
-                  Remove Item
-                </button>
+                {items && items.length >= 3 && (
+                  <button type="button" onClick={removeItem}>
+                    Remove Item
+                  </button>
+                )}
               </div>
             </div>
             <div className="add-items-container">

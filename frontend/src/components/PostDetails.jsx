@@ -21,7 +21,10 @@ export default function PostDetails() {
 
   async function getPostDetails() {
     try {
-      const response = await getRequest(import.meta.env.VITE_URL + `/posts/${id}`, false);
+      const response = await getRequest(
+        import.meta.env.VITE_URL + `/posts/${id}`,
+        false
+      );
       const result = await response.json();
       if (response.ok) {
         setPostDetails(result);
@@ -56,7 +59,10 @@ export default function PostDetails() {
       alert("You need to login to purchase this item");
       return;
     }
-    const response = await postRequest(import.meta.env.VITE_URL + `/posts/${id}/purchase`, {});
+    const response = await postRequest(
+      import.meta.env.VITE_URL + `/posts/${id}/purchase`,
+      {}
+    );
     const result = await response.json();
     if (!response.ok) {
       alert(result.message);
@@ -84,15 +90,18 @@ export default function PostDetails() {
                 <div>
                   {postDetails.purchase ? (
                     <p>Already Purchased</p>
-                  ) : (
+                  ) : user && user.id == postDetails.authorId ? null : (
                     <button onClick={handlePurchase}>Purchase</button>
                   )}
                 </div>
                 <p>
                   {user && user.id === postDetails.authorId ? (
-                    <Link to={`/profile`} >My Profile</Link>
+                    <Link to={`/profile`}>My Profile</Link>
                   ) : (
-                    <Link to={`/profile/${postDetails.authorId}`} state={{postId: postDetails.id}}>
+                    <Link
+                      to={`/profile/${postDetails.authorId}`}
+                      state={{ postId: postDetails.id }}
+                    >
                       View Author Details
                     </Link>
                   )}
