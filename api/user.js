@@ -358,7 +358,7 @@ router.get("/user/recommendations", isAuthenticated, async (req, res, next) => {
   for (const p of postArr) {
     const post = await prisma.post.findUnique({
       where: {
-        id: p[0],
+        id: p.id,
       },
       include: {
         _count: {
@@ -369,7 +369,7 @@ router.get("/user/recommendations", isAuthenticated, async (req, res, next) => {
         },
       },
     });
-    post["best_category"] = p[2];
+    post["best_category"] = p.best;
     recommendedPosts.push(post);
   }
   res.status(200).json(recommendedPosts);

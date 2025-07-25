@@ -82,8 +82,6 @@ export async function getRecommendations(user_id, k) {
 
   // recalculate weights based on feedback
   const currentWeights = await recalculateWeights(user);
-  // make weights add up to 100
-  const normalizedWeights = normalizeWeights(currentWeights);
 
   // change weight of user
   await prisma.user.update({
@@ -91,7 +89,7 @@ export async function getRecommendations(user_id, k) {
       id: user_id,
     },
     data: {
-      weights: normalizedWeights,
+      weights: currentWeights,
     },
   });
 
@@ -134,20 +132,15 @@ export async function getRecommendations(user_id, k) {
   const postsToHighest = getMaxCategoryPerPost(postIds, allVectors);
 
   // Get top k
-  sortedEntries = sortedEntries
-    .slice(0, k)
-    .map(([key, value]) => [parseInt(key), value, postsToHighest[key].type]);
+  sortedEntries = sortedEntries.slice(0, k).map(([key, value]) => ({
+    id: key,
+    value: value,
+    best: postsToHighest[key].type,
+  }));
   return sortedEntries;
 }
 
 // HELPER FUNCTIONS
-function normalizeWeights(weights) {
-  const sumWeights = weights.reduce((sum, current) => sum + current, 0);
-  const scale = 100 / sumWeights;
-  const normalizedWeights = weights.map((weight) => weight * scale);
-  return normalizedWeights;
-}
-
 async function recalculateWeights(user) {
   // recalculate weights based on previous feedback
   const previousFeedback = await prisma.recommendedPosts.findMany({
@@ -178,7 +171,10 @@ async function recalculateWeights(user) {
       isWeighed: true,
     },
   });
-  return currentWeights;
+  const sumWeights = currentWeights.reduce((sum, current) => sum + current, 0);
+  const scale = 100 / sumWeights;
+  const normalizedWeights = currentWeights.map((weight) => weight * scale);
+  return normalizedWeights;
 }
 
 function getMaxCategoryPerPost(postIds, allVectors) {
