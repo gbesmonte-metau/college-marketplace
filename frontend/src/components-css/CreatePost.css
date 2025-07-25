@@ -15,7 +15,7 @@
   margin-left: 10px;
 }
 .create-body {
-  background: white;
+  background: var(--background);
   height: 80%;
   width: 80%;
   border-radius: 20px;
