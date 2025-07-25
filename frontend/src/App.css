@@ -4,6 +4,7 @@
   grid-template-rows: auto 1fr;
   width: 100%;
   overflow: scroll;
+  background-color: var(--background);
 }
 .page {
   height: 100%;

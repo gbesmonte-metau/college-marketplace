@@ -10,9 +10,10 @@
 }
 @media (prefers-color-scheme: dark) {
   :root {
-    --text: #e0faef;
-    --background: #010403;
+    --text: white;
+    --background: #131313;
     --primary: #22dd95;
+    --light-primary:#8397ec;
     --secondary: #13267c;
     --accent: #2c19a3;
   }
@@ -22,6 +23,7 @@ body {
   margin: 0;
   height: 100vh;
   font-family: "Montserrat", sans-serif;
+  color: var(--text);
   width: 100%;
 }
 .pac-container:after {

@@ -1,10 +1,13 @@
 import { useState, useEffect } from "react";
-import { useParams } from "react-router";
+import { useParams, useLocation, Link } from "react-router";
 import { getRequest } from "../api";
 
 export default function OtherProfilePage() {
   const [userInfo, setUserInfo] = useState({});
   const id = useParams().id;
+  const location = useLocation();
+  const { state } = location;
+  console.log(location);
 
   async function getProfile() {
     const url = new URL(import.meta.env.VITE_URL + `/users/${id}`);
@@ -37,6 +40,7 @@ export default function OtherProfilePage() {
             ? userInfo.formatted_address
             : "No location"}
         </p>
+        {state.postId && <Link to={`/posts/${state.postId}`}>Go back to post</Link>}
       </div>
     </div>
   );

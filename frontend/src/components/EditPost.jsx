@@ -75,7 +75,7 @@ export default function EditPost({ postDetails, setIsEditOpen }) {
           )}
           <form onSubmit={handleEdit}>
             <div className="edit-option">
-              <p>Price</p>
+              <p>Price (required)</p>
               <input
                 name="price"
                 type="text"
@@ -85,7 +85,7 @@ export default function EditPost({ postDetails, setIsEditOpen }) {
               />
             </div>
             <div className="edit-option">
-              <p>Category</p>
+              <p>Category (required)</p>
               <select
                 name="category"
                 id="category"
@@ -100,7 +100,7 @@ export default function EditPost({ postDetails, setIsEditOpen }) {
               </select>
             </div>
             <div className="edit-option">
-              <p>Name</p>
+              <p>Name (required)</p>
               <input
                 name="name"
                 type="text"
@@ -161,7 +161,7 @@ export default function EditPost({ postDetails, setIsEditOpen }) {
               </select>
             </div>
             <div className="edit-option">
-              <p>Location</p>
+              <p>Location (required)</p>
               {formattedAddr}
               <AddressForm
                 setLocation={setLocation}
