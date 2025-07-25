@@ -358,7 +358,7 @@ router.get("/user/recommendations", isAuthenticated, async (req, res, next) => {
   for (const p of postArr) {
     const post = await prisma.post.findUnique({
       where: {
-        id: p.id,
+        id: parseInt(p.id),
       },
       include: {
         _count: {
