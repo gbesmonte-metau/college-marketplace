@@ -25,11 +25,10 @@ const RATING_WEIGHTS = {
 };
 const USER_SOLD_WEIGHT = 3;
 const WEIGHTS = {
-  information: 30,
-  category: 10,
-  location: 10,
-  trending: 25,
-  seller: 25,
+  information: 0,
+  category: 1,
+  otherUsers: 2,
+  seller: 3,
 };
 
 // MAIN FUNCTION
@@ -42,11 +41,9 @@ export async function getRecommendations(user_id, k) {
     posts
   );
   const informationVector = new Vector(postInformationScores);
-  informationVector.normalize().multiply(WEIGHTS.information);
   // category based recommendation
   const categoryScores = getRecommendationsByCategory(interactions, posts);
   const categoryVector = new Vector(categoryScores);
-  categoryVector.normalize().multiply(WEIGHTS.category);
   // other users based recommendation
   const user = await prisma.user.findUnique({
     where: {
@@ -58,11 +55,14 @@ export async function getRecommendations(user_id, k) {
   if (user.location) {
     locationScores = await getLocationScores(user);
     locationVector = new Vector(locationScores);
-    locationVector.normalize().multiply(WEIGHTS.location);
+    locationVector.normalize();
   }
-  const trendingScores = await getTrendingScores(posts);
+  const trendingScores = await getTrendingScores(posts, user_id);
+  const allZero = Object.values(trendingScores).every((score) => score == 0);
   const trendingVector = new Vector(trendingScores);
-  trendingVector.normalize().multiply(WEIGHTS.trending);
+  if (!allZero) {
+    trendingVector.normalize();
+  }
   // seller score
   const sellerToScore = {};
   const sellerArr = {};
@@ -79,12 +79,33 @@ export async function getRecommendations(user_id, k) {
     }
   }
   const sellerVector = new Vector(sellerArr);
-  sellerVector.normalize().multiply(WEIGHTS.seller);
+
+  // recalculate weights based on feedback
+  const currentWeights = await recalculateWeights(user);
+
+  // change weight of user
+  await prisma.user.update({
+    where: {
+      id: user_id,
+    },
+    data: {
+      weights: currentWeights,
+    },
+  });
+
+  // get and use weights from user
+  informationVector.normalize().multiply(user.weights[WEIGHTS["information"]]);
+  categoryVector.normalize().multiply(user.weights[WEIGHTS["category"]]);
+  const otherUserScores = trendingVector
+    .add(locationVector)
+    .multiply(user.weights[WEIGHTS["otherUsers"]]);
+  sellerVector.normalize().multiply(user.weights[WEIGHTS["seller"]]);
+
   // calculate final score
   const totalVectorObj = informationVector
+    .clone()
     .add(categoryVector)
-    .add(trendingVector)
-    .add(locationVector)
+    .add(otherUserScores)
     .add(sellerVector)
     .toObject();
   let sortedEntries = Object.entries(totalVectorObj).sort(
@@ -99,18 +120,81 @@ export async function getRecommendations(user_id, k) {
         (purchased) => purchased.id === parseInt(key)
       )
   );
+
+  // get the highest score for each post
+  const allVectors = {
+    0: informationVector.toObject(),
+    1: categoryVector.toObject(),
+    2: otherUserScores.toObject(),
+    3: sellerVector.toObject(),
+  };
+  const postIds = sortedEntries.map(([postId, _]) => postId.toString());
+  const postsToHighest = getMaxCategoryPerPost(postIds, allVectors);
+
   // Get top k
-  return sortedEntries
-    .slice(0, k)
-    .map(([key, value]) => [parseInt(key), value]);
+  sortedEntries = sortedEntries.slice(0, k).map(([key, value]) => ({
+    id: key,
+    value: value,
+    best: postsToHighest[key].type,
+  }));
+  return sortedEntries;
 }
 
 // HELPER FUNCTIONS
-/**
- * Get user interactions
- * Input: userId
- * Output: {viewed: [{userId, postId, viewedAt}], liked: [], saved: [], purchased: []}
- */
+async function recalculateWeights(user) {
+  // recalculate weights based on previous feedback
+  const previousFeedback = await prisma.recommendedPosts.findMany({
+    where: {
+      userId: user.id,
+      NOT: {
+        isWeighed: true,
+      },
+    },
+  });
+  const currentWeights = user.weights;
+  for (const feedback of previousFeedback) {
+    if (feedback.isFeedbackPositive) {
+      currentWeights[feedback.bestCategory] += 0.5;
+    } else {
+      currentWeights[feedback.bestCategory] -= 0.5;
+    }
+  }
+  // mark previous feedback as used
+  await prisma.recommendedPosts.updateMany({
+    where: {
+      userId: user.id,
+      NOT: {
+        isWeighed: true,
+      },
+    },
+    data: {
+      isWeighed: true,
+    },
+  });
+  const sumWeights = currentWeights.reduce((sum, current) => sum + current, 0);
+  const scale = 100 / sumWeights;
+  const normalizedWeights = currentWeights.map((weight) => weight * scale);
+  return normalizedWeights;
+}
+
+function getMaxCategoryPerPost(postIds, allVectors) {
+  const postsToHighest = {};
+  for (const postId of postIds) {
+    const { type, score } = Object.entries(allVectors).reduce(
+      (max, [type, vectorValues]) => {
+        const score =
+          vectorValues[postId] != undefined ? vectorValues[postId] : -Infinity;
+        if (score > max.score) {
+          return { type, score };
+        }
+        return max;
+      },
+      { type: -1, score: -Infinity }
+    );
+    postsToHighest[postId] = { type, score };
+  }
+  return postsToHighest;
+}
 
 /**
  * Get user interactions
@@ -341,25 +425,34 @@ async function getLocationScores(currUser) {
   return locationScores;
 }
 
-export async function getTrendingScores(posts) {
+export async function getTrendingScores(posts, userId) {
   let trendingScores = {};
   for (const post of posts) {
     trendingScores[post.id] = 0;
   }
   const allInteractions = await getAllInteractions();
   for (const viewed of allInteractions.viewed) {
+    if (userId && viewed.userId == userId) {
+      continue;
+    }
     trendingScores[viewed.postId] += calculateTrendingScore(
       viewed.viewedAt,
       VIEWED_WEIGHT
     );
   }
   for (const liked of allInteractions.liked) {
+    if (userId && liked.userId == userId) {
+      continue;
+    }
     trendingScores[liked.postId] += calculateTrendingScore(
       liked.likedAt,
       LIKED_WEIGHT
     );
   }
   for (const saved of allInteractions.saved) {
+    if (userId && saved.userId == userId) {
+      continue;
+    }
     trendingScores[saved.postId] += calculateTrendingScore(
       saved.savedAt,
       SAVED_WEIGHT

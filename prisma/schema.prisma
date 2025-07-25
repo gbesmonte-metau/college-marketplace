@@ -28,6 +28,8 @@ model User {
   savedPosts UserSavedPosts[] @relation("UserSavedPosts")
   purchases Purchase[] @relation("PurchaseBuyer")
   soldPosts Purchase[] @relation("PurchaseSeller")
+  recommendations RecommendedPosts[] @relation("UserRecommend")
+  weights Int[] @default([25,25,25,25])
 }
 
 model Post {
@@ -51,6 +53,7 @@ model Post {
   usersLiked UserLikedPosts[] @relation("UserLikedPosts")
   usersSaved UserSavedPosts[] @relation("UserSavedPosts")
   purchase Purchase? @relation("PurchasePost")
+  recommendations RecommendedPosts[] @relation("PostRecommend")
 }
 
 model UserViewedPosts {
@@ -90,4 +93,17 @@ model Purchase {
   postId Int @unique
   purchasedAt DateTime @default(now())
   rating Int?
+}
+
+model RecommendedPosts{
+  user User @relation("UserRecommend", fields: [userId], references: [id])
+  userId Int
+  post Post @relation("PostRecommend", fields: [postId], references: [id], onDelete: Cascade)
+  postId Int @unique
+  isRecommended Boolean @default(false)
+  isWeighed Boolean @default(false)
+  bestCategory Int?
+  isFeedbackPositive Boolean?
+  
+  @@id([userId, postId])
 }

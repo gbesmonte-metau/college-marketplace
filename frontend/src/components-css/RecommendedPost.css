@@ -1,0 +1,17 @@
+.recommended-post-image {
+  height: 500px;
+  width: 500px;
+  object-fit: cover;
+}
+.rec-post-like,
+.rec-post-save {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 30px;
+  width: 15%;
+}
+.rec-like-button,
+.rec-save-button {
+  font-size: 30px;
+}

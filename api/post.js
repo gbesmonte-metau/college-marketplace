@@ -457,7 +457,7 @@ router.patch(
 router.get("/trending", async (req, res, next) => {
   try {
     const posts = await prisma.post.findMany();
-    const trendingScores = await getTrendingScores(posts);
+    const trendingScores = await getTrendingScores(posts, null);
     let sorted = Object.entries(trendingScores).sort(
       ([, valA], [, valB]) => valB - valA,
     );

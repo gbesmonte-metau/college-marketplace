@@ -1,16 +1,17 @@
 import { useState, useEffect } from "react";
-import Post from "./Post";
 import { useNavigate } from "react-router";
 import { useContext } from "react";
 import { UserContext } from "../App";
 import "../components-css/ForYouPage.css";
 import Loading from "./Loading";
 import { getRequest } from "../api";
+import RecommendedPost from "./RecommendedPost";
 
 export default function ForYouPage() {
   const { user, setUser } = useContext(UserContext);
   const navigate = useNavigate();
-  const [posts, setPosts] = useState([]);
+  const [recommendedPosts, setRecommendedPosts] = useState([]);
+  const [recommendedPostIdx, setRecommendedPostIdx] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
 
   async function getRecommendedPosts() {
@@ -19,7 +20,7 @@ export default function ForYouPage() {
     const response = await getRequest(url, true);
     const result = await response.json();
     if (response.ok) {
-      setPosts(result);
+      setRecommendedPosts(result);
     }
     setIsLoading(false);
   }
@@ -40,8 +41,14 @@ export default function ForYouPage() {
       <div className="recommended-body">
         <h2>Recommended Posts</h2>
         <div className="recommended-container">
-          {posts &&
-            posts.map((post, idx) => <Post key={idx} post={post}></Post>)}
+          {recommendedPosts.length > 0 && (
+            <RecommendedPost
+              post={recommendedPosts[recommendedPostIdx]}
+              recommendedPosts={recommendedPosts}
+              recommendedPostIdx={recommendedPostIdx}
+              setRecommendedPostIdx={setRecommendedPostIdx}
+            />
+          )}
         </div>
       </div>
     </div>
