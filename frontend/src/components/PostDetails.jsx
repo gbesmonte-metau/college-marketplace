@@ -90,9 +90,9 @@ export default function PostDetails() {
                 </div>
                 <p>
                   {user && user.id === postDetails.authorId ? (
-                    <Link to={`/profile`}>My Profile</Link>
+                    <Link to={`/profile`} >My Profile</Link>
                   ) : (
-                    <Link to={`/profile/${postDetails.authorId}`}>
+                    <Link to={`/profile/${postDetails.authorId}`} state={{postId: postDetails.id}}>
                       View Author Details
                     </Link>
                   )}
