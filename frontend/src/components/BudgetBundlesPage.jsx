@@ -52,18 +52,21 @@ export default function BudgetBundlesPage() {
     const filteredItems = items.filter((item) => item != null && item != "");
     if (filteredItems.length < 2) {
       alert("Please add more items.");
+      setIsLoading(false);
       return;
     }
     let priorities = [];
     for (let i = 0; i < filteredItems.length; i++) {
       const priority = priorityMap[filteredItems[i]];
       if (priority == null) {
+        setIsLoading(false);
         alert("Please specify a priority for all items.");
         return;
       }
       priorities.push(priority);
     }
     if (budget == null || isNaN(budget)) {
+      setIsLoading(false);
       alert("Invalid budget request.");
       return;
     }

@@ -11,7 +11,7 @@ export async function calculateBundles(
   itemQueries,
   budget,
   user_id,
-  priorities,
+  priorities
 ) {
   let results = {};
   // find all items that match each query
@@ -105,6 +105,9 @@ function getOneBundle2D(items, budget) {
   // table[i][j] is an object
   // recommend: the best bundle with i items and j price
   // items: the items in the best bundle
+  if (items.length == 0){
+    return {priority: 0, items: []};
+  }
   const amountItems = items.length;
   const table = new Array(amountItems);
   for (let i = 0; i < amountItems; i++) {
@@ -134,7 +137,7 @@ function getOneBundle2D(items, budget) {
         if (alreadyUsed) {
           const newItems = [...previousBundle.items];
           const sameQuery = newItems.find(
-            (item) => item.query == items[i].query,
+            (item) => item.query == items[i].query
           );
           if (sameQuery.recommend_score < items[i].recommend_score) {
             priorityInclude = {

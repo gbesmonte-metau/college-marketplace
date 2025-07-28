@@ -1,5 +1,4 @@
-import React, { useEffect } from "react";
-import { useState } from "react";
+import { useEffect, useContext, useState } from "react";
 import Post from "./Post";
 import "../components-css/PostPage.css";
 import Filter from "./Filter";
@@ -7,6 +6,8 @@ import CreatePost from "./CreatePost";
 import { getCategoryIdByName } from "../../utils";
 import Loading from "./Loading";
 import { getRequest } from "../api";
+import { UserContext } from "../App";
+
 
 export default function PostPage() {
   const [posts, setPosts] = useState([]);
@@ -14,6 +15,7 @@ export default function PostPage() {
   const [search, setSearch] = useState("");
   const [isCreatePostOpen, setIsCreatePostOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const { user, setUser } = useContext(UserContext);
 
   useEffect(() => {
     getPosts();
@@ -89,9 +91,9 @@ export default function PostPage() {
           <button onClick={handleClear}>Clear</button>
         </form>
       </div>
-      <div className="create-btn">
+      {user && <div className="create-btn">
         <button onClick={() => setIsCreatePostOpen(true)}>Create Post</button>
-      </div>
+      </div>}
       <div className="post-body">
         <Filter filter={filter} setFilter={setFilter} />
         <div className="post-page">
