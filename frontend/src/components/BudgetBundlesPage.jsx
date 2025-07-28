@@ -20,6 +20,9 @@ export default function BudgetBundlesPage() {
 
   function changePriority(e, item) {
     const value = e.target.value;
+    if (item == null || item == ""){
+      return;
+    }
     setPriorityMap({ ...priorityMap, [item]: value });
   }
 
@@ -28,10 +31,15 @@ export default function BudgetBundlesPage() {
     setItems([...items, null]);
   }
 
-  function removeItem(e) {
+  function removeItem(e, index) {
     e.preventDefault();
+    const item = items[index];
     const newItems = [...items];
-    const item = newItems.pop();
+    if (newItems.length <= 2) {
+      alert("Minimum of 2 items.");
+      return;
+    }
+    newItems.splice(index, 1);
     setItems(newItems);
     const tempMap = { ...priorityMap };
     delete tempMap[item];
@@ -52,18 +60,21 @@ export default function BudgetBundlesPage() {
     const filteredItems = items.filter((item) => item != null && item != "");
     if (filteredItems.length < 2) {
       alert("Please add more items.");
+      setIsLoading(false);
       return;
     }
     let priorities = [];
     for (let i = 0; i < filteredItems.length; i++) {
       const priority = priorityMap[filteredItems[i]];
       if (priority == null) {
+        setIsLoading(false);
         alert("Please specify a priority for all items.");
         return;
       }
       priorities.push(priority);
     }
     if (budget == null || isNaN(budget)) {
+      setIsLoading(false);
       alert("Invalid budget request.");
       return;
     }
@@ -115,17 +126,15 @@ export default function BudgetBundlesPage() {
                     <option value="Medium">Medium</option>
                     <option value="Low">Low</option>
                   </select>
+                  <button type="button" onClick={(e) => removeItem(e, index)}>
+                    Remove Item
+                  </button>
                 </div>
               ))}
               <div>
                 <button type="button" onClick={addItem}>
                   Add Item
                 </button>
-                {items && items.length >= 3 && (
-                  <button type="button" onClick={removeItem}>
-                    Remove Item
-                  </button>
-                )}
               </div>
             </div>
             <div className="add-items-container">

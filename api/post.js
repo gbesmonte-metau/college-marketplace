@@ -415,6 +415,29 @@ router.patch("/posts/:id", isAuthenticated, async (req, res, next) => {
   }
 });
 
+//Get a rating
+router.get("/purchases/:id/rating", isAuthenticated, async (req, res, next) => {
+  const userId = req.session.user.id;
+  const post = req.params.id;
+  try {
+    const getPost = await prisma.purchase.findUnique({
+      where: {
+        postId: parseInt(post),
+      },
+    });
+    if (!getPost) {
+      next({ status: 404, message: `No post found with ID ${post}` });
+      return;
+    }
+    if (getPost.buyerId !== userId) {
+      next({ status: 403, message: `You are not the buyer of this post` });
+    }
+    res.status(200).json(getPost.rating);
+  } catch (err) {
+    next(err);
+  }
+});
+
 //Update a rating
 router.patch(
   "/purchases/:id/rating",
@@ -450,7 +473,7 @@ router.patch(
     } catch (err) {
       next(err);
     }
-  },
+  }
 );
 
 //get trending posts
@@ -459,7 +482,7 @@ router.get("/trending", async (req, res, next) => {
     const posts = await prisma.post.findMany();
     const trendingScores = await getTrendingScores(posts, null);
     let sorted = Object.entries(trendingScores).sort(
-      ([, valA], [, valB]) => valB - valA,
+      ([, valA], [, valB]) => valB - valA
     );
     const postIdArr = sorted.map(([key]) => parseInt(key));
     let trendingPosts = [];

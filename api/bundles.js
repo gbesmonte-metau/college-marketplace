@@ -11,7 +11,7 @@ export async function calculateBundles(
   itemQueries,
   budget,
   user_id,
-  priorities,
+  priorities
 ) {
   let results = {};
   // find all items that match each query
@@ -76,22 +76,31 @@ function getCheapestBundle(results, budget) {
     items.sort(priceCompare);
 
     // add to bundle
-    bundle.push(items[0]);
-    total += items[0].price;
+    items = items.filter(item => !bundle.includes(item));
+
+    if (items.length > 0){
+      bundle.push(items[0]);
+      total += items[0].price;
+    }
   });
   return total > budget ? null : bundle;
 }
 
 function transformDataToObjects(results) {
   const items = [];
+  const usedItems = new Set();
   for (const [query, matches] of Object.entries(results)) {
     for (const match of matches) {
+      if (usedItems.has(match.id)){
+        continue;
+      }
       const newItem = {
         ...match.original,
         priority: 1,
         query: query,
         price: Math.floor(match.original.price),
       };
+      usedItems.add(match.id);
       items.push(newItem);
     }
   }
@@ -105,6 +114,9 @@ function getOneBundle2D(items, budget) {
   // table[i][j] is an object
   // recommend: the best bundle with i items and j price
   // items: the items in the best bundle
+  if (items.length == 0){
+    return {priority: 0, items: []};
+  }
   const amountItems = items.length;
   const table = new Array(amountItems);
   for (let i = 0; i < amountItems; i++) {
@@ -134,7 +146,7 @@ function getOneBundle2D(items, budget) {
         if (alreadyUsed) {
           const newItems = [...previousBundle.items];
           const sameQuery = newItems.find(
-            (item) => item.query == items[i].query,
+            (item) => item.query == items[i].query
           );
           if (sameQuery.recommend_score < items[i].recommend_score) {
             priorityInclude = {

@@ -1,12 +1,22 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FaRegStar } from "react-icons/fa";
 import { FaStar } from "react-icons/fa";
 import "../components-css/RatePurchase.css";
-import { patchRequest } from "../api";
+import { getRequest, patchRequest } from "../api";
 
 export default function RatePurchase({ postDetails }) {
   const ratingOptions = [1, 2, 3, 4, 5];
   const [rating, setRating] = useState(null);
+
+  useEffect(()=> {
+    getRating();
+  }, [postDetails]);
+  
+  async function getRating(){
+    const response = await getRequest(import.meta.env.VITE_URL + "/purchases/" + postDetails.id + "/rating", true); 
+    const result = await response.json();
+    setRating(result);
+  }
 
   async function updateRating(e) {
     e.preventDefault();
