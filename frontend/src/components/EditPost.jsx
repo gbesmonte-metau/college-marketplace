@@ -78,7 +78,7 @@ export default function EditPost({ postDetails, setIsEditOpen }) {
               <p>Price (required)</p>
               <input
                 name="price"
-                type="text"
+                type="number"
                 value={price}
                 onChange={(e) => setPrice(e.target.value)}
                 required
