@@ -68,6 +68,7 @@ export default function PostDetails() {
       alert(result.message);
     } else {
       alert("Purchase successful");
+      getPostDetails();
     }
   }
 
