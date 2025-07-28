@@ -29,6 +29,7 @@ export default function CreatePost({ setIsCreatePostOpen }) {
   const [location, setLocation] = useState(null);
   const [formattedAddr, setFormattedAddr] = useState("");
   const [imageUrl, setImageUrl] = useState("");
+  const [imageTags, setImageTags] = useState([]);
 
   const [error, setError] = useState(null);
 
@@ -62,6 +63,7 @@ export default function CreatePost({ setIsCreatePostOpen }) {
       formatted_address: formattedAddr,
       image_url: imageUrl,
       authorId: user.id,
+      image_tags: imageTags.slice(0, 5),
     };
     const url = new URL(import.meta.env.VITE_URL + "/posts");
     const response = await postRequest(url, body);
@@ -79,7 +81,11 @@ export default function CreatePost({ setIsCreatePostOpen }) {
         <h2>Create Post</h2>
         <div className="create-box">
           {imageUrl ? (
-            <img className="create-post-img" src={imageUrl} alt="uploaded image" />
+            <img
+              className="create-post-img"
+              src={imageUrl}
+              alt="uploaded image"
+            />
           ) : (
             <img
               className="create-post-img"
@@ -185,7 +191,12 @@ export default function CreatePost({ setIsCreatePostOpen }) {
             </div>
             <div className="create-option">
               <p>Image</p>
-              <UploadImage url={imageUrl} setUrl={setImageUrl} />
+              <UploadImage
+                url={imageUrl}
+                setUrl={setImageUrl}
+                imageTags={imageTags}
+                setImageTags={setImageTags}
+              />
             </div>
             <button type="submit">Create</button>
             <button onClick={() => setIsCreatePostOpen(false)}>Close</button>

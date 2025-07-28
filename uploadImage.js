@@ -10,6 +10,7 @@ const opts = {
   overwrite: true,
   invalidate: true,
   resource_type: "auto",
+  categorization: "google_tagging"
 };
 
 export const uploadImage = (image) => {
@@ -17,7 +18,7 @@ export const uploadImage = (image) => {
   return new Promise((resolve, reject) => {
     cloudinary.uploader.upload(image, opts, (error, result) => {
       if (result && result.secure_url) {
-        return resolve(result.secure_url);
+        return resolve(result);
       }
       return reject({ message: error.message });
     });
