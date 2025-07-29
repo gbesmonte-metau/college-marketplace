@@ -23,6 +23,7 @@ export default function EditPost({ postDetails, setIsEditOpen }) {
     postDetails.formatted_address
   );
   const [imageUrl, setImageUrl] = useState(postDetails.image_url);
+  const [imageTags, setImageTags] = useState([]);
 
   async function handleEdit(e) {
     e.preventDefault();
@@ -38,6 +39,7 @@ export default function EditPost({ postDetails, setIsEditOpen }) {
         location: location,
         formatted_address: formattedAddr,
         image_url: imageUrl,
+        image_tags: imageTags.slice(0, 5),
       };
       const url = new URL(
         import.meta.env.VITE_URL + `/posts/${postDetails.id}`
@@ -170,7 +172,12 @@ export default function EditPost({ postDetails, setIsEditOpen }) {
             </div>
             <div className="edit-option">
               <p>Image</p>
-              <UploadImage url={imageUrl} setUrl={setImageUrl} />
+              <UploadImage
+                url={imageUrl}
+                setUrl={setImageUrl}
+                imageTags={imageTags}
+                setImageTags={setImageTags}
+              />
             </div>
             <button type="submit">Save</button>
             <button onClick={() => setIsEditOpen(false)}>Close</button>

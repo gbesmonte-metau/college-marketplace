@@ -303,9 +303,10 @@ function calculateTFIDF(posts) {
   // format data
   let formattedData = [];
   for (const post of posts) {
+    let tags = post.image_tags ? post.image_tags.join(" ") : "";
     formattedData.push({
       id: post.id,
-      content: filterString(post.description) + " " + filterString(post.name),
+      content: filterString(post.description) + " " + filterString(post.name) + " " + tags,
     });
   }
   // TF-IDF - create vectors for each post

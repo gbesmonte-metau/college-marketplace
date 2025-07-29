@@ -4,9 +4,9 @@
   grid-template-columns: 1fr 1fr;
 }
 .details-image {
+  object-fit: cover;
   width: 500px;
   height: 500px;
-  object-fit: cover;
 }
 .details-header {
   border-bottom: 1px solid lightgray;
@@ -15,4 +15,22 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  position: relative;
+}
+.img-body {
+  width: 500px;
+  height: 500px;
+  position: relative;
+}
+.hover-text {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  opacity: 0;
+  background-color: rgba(255, 255, 255, .5);
+}
+.hover-text:hover {
+  opacity: 1;
 }

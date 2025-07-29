@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-export default function UploadImage({ url, setUrl }) {
+export default function UploadImage({ url, setUrl, imageTags, setImageTags }) {
   const [loading, setLoading] = useState(false);
 
   const convertBase64 = (file) => {
@@ -29,6 +29,7 @@ export default function UploadImage({ url, setUrl }) {
       if (response.ok) {
         const data = await response.json();
         setUrl(data.url);
+        setImageTags(data.tags);
         alert("Image uploaded successfully");
       } else {
         alert(response.message);
