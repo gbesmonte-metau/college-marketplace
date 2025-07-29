@@ -121,6 +121,19 @@ export async function getRecommendations(user_id, k) {
       )
   );
 
+  // Filter all posts that have already been recommended to user
+  const alreadyRecommended = await prisma.recommendedPosts.findMany({
+    where: {
+      userId: user_id,
+      isRecommended: true,
+    },
+  });
+  const recommendedSet = new Set();
+  for (const recommendedPost of alreadyRecommended) {
+    recommendedSet.add(recommendedPost.postId);
+  }
+  sortedEntries = sortedEntries.filter((entry) => !recommendedSet.has(parseInt(entry[0])));
+
   // get the highest score for each post
   const allVectors = {
     0: informationVector.toObject(),
@@ -306,7 +319,12 @@ function calculateTFIDF(posts) {
     let tags = post.image_tags ? post.image_tags.join(" ") : "";
     formattedData.push({
       id: post.id,
-      content: filterString(post.description) + " " + filterString(post.name) + " " + tags,
+      content:
+        filterString(post.description) +
+        " " +
+        filterString(post.name) +
+        " " +
+        tags,
     });
   }
   // TF-IDF - create vectors for each post
