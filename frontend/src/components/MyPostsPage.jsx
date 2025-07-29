@@ -33,9 +33,11 @@ export default function MyPostsPage() {
         <div className="create-btn">
           <button onClick={() => setIsCreatePostOpen(true)}>Create Post</button>
         </div>
-        <div className="mypost-grid">
-          {myPosts &&
-            myPosts.map((post, idx) => <Post key={idx} post={post}></Post>)}
+        <div className="mypost-container">
+          <div className="mypost-grid">
+            {myPosts &&
+              myPosts.map((post, idx) => <Post key={idx} post={post}></Post>)}
+          </div>
         </div>
       </div>
       {isCreatePostOpen && (

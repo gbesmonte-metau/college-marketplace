@@ -96,6 +96,7 @@ export default function PostPage() {
       </div>}
       <div className="post-body">
         <Filter filter={filter} setFilter={setFilter} />
+        <div></div>
         <div className="post-page">
           <div className="post-grid">
             {posts.length > 0 ? (
