@@ -7,6 +7,7 @@ import EditPost from "./EditPost";
 import "../components-css/PostDetails.css";
 import RatePurchase from "./RatePurchase";
 import { getRequest, postRequest } from "../api";
+import { LuSparkles } from "react-icons/lu";
 
 export default function PostDetails() {
   const id = useParams().id;
@@ -78,11 +79,19 @@ export default function PostDetails() {
         <div>
           <div className="details">
             <div className="img-container">
-              <img
-                className="details-image"
-                src={postDetails.image_url || "../../public/placeholder.png"}
-                alt={postDetails.name}
-              />
+              <div className="img-body">
+                <img
+                  className="details-image"
+                  src={postDetails.image_url || "../../public/placeholder.png"}
+                  alt={postDetails.name}
+                />
+                {postDetails.image_tags.length > 0 && (
+                  <div className="hover-text">
+                    <LuSparkles />
+                    AI Image Tags: {postDetails.image_tags.join(", ")}
+                  </div>
+                )}
+              </div>
             </div>
             <div className="details-info">
               <div className="details-header">
