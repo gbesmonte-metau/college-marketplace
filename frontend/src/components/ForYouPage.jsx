@@ -12,7 +12,8 @@ export default function ForYouPage() {
   const navigate = useNavigate();
   const [recommendedPosts, setRecommendedPosts] = useState([]);
   const [recommendedPostIdx, setRecommendedPostIdx] = useState(0);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+  const [toggleRecommendReset, setToggleRecommendReset] = useState(false);
 
   async function getRecommendedPosts() {
     setIsLoading(true);
@@ -33,7 +34,7 @@ export default function ForYouPage() {
       navigate("/login");
     }
     getRecommendedPosts();
-  }, [user]);
+  }, [user, toggleRecommendReset]);
 
   return (
     <div className="page">
@@ -47,6 +48,8 @@ export default function ForYouPage() {
               recommendedPosts={recommendedPosts}
               recommendedPostIdx={recommendedPostIdx}
               setRecommendedPostIdx={setRecommendedPostIdx}
+              toggleRecommendReset={toggleRecommendReset}
+              setToggleRecommendReset={setToggleRecommendReset}
             />
           )}
         </div>

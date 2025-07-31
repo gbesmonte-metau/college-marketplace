@@ -9,6 +9,7 @@
   background-color: var(--light-primary);
   border-radius: 10px;
   overflow: hidden;
+  box-sizing: border-box;
 }
 .post:hover {
   transform: scale(1.05);
