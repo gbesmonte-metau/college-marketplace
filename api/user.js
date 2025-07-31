@@ -375,6 +375,25 @@ router.get("/user/recommendations", isAuthenticated, async (req, res, next) => {
   res.status(200).json(recommendedPosts);
 });
 
+// Reset recommendations for user-- does NOT affect user weights
+router.patch(
+  "/user/recommendations",
+  isAuthenticated,
+  async (req, res, next) => {
+    const userId = req.session.user.id;
+    try {
+      await prisma.recommendedPosts.deleteMany({
+        where: {
+          userId: userId,
+        },
+      });
+      res.status(200).json({ message: "Recommends reset" });
+    } catch (err) {
+      next(err);
+    }
+  }
+);
+
 //POST - Get bundles for current user
 router.post("/user/bundles", isAuthenticated, async (req, res, next) => {
   const userId = req.session.user.id;

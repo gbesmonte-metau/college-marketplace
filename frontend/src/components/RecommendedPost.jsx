@@ -8,7 +8,7 @@ import { FaRegHeart } from "react-icons/fa";
 import { FaRegBookmark } from "react-icons/fa";
 import { FaBookmark } from "react-icons/fa";
 import "../components-css/RecommendedPost.css";
-import { getRequest, postRequest } from "../api";
+import { getRequest, patchRequest, postRequest } from "../api";
 import { MdNavigateNext } from "react-icons/md";
 import { MdNavigateBefore } from "react-icons/md";
 
@@ -37,18 +37,18 @@ export default function RecommendedPost({
 
   async function createRecommendation() {
     let currentFeedback = false;
-    if (isLiked || isSaved){
-        currentFeedback = true; 
-        setIsFeedbackPositive(currentFeedback);
+    if (isLiked || isSaved) {
+      currentFeedback = true;
+      setIsFeedbackPositive(currentFeedback);
     }
     const body = {
-        "bestCategory": post.best_category,
-        "isFeedbackPositive": currentFeedback
-    }
+      bestCategory: post.best_category,
+      isFeedbackPositive: currentFeedback,
+    };
     const response = await postRequest(
-        import.meta.env.VITE_URL + `/user/recommended/${post.id}`,
-        body
-    )
+      import.meta.env.VITE_URL + `/user/recommended/${post.id}`,
+      body
+    );
   }
 
   async function getLikeSaveCount() {
@@ -111,7 +111,7 @@ export default function RecommendedPost({
       alert(e);
     }
   }
-  
+
   async function getIsSaved() {
     try {
       const url = new URL(import.meta.env.VITE_URL + `/user/save/${post.id}`);
@@ -192,6 +192,17 @@ export default function RecommendedPost({
       alert(e);
     }
   }
+
+  async function resetRecommended(e) {
+    e.preventDefault();
+    const URL = import.meta.env.VITE_URL + "/user/recommendations";
+    try {
+      const response = await patchRequest(URL, {});
+    } catch (e) {
+      alert(e);
+    }
+  }
+
   return (
     <>
       <div className="arrow-container">
@@ -240,6 +251,7 @@ export default function RecommendedPost({
             <MdNavigateNext />
           </button>
         )}
+        {recommendedPosts.length <= 1 && <button onClick={resetRecommended}>Reset</button>}
       </div>
     </>
   );

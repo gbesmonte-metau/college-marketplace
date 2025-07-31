@@ -3,6 +3,11 @@
   background-color: var(--background);
   border-radius: 10px;
   padding: 10px;
+  position: fixed;
+  top: 75px;
+  left: 0;
+  overflow: scroll;
+  height: 80%;
 }
 
 .filter-box p {

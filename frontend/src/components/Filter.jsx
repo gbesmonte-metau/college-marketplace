@@ -25,6 +25,7 @@ export default function Filter({ filter, setFilter }) {
       distance: distance || "All",
     });
   }
+  
   function clearFilter() {
     setPrice(0);
     setDistance("All");

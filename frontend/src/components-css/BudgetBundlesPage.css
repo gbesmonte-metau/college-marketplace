@@ -1,13 +1,16 @@
 .bundle-page {
   margin-left: 2rem;
   margin-right: 2rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
+  display: grid;
+  grid-template-columns: 1fr 3fr;
 }
 .bundle-inputs {
   display: flex;
+}
+.bundle-page form {
+  background-color: var(--light-primary);
+  padding: 10px;
+  border-radius: 10px;
 }
 .bundle-page input,
 .bundle-page select {
@@ -17,12 +20,6 @@
   border-radius: 5px;
   border: 1px solid lightgray;
 }
-.bundles {
-  margin-left: 20px;
-  width: 100%;
-  max-width: 100%;
-  overflow: scroll;
-}
 .add-items-container {
   display: flex;
   flex-direction: column;
@@ -30,9 +27,20 @@
   align-items: center;
   gap: 5px;
 }
+.bundle-title {
+  text-align: center;
+}
 .bundles {
+  margin-left: 10px;
+  max-width: 100%;
+  overflow: scroll;
   display: flex;
   flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.remove-item-btn {
+  display: flex;
   justify-content: center;
   align-items: center;
 }

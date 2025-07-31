@@ -91,7 +91,7 @@ function transformDataToObjects(results) {
   const usedItems = new Set();
   for (const [query, matches] of Object.entries(results)) {
     for (const match of matches) {
-      if (usedItems.has(match.id)){
+      if (usedItems.has(match.original.id)){
         continue;
       }
       const newItem = {
@@ -100,7 +100,7 @@ function transformDataToObjects(results) {
         query: query,
         price: Math.floor(match.original.price),
       };
-      usedItems.add(match.id);
+      usedItems.add(match.original.id);
       items.push(newItem);
     }
   }

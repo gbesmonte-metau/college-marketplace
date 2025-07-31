@@ -3,6 +3,7 @@ import Bundle from "./Bundle";
 import "../components-css/BudgetBundlesPage.css";
 import { postRequest } from "../api";
 import Loading from "./Loading";
+import { FaMinus } from "react-icons/fa";
 
 export default function BudgetBundlesPage() {
   const [items, setItems] = useState([null, null]);
@@ -20,7 +21,7 @@ export default function BudgetBundlesPage() {
 
   function changePriority(e, item) {
     const value = e.target.value;
-    if (item == null || item == ""){
+    if (item == null || item == "") {
       return;
     }
     setPriorityMap({ ...priorityMap, [item]: value });
@@ -97,10 +98,13 @@ export default function BudgetBundlesPage() {
   return (
     <div className="page">
       <Loading isLoading={isLoading}></Loading>
-      <div className="bundle-page">
+      <div className='bundle-title'>
         <h2>Budget Bundles</h2>
+      </div>
+      <div className="bundle-page">
         <div>
           <form onSubmit={findBundles}>
+            <h3>Create Bundle</h3>
             <div className="add-items-container">
               <p>Add Items</p>
               {items.map((item, index) => (
@@ -126,8 +130,12 @@ export default function BudgetBundlesPage() {
                     <option value="Medium">Medium</option>
                     <option value="Low">Low</option>
                   </select>
-                  <button type="button" onClick={(e) => removeItem(e, index)}>
-                    Remove Item
+                  <button
+                    className="remove-item-btn"
+                    type="button"
+                    onClick={(e) => removeItem(e, index)}
+                  >
+                    <FaMinus />
                   </button>
                 </div>
               ))}
@@ -155,20 +163,18 @@ export default function BudgetBundlesPage() {
             </div>
           </form>
         </div>
-        <div className="bundles">
-          {bundles && (
-            <div>
-              <Bundle
-                bundleItems={bundles.cheapestBundle}
-                type={"Cheapest Bundle"}
-              />
-              <Bundle
-                bundleItems={bundles.bestValueBundle}
-                type={"Best Value Bundle"}
-              />
-            </div>
-          )}
-        </div>
+        {bundles && (
+          <div className="bundles">
+            <Bundle
+              bundleItems={bundles.cheapestBundle}
+              type={"Cheapest Bundle"}
+            />
+            <Bundle
+              bundleItems={bundles.bestValueBundle}
+              type={"Best Value Bundle"}
+            />
+          </div>
+        )}
       </div>
     </div>
   );
