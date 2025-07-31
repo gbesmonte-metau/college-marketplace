@@ -9,13 +9,17 @@ export default function MyPostsPage() {
   const [myPosts, setMyPosts] = useState([]);
   const [isCreatePostOpen, setIsCreatePostOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [hasSoldPosts, setHasSoldPosts] = useState(false);
 
   async function getMyPosts() {
     setIsLoading(true);
     const url = new URL(import.meta.env.VITE_URL + `/authored`);
     const response = await getRequest(url, true);
-    const result = await response.json();
+    let result = await response.json();
     if (response.ok) {
+      if (!hasSoldPosts){
+        result = result.filter(post => post.time_sold == null);
+      }
       setMyPosts(result);
     }
     setIsLoading(false);
@@ -23,7 +27,7 @@ export default function MyPostsPage() {
 
   useEffect(() => {
     getMyPosts();
-  }, [isCreatePostOpen]);
+  }, [isCreatePostOpen, hasSoldPosts]);
 
   return (
     <div className="page">
@@ -32,6 +36,10 @@ export default function MyPostsPage() {
         <h2>My Posts</h2>
         <div className="create-btn">
           <button onClick={() => setIsCreatePostOpen(true)}>Create Post</button>
+        </div>
+        <div>
+          <input type="checkbox" id="toggleSoldPosts" name="toggleSoldPosts" value={hasSoldPosts} onChange={(e) => setHasSoldPosts(!hasSoldPosts)}/>
+          <label for="toggleSoldPosts">Show Sold Posts</label>
         </div>
         <div className="mypost-container">
           <div className="mypost-grid">
