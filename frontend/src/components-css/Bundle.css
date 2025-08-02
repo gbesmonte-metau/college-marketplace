@@ -7,7 +7,12 @@
 }
 .bundle-container {
   display: flex;
+  justify-content: flex-start;
+  align-items: start;
+  box-sizing: border-box;
   width: 100%;
   max-width: 100%;
   overflow-x: scroll;
+  overflow-y: hidden;
+  height: 450px;
 }

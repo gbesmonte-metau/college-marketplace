@@ -17,6 +17,8 @@ export default function RecommendedPost({
   recommendedPosts,
   recommendedPostIdx,
   setRecommendedPostIdx,
+  toggleRecommendReset,
+  setToggleRecommendReset,
 }) {
   const [isLiked, setIsLiked] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
@@ -198,6 +200,8 @@ export default function RecommendedPost({
     const URL = import.meta.env.VITE_URL + "/user/recommendations";
     try {
       const response = await patchRequest(URL, {});
+      setToggleRecommendReset(!toggleRecommendReset);
+      setRecommendedPostIdx(0);
     } catch (e) {
       alert(e);
     }
@@ -251,7 +255,9 @@ export default function RecommendedPost({
             <MdNavigateNext />
           </button>
         )}
-        {recommendedPosts.length <= 1 && <button onClick={resetRecommended}>Reset</button>}
+        {recommendedPostIdx == recommendedPosts.length - 1 && (
+          <button onClick={resetRecommended}>Reset</button>
+        )}
       </div>
     </>
   );

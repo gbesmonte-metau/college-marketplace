@@ -308,6 +308,14 @@ router.post("/posts/:id/purchase", isAuthenticated, async (req, res, next) => {
       next({ status: 403, message: `You are the author of this post` });
       return;
     }
+    await prisma.post.update({
+      where: {
+        id: parseInt(postId),
+      },
+      data: {
+        time_sold: Date.now().toString()
+      }
+    })
     const newPost = await prisma.purchase.create({
       data: {
         buyerId: userId,

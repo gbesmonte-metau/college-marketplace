@@ -33,7 +33,13 @@ const WEIGHTS = {
 
 // MAIN FUNCTION
 export async function getRecommendations(user_id, k) {
-  const posts = await prisma.post.findMany();
+  const posts = await prisma.post.findMany({
+    where: {
+      NOT: {
+        authorId: user_id,
+      },
+    },
+  });
   const interactions = await getUserInteractions(user_id);
   // keyword based recommendation
   const postInformationScores = getRecommendationsByPostInformation(
@@ -132,7 +138,9 @@ export async function getRecommendations(user_id, k) {
   for (const recommendedPost of alreadyRecommended) {
     recommendedSet.add(recommendedPost.postId);
   }
-  sortedEntries = sortedEntries.filter((entry) => !recommendedSet.has(parseInt(entry[0])));
+  sortedEntries = sortedEntries.filter(
+    (entry) => !recommendedSet.has(parseInt(entry[0]))
+  );
 
   // get the highest score for each post
   const allVectors = {
@@ -250,16 +258,40 @@ async function getUserInteractions(userId) {
   return interactions;
 }
 
-async function getAllInteractions() {
+async function getAllInteractions(userId) {
   let interactions = {};
   // Get viewed
-  const views = await prisma.userViewedPosts.findMany();
+  const views = await prisma.userViewedPosts.findMany({
+    where: {
+      post: {
+        authorId: {
+          not: userId ? userId : -1
+        }
+      },
+    },
+  });
   interactions["viewed"] = views;
   // Get liked
-  const likes = await prisma.userLikedPosts.findMany();
+  const likes = await prisma.userLikedPosts.findMany({
+    where: {
+      post: {
+        authorId: {
+          not: userId ? userId : -1
+        }
+      },
+    },
+  });
   interactions["liked"] = likes;
   // Get saved
-  const saves = await prisma.userSavedPosts.findMany();
+  const saves = await prisma.userSavedPosts.findMany({
+    where: {
+      post: {
+        NOT: {
+          authorId: userId ? userId : -1
+        },
+      },
+    },
+  });
   interactions["saved"] = saves;
   return interactions;
 }
@@ -449,7 +481,7 @@ export async function getTrendingScores(posts, userId) {
   for (const post of posts) {
     trendingScores[post.id] = 0;
   }
-  const allInteractions = await getAllInteractions();
+  const allInteractions = await getAllInteractions(userId);
   for (const viewed of allInteractions.viewed) {
     if (userId && viewed.userId == userId) {
       continue;
